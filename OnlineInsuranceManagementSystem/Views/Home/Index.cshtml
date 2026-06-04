@@ -1,0 +1,874 @@
+﻿@model OnlineInsuranceManagementSystem.ViewModels.ContactMessageViewModel
+
+<!-- Toast Notification -->
+<div id="toast" class="toast toast-success">
+    <i class="fas fa-check-circle mr-2"></i>
+    <span id="toastMessage">Success!</span>
+</div>
+
+<!-- ========== NAVBAR ========== -->
+<nav id="navbar" class="fixed top-0 left-0 w-full z-50 glass border-b border-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 lg:h-20">
+            <!-- Logo -->
+            <a href="#home" class="flex items-center group">
+                <div class="w-32 h-32 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <img id="navbarLogo"
+                         src="../images/NAVBAR_LOGO_LIGHT_MODE.png"
+                         alt="OIMS Logo"
+                         class="w-full h-full object-contain">
+                </div>
+            </a>
+
+            <!-- Desktop Tab Navigation -->
+            <div class="hidden lg:flex items-center">
+                <div class="tab-nav-container" role="tablist" aria-label="Main Navigation">
+                    <div class="tab-glider" id="tabGlider" aria-hidden="true"></div>
+                        
+                    <input type="radio" name="nav-tab" id="tab-home" class="tab-radio" value="0" checked>
+                    <input type="radio" name="nav-tab" id="tab-services" class="tab-radio" value="1">
+                    <input type="radio" name="nav-tab" id="tab-features" class="tab-radio" value="2">
+                    <input type="radio" name="nav-tab" id="tab-testimonials" class="tab-radio" value="3">
+                    <input type="radio" name="nav-tab" id="tab-contact" class="tab-radio" value="4">
+                        
+                    <a href="#home" class="tab-link active" role="tab" aria-controls="home" data-tab="0" aria-selected="true">Home</a>
+                    <a href="#services" class="tab-link" role="tab" aria-controls="services" data-tab="1" aria-selected="false">Services</a>
+                    <a href="#features" class="tab-link" role="tab" aria-controls="features" data-tab="2" aria-selected="false">Features</a>
+                    <a href="#testimonials" class="tab-link" role="tab" aria-controls="testimonials" data-tab="3" aria-selected="false">Testimonials</a>
+                    <a href="#contact" class="tab-link" role="tab" aria-controls="contact" data-tab="4" aria-selected="false">Contact</a>
+                </div>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="hidden lg:flex items-center space-x-4">
+                <a href="/Account/Login" class="px-5 py-2 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-white font-semibold transition-all">
+                    Login
+                </a>
+                <a href="/Account/RegisterChoice" class="btn-accent px-5 py-2 rounded-full text-white font-semibold">
+                    Register
+                </a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <div class="flex lg:hidden items-center">
+                <button id="hamburger" class="hamburger flex flex-col space-y-1.5 p-2" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobileMenu">
+                    <span class="w-6 h-0.5 block"></span>
+                    <span class="w-6 h-0.5 block"></span>
+                    <span class="w-6 h-0.5 block"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="lg:hidden hidden bg-white border-t border-border">
+        <div class="px-4 py-4 space-y-3">
+            <a href="#home" class="block py-2 px-4 rounded-lg text-gray-600 hover:bg-primary hover:text-white font-medium transition-colors mobile-link">Home</a>
+            <a href="#services" class="block py-2 px-4 rounded-lg text-gray-600 hover:bg-primary hover:text-white font-medium transition-colors mobile-link">Services</a>
+            <a href="#features" class="block py-2 px-4 rounded-lg text-gray-600 hover:bg-primary hover:text-white font-medium transition-colors mobile-link">Features</a>
+            <a href="#testimonials" class="block py-2 px-4 rounded-lg text-gray-600 hover:bg-primary hover:text-white font-medium transition-colors mobile-link">Testimonials</a>
+            <a href="#contact" class="block py-2 px-4 rounded-lg text-gray-600 hover:bg-primary hover:text-white font-medium transition-colors mobile-link">Contact</a>
+            <div class="pt-3 border-t border-border space-y-3">
+                <a href="/Account/Login" class="w-full py-2.5 rounded-lg border-2 border-primary text-primary hover:bg-primary hover:text-white font-semibold transition-all text-center block">Login</a>
+                <a href="/Account/RegisterChoice" class="w-full btn-accent py-2.5 rounded-lg text-white font-semibold text-center block">Register</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ========== HERO SECTION ========== -->
+<section id="home" class="hero-section min-h-screen flex items-center relative overflow-hidden pt-20">
+    
+    <!-- Floating Shapes -->
+    <div class="absolute top-20 left-10 w-20 h-20 rounded-full bg-white/10 animate-float"></div>
+    <div class="absolute bottom-20 right-20 w-32 h-32 rounded-full bg-white/5 animate-float" style="animation-delay: 1s;"></div>
+    <div class="absolute top-40 right-40 w-16 h-16 rounded-full bg-white/10 animate-float" style="animation-delay: 2s;"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+
+            <!-- Left Content -->
+            <div class="text-white space-y-8 animate-fadeInLeft">
+                <div class="inline-flex items-center space-x-2 bg-white px-4 py-2 rounded-full border border-border">
+                    <i class="fas fa-star text-success"></i>
+                    <span class="text-sm font-medium text-deep">Trusted by 50,000+ Customers</span>
+                </div>
+
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
+                    Protect What<br>
+                    <span class="text-primary">Matters Most</span><br>
+                    To You
+                </h1>
+
+                <p class="text-lg text-white/80 max-w-lg leading-relaxed">
+                    Comprehensive insurance solutions tailored to your life. From health to home, we've got you covered with premium policies and hassle-free claims.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="/Account/GetStarted"
+                       class="px-8 py-4 rounded-full text-white font-bold text-lg bg-[#08979D] hover:bg-[#23BBB7] text-center">
+                        <i class="fas fa-rocket mr-2"></i> Get Started Free
+                    </a>
+
+                    <a href="#services"
+                           class="px-8 py-4 rounded-full
+                        bg-transparent text-white
+                        border border-white
+                        hover:bg-white hover:text-black
+                        font-bold text-lg transition-all text-center">
+                        
+                        <i class="fas fa-eye mr-2"></i> View Plans
+                    </a>
+                </div>
+
+                <!-- Trust Badges -->
+                <div class="flex items-center space-x-6 pt-4">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span class="text-sm text-white/80">24/7 Support</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span class="text-sm">Instant Claims</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span class="text-sm">Best Rates</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Content -->
+            <div class="animate-fadeInRight">
+                <div class="rounded-3xl p-8 backdrop-blur-xl bg-slate-800/70 border border-white/20 shadow-2xl">
+                    
+                    <h3 class="text-white text-xl font-bold mb-6 flex items-center">
+                        <i class="fas fa-calculator mr-2 text-success"></i> Quick Premium Estimator
+                    </h3>
+
+                    <div class="space-y-5">
+
+                        <div>
+                            <label class="text-success text-sm font-medium mb-2 block">
+                                Insurance Type
+                            </label>
+                            <select id="heroInsType"
+                                    class="w-full px-4 py-3 rounded-xl
+                                bg-white
+                                border border-border
+                                text-gray-800
+                                focus:outline-none focus:border-secondary">
+                                
+                                <option value="life">Life Insurance</option>
+                                <option value="medical">Medical Insurance</option>
+                                <option value="motor">Motor Insurance</option>
+                                <option value="home">Home Insurance</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-success text-sm font-medium mb-2 block">
+                                Coverage Amount: $<span id="heroCoverageValue">50,000</span>
+                            </label>
+                            <input type="range" id="heroCoverage" min="10000" max="500000" step="10000" value="50000" class="calc-slider">
+                        </div>
+
+                        <div>
+                            <label class="text-success text-sm font-medium mb-2 block">
+                                Your Age
+                            </label>
+                            <input type="number" id="heroAge" placeholder="e.g., 30"
+                                   class="w-full px-4 py-3 rounded-xl
+                            bg-white
+                            border border-border
+                            text-gray-800
+                            placeholder-gray-400
+                            focus:outline-none focus:border-secondary">
+                        </div>
+
+                        <button onclick="calculateHeroPremium()"
+                                class="w-full btn-accent py-3 rounded-xl text-white font-bold text-lg">
+                            Calculate Premium
+                        </button>
+
+                        <div id="heroPremiumResult"
+                             class="hidden bg-white rounded-xl p-4 text-center border border-border">
+                            
+                            <p class="text-gray-600 text-sm">
+                                Estimated Monthly Premium
+                            </p>
+
+                            <p class="text-3xl font-bold text-success" id="heroPremiumAmount">
+                                $0
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ========== INSURANCE SERVICES ========== -->
+<section id="services" class="py-20 lg:py-28 bg-background">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 reveal">
+            <span class="text-success font-semibold text-sm uppercase tracking-wider">Our Services</span>
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mt-3 text-gray-800">
+                Insurance <span class="text-primary">Solutions</span>
+            </h2>
+            <div class="section-divider mx-auto mt-4"></div>
+            <p class="text-muted mt-6 max-w-2xl mx-auto text-lg">Choose from our comprehensive range of insurance policies designed to protect every aspect of your life.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Life Insurance -->
+            <a href="/Account/ServiceRedirect?service=life" class="service-card reveal bg-white rounded-2xl p-8 group cursor-pointer block no-underline">
+                <div class="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-heart-pulse text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-3">Life Insurance</h3>
+                <p class="text-muted text-sm leading-relaxed mb-4">Secure your family's future with comprehensive life coverage. Term, whole life, and endowment plans available.</p>
+                <div class="flex items-center text-success font-semibold text-sm group-hover:text-primary transition-colors">
+                    <span>Learn More</span>
+                    <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform"></i>
+                </div>
+            </a>
+
+            <!-- Medical Insurance -->
+            <a href="/Account/ServiceRedirect?service=medical" class="service-card reveal bg-white rounded-2xl p-8 group cursor-pointer block no-underline"
+                style="transition-delay: 0.1s;">
+                <div class="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-hospital text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-3">Medical Insurance</h3>
+                <p class="text-muted text-sm leading-relaxed mb-4">Access top healthcare facilities with cashless treatment. Family floater and individual health plans.</p>
+                <div class="flex items-center text-success font-semibold text-sm group-hover:text-primary transition-colors">
+                    <span>Learn More</span>
+                    <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform"></i>
+                </div>
+            </a>
+
+            <!-- Motor Insurance -->
+            <a href="/Account/ServiceRedirect?service=motor" class="service-card reveal bg-white rounded-2xl p-8 group cursor-pointer block no-underline"
+                style="transition-delay: 0.2s;">
+                <div class="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-car text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-3">Motor Insurance</h3>
+                <p class="text-muted text-sm leading-relaxed mb-4">Drive with confidence. Comprehensive and third-party vehicle insurance with quick claim settlement.</p>
+                <div class="flex items-center text-success font-semibold text-sm group-hover:text-primary transition-colors">
+                    <span>Learn More</span>
+                    <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform"></i>
+                </div>
+            </a>
+
+            <!-- Home Insurance -->
+            <a href="/Account/ServiceRedirect?service=home" class="service-card reveal bg-white rounded-2xl p-8 group cursor-pointer block no-underline"
+                style="transition-delay: 0.3s;">
+                <div class="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-house-chimney text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-3">Home Insurance</h3>
+                <p class="text-muted text-sm leading-relaxed mb-4">Protect your property and belongings. Coverage against fire, theft, natural disasters, and more.</p>
+                <div class="flex items-center text-success font-semibold text-sm group-hover:text-primary transition-colors">
+                    <span>Learn More</span>
+                    <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ========== FEATURES SECTION ========== -->
+<section id="features" class="py-20 lg:py-28 bg-white border-t border-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 reveal">
+            <span class="text-success font-semibold text-sm uppercase tracking-wider">Why Choose Us</span>
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mt-3 text-gray-800">
+                Powerful <span class="text-primary">Features</span>
+            </h2>
+            <div class="section-divider mx-auto mt-4"></div>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Premium Calculator -->
+            <div class="feature-card reveal text-center p-6 rounded-2xl hover:bg-gray-50 transition-colors group border border-transparent hover:border-border">
+                <div class="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-accent group-hover:scale-110 transition-all">
+                    <i class="fas fa-calculator text-accent text-2xl group-hover:text-white transition-colors"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Premium Calculator</h3>
+                <p class="text-muted text-sm">Get instant premium estimates with our smart calculator tailored to your needs.</p>
+            </div>
+
+            <!-- Secure Payments -->
+            <div class="feature-card reveal text-center p-6 rounded-2xl hover:bg-gray-50 transition-colors group border border-transparent hover:border-border">
+                <div class="w-20 h-20 mx-auto rounded-full bg-success/10 flex items-center justify-center mb-6 group-hover:bg-accent group-hover:scale-110 transition-all">
+                    <i class="fas fa-lock text-accent text-2xl group-hover:text-white transition-colors"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Secure Payments</h3>
+                <p class="text-muted text-sm">256-bit SSL encryption ensures your payment data is always protected.</p>
+            </div>
+
+            <!-- Loan Facility -->
+            <div class="feature-card reveal text-center p-6 rounded-2xl hover:bg-gray-50 transition-colors group border border-transparent hover:border-border">
+                <div class="w-20 h-20 mx-auto rounded-full bg-accent/10 flex items-center justify-center mb-6 group-hover:bg-accent group-hover:scale-110 transition-all">
+                    <i class="fas fa-hand-holding-dollar text-accent text-2xl group-hover:text-white transition-colors"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Loan Facility</h3>
+                <p class="text-muted text-sm">Access loans against your policy with competitive interest rates.</p>
+            </div>
+
+            <!-- Easy Policy Management -->
+            <div class="feature-card reveal text-center p-6 rounded-2xl hover:bg-gray-50 transition-colors group border border-transparent hover:border-border">
+                <div class="w-20 h-20 mx-auto rounded-full bg-secondary/10 flex items-center justify-center mb-6 group-hover:bg-accent group-hover:scale-110 transition-all">
+                    <i class="fas fa-sliders text-accent text-2xl group-hover:text-white transition-colors"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Policy Management</h3>
+                <p class="text-muted text-sm">Manage all your policies from a single dashboard with real-time updates.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== ANIMATED COUNTERS ========== -->
+<section id="counters" class="py-20 counter-section relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="text-center text-white p-6">
+                <i class="fas fa-users text-4xl text-success mb-4"></i>
+                <h3 class="text-4xl lg:text-5xl font-extrabold mb-2"><span class="counter" data-target="50000">0</span>+</h3>
+                <p class="text-white/70 font-medium">Total Users</p>
+            </div>
+            <div class="text-center text-white p-6">
+                <i class="fas fa-file-contract text-4xl text-success mb-4"></i>
+                <h3 class="text-4xl lg:text-5xl font-extrabold mb-2"><span class="counter" data-target="100,000">0</span>+</h3>
+                <p class="text-white/70 font-medium">Policies Issued</p>
+            </div>
+            <div class="text-center text-white p-6">
+                <i class="fas fa-clipboard-check text-4xl text-success mb-4"></i>
+                <h3 class="text-4xl lg:text-5xl font-extrabold mb-2"><span class="counter" data-target="98000">0</span>+</h3>
+                <p class="text-white/70 font-medium">Claims Processed</p>
+            </div>
+            <div class="text-center text-white p-6">
+                <i class="fas fa-headset text-4xl text-success mb-4"></i>
+                <h3 class="text-4xl lg:text-5xl font-extrabold mb-2"><span class="counter" data-target="99">0</span>%</h3>
+                <p class="text-white/70 font-medium">Satisfaction Rate</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== TESTIMONIALS ========== -->
+<section id="testimonials" class="py-20 lg:py-28 bg-background">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 reveal">
+            <span class="text-success font-semibold text-sm uppercase tracking-wider">Testimonials</span>
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mt-3 text-gray-800">
+                What Our <span class="text-primary">Clients Say</span>
+            </h2>
+            <div class="section-divider mx-auto mt-4"></div>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Testimonial 1 -->
+            <div class="testimonial-card reveal bg-white rounded-2xl p-8 relative">
+                <div class="absolute top-6 right-6 text-6xl text-primary/20 font-serif">"</div>
+                <div class="flex items-center space-x-1 mb-4">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                </div>
+                <p class="text-gray-600 mb-6 leading-relaxed">"OIMS made getting life insurance incredibly simple. The online process was smooth and the premium was very competitive. Highly recommended!"</p>
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">S</div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">Sarah Johnson</h4>
+                        <p class="text-muted text-sm">Life Insurance Customer</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testimonial 2 -->
+            <div class="testimonial-card reveal bg-white rounded-2xl p-8 relative" style="transition-delay: 0.1s;">
+                <div class="absolute top-6 right-6 text-6xl text-primary/20 font-serif">"</div>
+                <div class="flex items-center space-x-1 mb-4">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star-half-alt text-yellow-400"></i>
+                </div>
+                <p class="text-gray-600 mb-6 leading-relaxed">"When I had a medical emergency, the cashless claim process was seamless. I didn't have to worry about finances during a critical time."</p>
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-full bg-success flex items-center justify-center text-white font-bold text-lg">M</div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">Michael Chen</h4>
+                        <p class="text-muted text-sm">Medical Insurance Customer</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testimonial 3 -->
+            <div class="testimonial-card reveal bg-white rounded-2xl p-8 relative" style="transition-delay: 0.2s;">
+                <div class="absolute top-6 right-6 text-6xl text-primary/20 font-serif">"</div>
+                <div class="flex items-center space-x-1 mb-4">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                </div>
+                <p class="text-gray-600 mb-6 leading-relaxed">"My car accident claim was processed within 48 hours. The customer support team was exceptional throughout the entire process."</p>
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-white font-bold text-lg">A</div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">Ahmed Khan</h4>
+                        <p class="text-muted text-sm">Motor Insurance Customer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== PREMIUM CALCULATOR SECTION ========== -->
+<section id="calculator" class="calculator-section py-20 lg:py-28 relative overflow-hidden">
+
+    <!-- Light Overlay -->
+    <div class="absolute inset-0 bg-black/30"></div>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        <!-- Heading -->
+        <div class="text-center mb-16 reveal">
+            <span class="text-background font-semibold text-sm uppercase tracking-wider">Smart Tool</span>
+            
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mt-3 text-white">
+                Premium <span style="color:#23BBB7;">Calculator</span>
+            </h2>
+            
+            <div class="section-divider mx-auto mt-4"></div>
+        </div>
+
+        <!-- Calculator Card -->
+        <div class="reveal bg-white/95 backdrop-blur-md rounded-3xl p-8 lg:p-12 border border-border">
+            
+            <div class="grid md:grid-cols-2 gap-8">
+
+                <!-- Left Inputs -->
+                <div class="space-y-6">
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Insurance Type
+                        </label>
+                        <select id="calcType" class="w-full px-4 py-3 rounded-xl border border-border text-gray-800 focus:outline-none">
+                            <option value="life">Life Insurance</option>
+                            <option value="medical">Medical Insurance</option>
+                            <option value="motor">Motor Insurance</option>
+                            <option value="home">Home Insurance</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Coverage Amount
+                        </label>
+                        <input type="number" id="calcCoverage" placeholder="e.g., 100000"
+                               class="w-full px-4 py-3 rounded-xl border border-border text-gray-800 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Your Age
+                        </label>
+                        <input type="number" id="calcAge" placeholder="e.g., 30"
+                               class="w-full px-4 py-3 rounded-xl border border-border text-gray-800 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Policy Term (Years)
+                        </label>
+                        <input type="range" id="calcTerm" min="5" max="40" value="20" class="calc-slider">
+                        
+                        <div class="flex justify-between text-xs text-gray-600 mt-1">
+                            <span>5 years</span>
+                            <span id="calcTermValue" class="font-bold" style="color:#025f67;">20 years</span>
+                            <span>40 years</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Output -->
+                <div class="flex flex-col justify-center items-center space-y-6">
+                    
+                    <div class="text-center">
+                        <p class="text-sm mb-1" style="color:#898F99;">
+                            Estimated Monthly Premium
+                        </p>
+
+                        <h3 class="text-5xl font-extrabold" style="color:#025f67;" id="calcPremium">
+                            $0.00
+                        </h3>
+                    </div>
+
+                    <div class="text-center space-y-2">
+                        <p class="text-sm" style="color:#898F99;">
+                            Annual Premium:
+                            <span id="calcAnnual" class="font-semibold text-gray-800">$0.00</span>
+                        </p>
+
+                        <p class="text-sm" style="color:#898F99;">
+                            Total over Term:
+                            <span id="calcTotal" class="font-semibold text-gray-800">$0.00</span>
+                        </p>
+                    </div>
+
+                    <button onclick="calculatePremium()"
+                            class="w-full py-3 rounded-xl text-white font-bold text-lg"
+                            style="background:#2F9D94;">
+                        <i class="fas fa-calculator mr-2"></i> Calculate Now
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ========== CONTACT SECTION ========== -->
+<section id="contact" class="py-20 lg:py-28 bg-background">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 reveal">
+            <span class="text-success font-semibold text-sm uppercase tracking-wider">Get In Touch</span>
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mt-3 text-gray-800">
+                Contact <span class="text-primary">Us</span>
+            </h2>
+            <div class="section-divider mx-auto mt-4"></div>
+        </div>
+
+        <div class="grid lg:grid-cols-5 gap-12">
+            <!-- Contact Info -->
+            <div class="lg:col-span-2 space-y-8 reveal">
+                <div class="bg-white rounded-2xl p-6 border border-border flex items-start space-x-4">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-location-dot text-accent text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">Our Office</h4>
+                        <p class="text-muted text-sm mt-1">123 Insurance Tower, Financial District, NY 10001</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 border border-border flex items-start space-x-4">
+                    <div class="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-phone text-accent text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">Phone</h4>
+                        <p class="text-muted text-sm mt-1">+1 (800) 555-0199</p>
+                        <p class="text-muted text-sm mt-1">Mon-Fri: 9AM - 6PM</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 border border-border flex items-start space-x-4">
+                    <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-envelope text-accent text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">Email</h4>
+                        <p class="text-muted text-sm mt-1">support@oims.com</p>
+                        <p class="text-muted text-sm mt-1">24/7 Email Support</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="lg:col-span-3 reveal">
+                <form method="post"
+                      asp-action="SendMessage"
+                      asp-controller="Account"
+                      id="contactForm"
+                      novalidate
+                      class="bg-white rounded-2xl p-8 border border-border">
+
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-red-500 text-sm mb-4">
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+
+                        <!-- Full Name -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Full Name
+                            </label>
+
+                            <input asp-for="FullName"
+                                   class="form-input w-full px-4 py-3 rounded-xl focus:outline-none" />
+
+                            <span asp-validation-for="FullName"
+                                  class="text-red-500 text-xs mt-1"></span>
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Email Address
+                            </label>
+
+                            <input asp-for="Email"
+                                   class="form-input w-full px-4 py-3 rounded-xl focus:outline-none" />
+
+                            <span asp-validation-for="Email"
+                                  class="text-red-500 text-xs mt-1"></span>
+                        </div>
+
+                    </div>
+
+                    <!-- Subject -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Subject
+                        </label>
+
+                        <input asp-for="Subject"
+                               class="form-input w-full px-4 py-3 rounded-xl focus:outline-none" />
+
+                        <span asp-validation-for="Subject"
+                              class="text-red-500 text-xs mt-1"></span>
+                    </div>
+
+                    <!-- Message -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Message
+                        </label>
+
+                        <textarea asp-for="Message"
+                                  rows="5"
+                                  class="form-input w-full px-4 py-3 rounded-xl focus:outline-none resize-none"></textarea>
+
+                        <span asp-validation-for="Message"
+                              class="text-red-500 text-xs mt-1"></span>
+                    </div>
+
+                    <button type="submit"
+                            class="w-full btn-accent py-3 rounded-xl text-white font-bold text-lg">
+
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Send Message
+
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="bg-muted text-white pt-16 pb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-12">
+
+            <!-- Company Info -->
+            <div class="flex flex-col items-start gap-4">
+
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <div class="w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center">
+                        <img src="../images/FOOTER_LOGO.png"
+                             alt="OIMS Logo"
+                             class="w-full h-full object-contain">
+                    </div>
+                </div>
+
+                <!-- Paragraph -->
+                <p class="text-gray-400 text-sm leading-relaxed">
+                    Your trusted partner for comprehensive insurance solutions.
+                </p>
+
+                <!-- Social Icons -->
+                <div class="flex space-x-3">
+                    <a href="https://www.facebook.com" target="_blank" class="social-icon w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-primary hover:bg-accent">
+                        <i class="fab fa-facebook-f text-sm"></i>
+                    </a>
+
+                    <a href="https://twitter.com" target="_blank" class="social-icon w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-primary hover:bg-accent">
+                        <i class="fab fa-twitter text-sm"></i>
+                    </a>
+
+                    <a href="https://www.linkedin.com" target="_blank" class="social-icon w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-primary hover:bg-accent">
+                        <i class="fab fa-linkedin-in text-sm"></i>
+                    </a>
+
+                    <a href="https://www.instagram.com" target="_blank" class="social-icon w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-primary hover:bg-accent">
+                        <i class="fab fa-instagram text-sm"></i>
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h4 class="font-bold text-lg mb-6">Quick Links</h4>
+                <ul class="space-y-3">
+                    <li><a href="#home" class="text-gray-400 hover:text-success transition-colors text-sm">Home</a></li>
+                    <li><a href="#services" class="text-gray-400 hover:text-success transition-colors text-sm">Services</a></li>
+                    <li><a href="#features" class="text-gray-400 hover:text-success transition-colors text-sm">Features</a></li>
+                    <li><a href="#testimonials" class="text-gray-400 hover:text-success transition-colors text-sm">Testimonials</a></li>
+                    <li><a href="#contact" class="text-gray-400 hover:text-success transition-colors text-sm">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- Services -->
+            <div>
+                <h4 class="font-bold text-lg mb-6">Our Services</h4>
+                <ul class="space-y-3">
+                    <li><a href="/Account/ServiceRedirect?service=life" class="text-gray-400 hover:text-success transition-colors text-sm">Life Insurance</a></li>
+                    <li><a href="/Account/ServiceRedirect?service=medical" class="text-gray-400 hover:text-success transition-colors text-sm">Medical Insurance</a></li>
+                    <li><a href="/Account/ServiceRedirect?service=motor" class="text-gray-400 hover:text-success transition-colors text-sm">Motor Insurance</a></li>
+                    <li><a href="/Account/ServiceRedirect?service=home" class="text-gray-400 hover:text-success transition-colors text-sm">Home Insurance</a></li>
+                    <li><a href="/Account/ServiceRedirect?service=business" class="text-gray-400 hover:text-success transition-colors text-sm">Business Insurance</a></li>
+                </ul>
+            </div>
+
+            <!-- Newsletter -->
+            <div>
+                <h4 class="font-bold text-lg mb-6">Newsletter</h4>
+                <p class="text-gray-400 text-sm mb-4">
+                    Subscribe to get the latest updates and offers.
+                </p>
+
+                <form onsubmit="handleNewsletter(event)" class="space-y-3">
+                    <input type="email"
+                           placeholder="Your email address"
+                           class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-success text-sm">
+
+                    <button type="submit"
+                            class="w-full btn-accent py-3 rounded-xl text-white font-semibold text-sm cursor-default hover:cursor-default">
+                        Subscribe
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="border-t border-accent-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+
+            <p class="text-gray-400 text-sm text-center md:text-left">
+                &copy; 2025 OIMS. All rights reserved.
+            </p>
+
+        </div>
+
+    </div>
+</footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const form = document.getElementById("contactForm");
+
+        form.addEventListener("submit", function (e) {
+
+            let isValid = true;
+
+            const inputs = form.querySelectorAll("input, textarea");
+
+            inputs.forEach(input => {
+
+                const validationSpan = document.querySelector(
+                    `[data-valmsg-for="${input.name}"]`
+                );
+
+                if (validationSpan) {
+                    validationSpan.innerText = "";
+                }
+
+                if (!input.value.trim()) {
+
+                    isValid = false;
+
+                    if (validationSpan) {
+                        validationSpan.innerText = "This field is required";
+                    }
+                }
+            });
+
+            if (!isValid) {
+
+                e.preventDefault();
+
+                document.getElementById("contact")
+                    .scrollIntoView({
+                        behavior: "smooth"
+                    });
+            }
+
+        });
+
+        @if (TempData["ContactError"] != null)
+        {
+                <text>
+                        document.getElementById("contact")
+                            .scrollIntoView({
+                                behavior: "smooth"
+                            });
+                </text>
+        }
+
+    });
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+        const toast = document.getElementById("toast");
+        const toastMessage = document.getElementById("toastMessage");
+
+        function showToast(message, isSuccess = true) {
+
+            toastMessage.innerText = message;
+
+            toast.classList.remove("toast-success", "toast-error");
+
+            if (isSuccess) {
+                toast.classList.add("toast-success");
+            } else {
+                toast.classList.add("toast-error");
+            }
+
+            toast.classList.add("show");
+
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3500);
+        }
+
+        @if (TempData["Success"] != null)
+        {
+                <text>
+                        showToast("@TempData["Success"]", true);
+                </text>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+                <text>
+                        showToast("@TempData["Error"]", false);
+                </text>
+        }
+
+    });
+</script>

@@ -1,0 +1,310 @@
+/* Base transition for smooth switching */
+body {
+  background-color: #ffffff;
+  color: #000000;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* 🌙 Dark Mode Styles */
+body.dark-mode {
+  background-color: #0D1117; /* Main Page Background */
+  color: #C9D1D9;
+}
+
+/* Navbar background */
+body.dark-mode .navbar {
+  background-color: #1E242C !important; /* Neutral dark gray */
+  border-bottom: 1px solid #30363D;
+}
+
+/* Search bar inside navbar */
+body.dark-mode .navbar .form-control {
+  background-color: #1E242C !important;
+  color: #C9D1D9 !important;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .navbar .form-control::placeholder {
+  color: #8B949E !important;
+}
+
+body.dark-mode .navbar .form-control:focus {
+  outline: none;
+  border-color: #696cff !important;
+  box-shadow: 0 0 0 0.2rem rgba(88, 166, 255, 0.25);
+}
+
+/* Cards */
+body.dark-mode .card {
+  background-color: #161B22 !important; /* Slightly lighter than page */
+  color: #C9D1D9 !important;
+  border: 1px solid #30363D !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Card titles and text */
+body.dark-mode .card-title{
+    color: #696cff !important;
+}
+body.dark-mode .card-text {
+  color: #E6EDF3 !important;
+}
+
+/* Buttons */
+body.dark-mode .btn-outline-primary {
+  color: #696cff !important;
+  border-color: #696cff !important;
+}
+
+body.dark-mode .btn-outline-primary:hover {
+  background-color: #696cff !important;
+  color: #ffffff !important;
+  border-color: #696cff !important;
+}
+
+/* Dropdowns & user menu */
+body.dark-mode .dropdown-menu {
+  background-color: #161B22 !important;
+  color: #C9D1D9 !important;
+  border: 1px solid #30363D;
+}
+
+body.dark-mode .dropdown-item {
+  color: #C9D1D9 !important;
+}
+
+body.dark-mode .dropdown-item:hover {
+  background-color: #1E242C !important;
+}
+
+/* Scrollbar (optional styling for dark mode) */
+body.dark-mode ::-webkit-scrollbar {
+  width: 10px;
+}
+
+body.dark-mode ::-webkit-scrollbar-track {
+  background: #0D1117;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background-color: #30363D;
+  border-radius: 5px;
+}
+
+/* 🌙 DARK MODE — Sidebar (Aside) Styling */
+body.dark-mode #layout-menu {
+  background-color: #161B22 !important; /* Same as card background */
+  color: #C9D1D9 !important;
+  border-right: 1px solid #30363D !important;
+  transition: all 0.3s ease;
+}
+
+
+
+/* Sidebar Brand (Logo area) */
+body.dark-mode .app-brand {
+  background-color: #161B22 !important;
+  border-bottom: 1px solid #30363D !important;
+}
+
+body.dark-mode .app-brand-text {
+  color: #E6EDF3 !important;
+}
+
+/* Menu Items */
+body.dark-mode .menu-item > .menu-link {
+  color: #C9D1D9 !important;
+  background-color: transparent !important;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+/* Hover and Active State */
+body.dark-mode .menu-item > .menu-link:hover,
+body.dark-mode .menu-item.active > .menu-link {
+  background-color: #1E242C !important; /* Slightly lighter hover */
+  color: #696cff !important;
+}
+
+/* Menu Icons */
+body.dark-mode .menu-icon {
+  color: #8B949E !important;
+}
+
+body.dark-mode .menu-item.active .menu-icon,
+body.dark-mode .menu-item:hover .menu-icon {
+  color: #696cff !important;
+}
+
+/* Menu Headers */
+body.dark-mode .menu-header {
+  color: #8B949E !important;
+  border-top: 1px solid #30363D !important;
+}
+
+/* Submenu Background */
+body.dark-mode .menu-sub {
+  background-color: #161B22 !important;
+  border-left: 1px solid #30363D !important;
+}
+
+/* Submenu Links */
+body.dark-mode .menu-sub .menu-item .menu-link {
+  color: #C9D1D9 !important;
+}
+
+body.dark-mode .menu-sub .menu-item .menu-link:hover {
+  background-color: #1E242C !important;
+  color: #696cff !important;
+}
+
+/* Scroll shadow in sidebar */
+body.dark-mode .menu-inner-shadow {
+  background: linear-gradient(to bottom, rgba(13, 17, 23, 0.6), transparent) !important;
+}
+
+/* 🌙 DARK MODE — Footer Styling */
+body.dark-mode .footer {
+  background-color: #161B22 !important; /* Same as card/aside */
+  color: #C9D1D9 !important;
+  border-top: 1px solid #30363D !important;
+  transition: all 0.3s ease;
+}
+
+/* Footer Links */
+body.dark-mode .footer .footer-link {
+  color: #8B949E !important;
+  transition: color 0.3s ease;
+}
+
+body.dark-mode .footer .footer-link:hover {
+  color: #696cff !important;
+  text-decoration: none;
+}
+
+/* Footer Text (© section) */
+body.dark-mode .footer .fw-bolder,
+body.dark-mode .footer div {
+  color: #C9D1D9 !important;
+}
+
+/* Heart Icon (❤️) — optional blue glow */
+body.dark-mode .footer .footer-heart {
+  color: #F85149 !important;
+}
+
+/* Make sure container spacing feels balanced */
+body.dark-mode .footer .container-xxl {
+  border-top: 1px solid #30363D;
+  padding-top: 1rem;
+}
+
+#themeToggle {
+  background: none !important;
+  border: none !important;
+  outline: none !important;
+  padding: 6px;
+  cursor: pointer;
+}
+
+#themeToggle:hover,
+#themeToggle:focus,
+#themeToggle:active {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#themeIcon {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s ease;
+}
+
+
+  /* --- Calendar Styling Tweaks --- */
+
+  /* Remove grid borders */
+  .fc-theme-bootstrap5 td,
+  .fc-theme-bootstrap5 th {
+    border: none !important;
+  }
+
+  /* Make Sundays red */
+  .fc-day-sun a {
+    color: #dc3545 !important; /* Bootstrap danger red */
+    font-weight: 500;
+  }
+
+  /* Highlight today's date */
+  .fc-day-today {
+    background: none !important;
+    position: relative;
+  }
+
+  .fc-day-today .fc-daygrid-day-number {
+    background-color: var(--bs-primary);
+    color: #fff !important;
+    border-radius: 80%;
+    font-weight: 400;
+  }
+
+#calendar {
+  font-size: 0.6rem;
+  text-align: center;
+}
+
+/* Remove all borders */
+.fc,
+.fc * {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Center the header text (Mon, Tue, etc.) */
+.fc-col-header-cell,
+.fc-col-header-cell-cushion {
+  text-align: center;
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Remove borders in day grid */
+.fc-daygrid-day,
+.fc-daygrid-day-frame {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Center the actual day numbers */
+.fc-daygrid-day-number {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  line-height: 1.5rem; /* adjust vertical spacing */
+}
+
+/* Center the content inside each day */
+.fc-daygrid-day-top {
+  display: flex;
+  justify-content: center;
+}
+
+/* Keep Sundays red */
+.fc-day-sun .fc-daygrid-day-number {
+  color: #dc3545 !important;
+  font-weight: 500;
+}
+
+/* Highlight today */
+.fc-day-today .fc-daygrid-day-number {
+  background-color: var(--bs-primary);
+  color: #fff !important;
+  border-radius: 50%;
+  padding: 4px 8px;
+  font-weight: 600;
+  text-align: center;
+  display: inline-block;
+}

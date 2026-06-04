@@ -1,0 +1,675 @@
+﻿<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+<title>@ViewData["Title"] | OIMS - Online Insurance Management Suite</title>
+<meta name="description" content="" />
+<link rel="icon" type="image/x-icon" href="~/aassets/img/favicon/favicon.ico" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="~/aassets/vendor/fonts/boxicons.css" />
+<link rel="stylesheet" href="~/aassets/vendor/css/core.css" class="template-customizer-core-css" />
+<link rel="stylesheet" href="~/aassets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
+<link rel="stylesheet" href="~/aassets/css/demo.css" />
+<link rel="stylesheet" href="~/aassets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="~/aassets/vendor/libs/apex-charts/apex-charts.css" />
+<script src="~/aassets/vendor/js/helpers.js"></script>
+<script src="~/aassets/js/config.js"></script>
+
+    <!-- PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Table to PDF helper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- Excel Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body style="background-color: #edf2f9f5;">
+<!-- Layout wrapper -->
+<div class="layout-wrapper layout-content-navbar">
+<div class="layout-container">
+<!-- Menu -->
+<aside id="layout-menu" class="layout-menu menu-vertical d-flex flex-column" style="height: 100vh; position: sticky; border-radius: 0px 30px 30px 0px;">
+<!-- TOP SECTION -->
+<div class="flex-grow-1 d-flex flex-column overflow-hidden" style="min-height: 0;">
+<!-- Brand -->
+<div class="app-brand demo d-flex align-items-center justify-content-center py-4">
+<a asp-controller="Admin" asp-action="Dashboard" class="app-brand-link d-flex align-items-center">
+<span class="app-brand-logo demo">
+<img src="~/aassets/img/favicon/db-logo.png" id="logo" alt="Logo" width="140" />
+</span>
+</a>
+                    <a href="javascript:void(0);" class="layout-menu-toggle menu-link menu-toggle-btn d-block d-xl-none">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </a>
+                </div>
+                <div class="menu-inner-shadow"></div>
+                <div class="menu-scroll flex-grow-1 overflow-auto px-2" style="min-height: 0;">
+                    <!-- MENU -->
+                    <ul class="menu-inner py-1">
+                        <!-- Dashboard -->
+                        <li class="menu-item">
+                            <a asp-controller="Admin" asp-action="Dashboard" class="menu-link d-flex align-items-center text-dark">
+                                <i class="menu-icon bi bi-speedometer2 me-2"></i>
+                                <div>Dashboard</div>
+                            </a>
+                        </li>
+                        <!-- User Management -->
+                        <li class="menu-item">
+                            <a href="javascript:void(0);" class="menu-link menu-toggle text-dark">
+                                <i class="menu-icon bi bi-people me-2"></i>
+                                <div>User Management</div>
+                            </a>
+                            <ul class="menu-sub">
+                                <li class="menu-item">
+                                    <a asp-controller="UserManagement" asp-action="User" class="menu-link text-dark">
+                                        <i class="menu-icon bi bi-person me-2"></i>
+                                        <div>Users</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a asp-controller="UserManagement" asp-action="Customers" class="menu-link text-dark">
+                                        <i class="menu-icon bi bi-person-vcard me-2"></i>
+                                        <div>Customers</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a asp-controller="UserManagement" asp-action="Agents" class="menu-link text-dark">
+                                        <i class="menu-icon bi bi-person-gear me-2"></i>
+                                        <div>Agents</div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Insurance Management -->
+                        <li class="menu-item">
+                            <a href="javascript:void(0);" class="menu-link menu-toggle text-dark">
+                                <i class="menu-icon bi bi-shield-check me-2"></i>
+                                <div>Insurance Management</div>
+                            </a>
+                            <ul class="menu-sub">
+                                <li class="menu-item">
+                                    <a asp-controller="InsuranceManagement" asp-action="InsuranceTypes" class="menu-link text-dark">
+                                        <i class="menu-icon bi bi-tags me-2"></i>
+                                        <div>Insurance Types</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a asp-controller="InsuranceManagement" asp-action="Policies" class="menu-link text-dark">
+                                        <i class="menu-icon bi bi-journal-text me-2"></i>
+                                        <div>Policies</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a asp-controller="InsuranceManagement" asp-action="LifeInsurance" class="menu-link text-dark">
+                                        <i class="menu-icon bi bi-heart-pulse me-2"></i>
+                                        <div>Life Insurance</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a asp-controller="InsuranceManagement" asp-action="MedicalInsurance" class="menu-link text-dark">
+                                        <i class="menu-icon bi bi-hospital me-2"></i>
+                                        <div>Medical Insurance</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a asp-controller="InsuranceManagement" asp-action="MotorInsurance" class="menu-link text-dark">
+                                        <i class="menu-icon bi bi-car-front me-2"></i>
+                                        <div>Motor Insurance</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a asp-controller="InsuranceManagement" asp-action="HomeInsurance" class="menu-link text-dark">
+                                        <i class="menu-icon bi bi-house-door me-2"></i>
+                                        <div>Home Insurance</div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Applications -->
+                        <li class="menu-item">
+                            <a asp-controller="Admin" asp-action="Applications" class="menu-link d-flex align-items-center text-dark">
+                                <i class="menu-icon bi bi-file-earmark-text me-2"></i>
+                                <div>Applications</div>
+                            </a>
+                        </li>
+                        <!-- Claims -->
+                        <li class="menu-item">
+                            <a asp-controller="Admin" asp-action="Claims" class="menu-link d-flex align-items-center text-dark">
+                                <i class="menu-icon bi bi-clipboard2-check me-2"></i>
+                                <div>Claims</div>
+                            </a>
+                        </li>
+                        <!-- Loans -->
+                        <li class="menu-item">
+                            <a asp-controller="Admin" asp-action="Loans" class="menu-link d-flex align-items-center text-dark">
+                                <i class="menu-icon bi bi-bank me-2"></i>
+                                <div>Loans</div>
+                            </a>
+                        </li>
+                        <!-- Payments -->
+                        <li class="menu-item">
+                            <a asp-controller="Admin" asp-action="Payments" class="menu-link d-flex align-items-center text-dark">
+                                <i class="menu-icon bi bi-credit-card me-2"></i>
+                                <div>Payments</div>
+                            </a>
+                        </li>
+                            <!-- Messages with Indicator Dot & Badge -->
+                            <li class="menu-item">
+                                <a asp-controller="Admin" asp-action="Messages" class="menu-link d-flex align-items-center justify-content-between text-dark">
+                                    <div class="d-flex align-items-center">
+                                        <!-- Icon with Indicator Dot -->
+                                        <div class="position-relative me-2">
+                                            <i class="menu-icon bi bi-chat-dots"></i>
+                                            @if (ViewBag.UnreadMessageCount != null && (int)ViewBag.UnreadMessageCount > 0)
+                                            {
+                                                <!-- Indicator Dot on Icon -->
+                                                <span class="indicator-dot"
+                                                      style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: red !important; border-radius: 50%; box-shadow: 0 0 0 2px #edf2f9;"></span>
+                                            }
+                                        </div>
+                                        <div>Messages</div>
+                                    </div>
+                                    @if (ViewBag.UnreadMessageCount != null && (int)ViewBag.UnreadMessageCount > 0)
+                                    {
+                                        <!-- Badge Count -->
+                                        <span class="badge bg-danger rounded-pill px-2"
+                                              style="font-size: 0.7rem; min-width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                                            @ViewBag.UnreadMessageCount
+                                        </span>
+                                    }
+                                </a>
+                            </li>
+
+                            @* <!-- Notifications with Indicator Dot & Badge -->
+                            <li class="menu-item">
+                                <a asp-controller="Admin" asp-action="Notifications" class="menu-link d-flex align-items-center justify-content-between text-dark">
+                                    <div class="d-flex align-items-center">
+                                        <!-- Icon with Indicator Dot -->
+                                        <div class="position-relative me-2">
+                                            <i class="menu-icon bi bi-bell"></i>
+                                            @if (ViewBag.UnreadNotificationCount != null && (int)ViewBag.UnreadNotificationCount > 0)
+                                            {
+                                                <span class="indicator-dot"
+                                                      style="position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: red !important; border-radius: 50%; box-shadow: 0 0 0 2px #edf2f9;"></span>
+                                            }
+                                        </div>
+                                        <div>Notifications</div>
+                                    </div>
+                                    @if (ViewBag.UnreadNotificationCount != null && (int)ViewBag.UnreadNotificationCount > 0)
+                                    {
+                                        <span class="badge bg-danger rounded-pill px-2"
+                                              style="font-size: 0.7rem; min-width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                                            @ViewBag.UnreadNotificationCount
+                                        </span>
+                                    }
+                                </a>
+                            </li> *@
+
+
+                        <!-- Reports -->
+                        
+                    </ul>
+
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            const currentPage = window.location.pathname;
+                            document.querySelectorAll(".menu-link[href]").forEach(link => {
+                                const href = link.getAttribute("href");
+                                if (href && currentPage.endsWith(href.split("/").pop())) {
+                                    const menuItem = link.closest(".menu-item");
+                                    if (menuItem) {
+                                        menuItem.classList.add("active");
+                                    }
+                                    const parentMenu = link.closest(".menu-sub");
+                                    if (parentMenu) {
+                                        const parentItem = parentMenu.closest(".menu-item");
+                                        if (parentItem) {
+                                            parentItem.classList.add("active");
+                                            parentItem.classList.add("open");
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        </aside>
+
+            <style>
+                /* Sidebar Badge Styling */
+                .menu-item .badge {
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                transition: all 0.3s ease;
+                }
+
+                .menu-item:hover .badge {
+                transform: scale(1.1);
+                }
+
+                    .indicator-dot {
+                    animation: pulse-dot 2s infinite;
+                    }
+
+                    @@keyframes pulse-dot {
+                    0%, 100% {
+                    opacity: 1;
+                    transform: scale(1);
+                    }
+
+                    50% {
+                    opacity: 0.7;
+                    transform: scale(1.3);
+                    }
+                    }
+
+
+                /* Red badge for unread messages */
+                .badge.bg-danger {
+                background: red !important;
+                box-shadow: none !important;
+                }
+            </style>
+        <!-- / Menu -->
+        <!-- Layout container -->
+        <div class="layout-page">
+            <!-- Navbar -->
+            <div class="container-fluid mt-1 sticky-top-navbar">
+                <nav class="layout-navbar navbar navbar-expand-xl align-items-center rounded-4 px-3 py-2" style="background-color: #edf2f9 !important;">
+                    <!-- Left Menu Toggle -->
+                    <div class="layout-menu-toggle navbar-nav d-xl-none me-3">
+                        <a class="nav-link px-0" href="javascript:void(0)">
+                            <i class="bx bx-menu bx-sm"></i>
+                        </a>
+                    </div>
+                    <!-- Search -->
+                    <div class="navbar-nav align-items-center flex-grow-1 flex-xl-grow-0 mx-2">
+                        <div class="nav-item w-100 w-xl-auto">
+                            <div class="input-group bg-white rounded-pill px-3 py-1 ">
+                                <span class="input-group-text bg-transparent border-0">
+                                    <i class="bx bx-search"></i>
+                                </span>
+                                    <input type="text" id="globalSearch" class="form-control border-0 shadow-none" placeholder="Search..." />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Side -->
+                    <ul class="navbar-nav flex-row align-items-center ms-auto gap-2">
+                        @* <!-- Notifications -->
+                        <li class="nav-item">
+                            <button class="btn btn-sm rounded-circle bg-white d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px;">
+                                <i class="bx bx-bell"></i>
+                            </button>
+                        </li> *@
+
+                            <!-- User -->
+                            <li class="nav-item dropdown profile-dropdown">
+                                @{
+                                    var profileImg = Context.Session.GetString("ProfileImageUrl");
+                                    var defaultImg = Url.Content("~/aassets/img/avatars/default.png");
+
+                                    // ✅ Ensure path is correct
+                                    if (!string.IsNullOrEmpty(profileImg) && !profileImg.StartsWith("/"))
+                                    {
+                                        profileImg = "/" + profileImg;
+                                    }
+                                }
+
+                                <a class="btn btn-light rounded-circle d-flex align-items-center justify-content-center shadow-sm overflow-hidden"
+                                   style="width: 38px; height: 38px; padding: 0;"
+                                   href="#"
+                                   data-bs-toggle="dropdown">
+
+                                    <img src="@(!string.IsNullOrEmpty(profileImg) ? profileImg : defaultImg)"
+                                         alt="Profile"
+                                         style="width:100%; height:100%; object-fit:cover;"
+                                         onerror="this.src='@defaultImg'" />
+
+                                </a>
+
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li class="px-3 py-2">
+                                        <strong>@(Context.Session.GetString("UserName") ?? "Guest User")</strong><br>
+                                        <small class="badge bg-label-primary">
+                                            @(Context.Session.GetString("UserRole") ?? "User")
+                                        </small>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Admin" asp-action="Profile">
+                                            <i class="bx bx-user me-2"></i>My Profile
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
+                                            <i class="bx bx-power-off text-danger me-2"></i> Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                    </ul>
+                </nav>
+            </div>
+            <!-- / Navbar -->
+
+            <!-- Content wrapper -->
+            <div class="content-wrapper">
+                <!-- Content -->
+                <div class="flex-grow-1 px-3 py-2 container-p-y">
+                    @RenderBody()
+                </div>
+                <!-- / Content -->
+                <div class="content-backdrop fade"></div>
+            </div>
+            <!-- Content wrapper -->
+        </div>
+        <!-- / Layout page -->
+    </div>
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+</div>
+<!-- / Layout wrapper -->
+
+<!-- Core JS -->
+<script src="~/aassets/vendor/libs/jquery/jquery.js"></script>
+<script src="~/aassets/vendor/libs/popper/popper.js"></script>
+<script src="~/aassets/vendor/js/bootstrap.js"></script>
+<script src="~/aassets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+<script src="~/aassets/vendor/js/menu.js"></script>
+<!-- Vendors JS -->
+<script src="~/aassets/vendor/libs/apex-charts/apexcharts.js"></script>
+<!-- Main JS -->
+<script src="~/aassets/js/main.js"></script>
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<script>
+    const toggleBtn = document.getElementById("themeToggle");
+    const icon = document.getElementById("themeIcon");
+    if (toggleBtn) {
+        toggleBtn.addEventListener("click", function () {
+            document.body.classList.toggle("dark-mode");
+            if (document.body.classList.contains("dark-mode")) {
+                icon.classList.remove("bx-moon");
+                icon.classList.add("bx-sun");
+            } else {
+                icon.classList.remove("bx-sun");
+                icon.classList.add("bx-moon");
+            }
+        });
+    }
+</script>
+@await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+    window.exportTable = function (type, tableId, fileName) {
+
+        const table = document.getElementById(tableId);
+
+        if (!table) {
+            alert("Table not found!");
+            return;
+        }
+
+        const today = new Date().toLocaleDateString();
+
+        // =========================
+        // GET TABLE HEADERS
+        // =========================
+        const headers = [];
+
+        table.querySelectorAll("thead th").forEach((th) => {
+
+            // Skip Actions column
+            if (th.innerText.trim().toLowerCase() !== "actions") {
+                headers.push(th.innerText.trim());
+            }
+        });
+
+        // =========================
+        // GET TABLE ROWS
+        // =========================
+        const rows = [];
+
+        table.querySelectorAll("tbody tr").forEach(row => {
+
+            // Skip hidden rows
+            if (row.style.display === "none") return;
+
+            const rowData = [];
+
+            Array.from(row.cells).forEach((cell, index) => {
+
+                const headerText = table.querySelectorAll("thead th")[index]
+                    ?.innerText
+                    ?.trim()
+                    ?.toLowerCase();
+
+                // Skip Actions column
+                if (headerText !== "actions") {
+
+                    rowData.push(
+                        cell.innerText.trim()
+                    );
+                }
+            });
+
+            rows.push(rowData);
+        });
+
+        // =========================
+        // EXCEL EXPORT
+        // =========================
+        if (type === "excel") {
+
+            const wb = XLSX.utils.book_new();
+
+            const data = [
+                headers,
+                ...rows
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+
+            // Auto width
+            ws['!cols'] = headers.map((header, i) => {
+
+                let maxLength = header.length;
+
+                rows.forEach(r => {
+
+                    const cellValue = r[i]
+                        ? r[i].toString()
+                        : "";
+
+                    if (cellValue.length > maxLength) {
+                        maxLength = cellValue.length;
+                    }
+                });
+
+                return {
+                    wch: Math.min(maxLength + 8, 80)
+                };
+            });
+
+            XLSX.utils.book_append_sheet(
+                wb,
+                ws,
+                fileName
+            );
+
+            XLSX.writeFile(
+                wb,
+                fileName + ".xlsx"
+            );
+        }
+
+        // =========================
+        // PDF EXPORT
+        // =========================
+        if (type === "pdf") {
+
+            const { jsPDF } = window.jspdf;
+
+            const doc = new jsPDF("landscape");
+
+            // Company Name
+            doc.setFontSize(18);
+            doc.setTextColor(8, 145, 178);
+            doc.text(
+                "Online Insurance Management System",
+                14,
+                15
+            );
+
+            // Report Name
+            doc.setFontSize(13);
+            doc.setTextColor(0, 0, 0);
+            doc.text(
+                fileName + " Report",
+                14,
+                25
+            );
+
+            // Date
+            doc.setFontSize(10);
+            doc.text(
+                "Generated On: " + today,
+                14,
+                32
+            );
+
+            // Dynamic column widths
+            const columnStyles = {};
+
+            headers.forEach((h, i) => {
+
+                // Description column wider
+                if (h.toLowerCase().includes("description")) {
+
+                    columnStyles[i] = {
+                        cellWidth: 80
+                    };
+                }
+                else {
+
+                    columnStyles[i] = {
+                        cellWidth: "auto"
+                    };
+                }
+            });
+
+            doc.autoTable({
+
+                startY: 40,
+
+                head: [headers],
+
+                body: rows,
+
+                theme: "grid",
+
+                styles: {
+                    fontSize: 9,
+                    cellPadding: 4,
+                    valign: "middle",
+                    overflow: "linebreak"
+                },
+
+                headStyles: {
+                    fillColor: [13, 110, 253],
+                    textColor: [255, 255, 255],
+                    fontStyle: "bold"
+                },
+
+                alternateRowStyles: {
+                    fillColor: [245, 247, 250]
+                },
+
+                columnStyles: columnStyles
+            });
+
+            doc.save(fileName + ".pdf");
+        }
+    };
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+        const searchInput = document.getElementById("globalSearch");
+
+        if (!searchInput) return;
+
+        // Mapping of keywords → pages
+        const routes = {
+        "dashboard": "/Admin/Dashboard",
+        "home": "/Admin/Dashboard",
+
+        "applications": "/Admin/Applications",
+        "application": "/Admin/Applications",
+
+        "claims": "/Admin/Claims",
+        "claim": "/Admin/Claims",
+
+        "policies": "/InsuranceManagement/Policies",
+        "policy": "/InsuranceManagement/Policies",
+
+        "customers": "/UserManagement/Customers",
+        "customer": "/UserManagement/Customers",
+
+        "agents": "/UserManagement/Agents",
+        "agent": "/UserManagement/Agents",
+
+        "payments": "/Admin/Payments",
+        "payment": "/Admin/Payments",
+
+        "loans": "/Admin/Loans",
+        "loan": "/Admin/Loans",
+
+        "messages": "/Admin/Messages",
+        "message": "/Admin/Messages",
+
+        "reports": "/Admin/Reports",
+        "report": "/Admin/Reports"
+        };
+
+        searchInput.addEventListener("keydown", function (e) {
+
+        if (e.key === "Enter") {
+
+        const query = searchInput.value.trim().toLowerCase();
+
+        if (query === "") return;
+
+        // match search text
+        let match = null;
+
+        for (const key in routes) {
+        if (key.includes(query)) {
+        match = routes[key];
+        break;
+        }
+        }
+
+        if (match) {
+        window.location.href = match;
+        }
+        else {
+        alert("No page found for: " + query);
+        }
+        }
+        });
+
+        });
+
+    </script>
+
+</body>
+</html>

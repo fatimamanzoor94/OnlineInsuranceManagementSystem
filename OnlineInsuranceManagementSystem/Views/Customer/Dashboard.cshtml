@@ -1,0 +1,749 @@
+﻿@model OnlineInsuranceManagementSystem.ViewModels.CustomerDashboardViewModel
+
+@functions {
+    public string GetStatusBadge(string status)
+    {
+        return status?.ToLower() switch
+        {
+            "pending" => "warning",
+            "approved" => "success",
+            "rejected" => "danger",
+            "processing" => "info",
+            "paid" => "success",
+            "active" => "success",
+            _ => "secondary"
+        };
+    }
+
+    public string GetPaymentIcon(string method)
+    {
+        return method?.ToLower() switch
+        {
+            "credit card" => "credit-card-2-front",
+            "debit card" => "credit-card",
+            "bank transfer" => "bank",
+            "cash" => "cash",
+            "easypaisa" => "phone",
+            "jazzcash" => "phone",
+            _ => "wallet2"
+        };
+    }
+}
+
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_CustomerLayout.cshtml";
+}
+
+<div class="card border-0 w-100 mb-3" style="border-radius: 30px; background-color: #f5f8fd;">
+    <div class="p-3 main-card">
+        <div class="container-fluid card-scroll-content px-3">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-3 flex-wrap gap-2">
+                <div>
+                    <h4 class="mb-0">Dashboard Overview</h4>
+                    <small class="text-muted">Here's an overview of your policies, claims, and recent account activity</small>
+                </div>
+                <span class="badge bg-label-primary rounded-pill px-3 py-2">
+                    <i class="bi bi-calendar3 me-1"></i>@DateTime.Now.ToString("dd MMM yyyy")
+                </span>
+            </div>
+
+            <!-- ==================== SUMMARY CARDS ==================== -->
+            <div class="row g-3 mb-4">
+                <!-- Active Policies -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-shield-check text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Active Policies</h6>
+                                <small class="text-muted" id="activePolicies">@Model.ActivePoliciesCount.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                        @if (Model.ActivePoliciesCount > 0)
+                        {
+                            <div class="mt-2 px-3 pb-3">
+                                <a asp-action="Policies" class="text-primary small text-decoration-none">
+                                    View Policies <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Total Applications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-file-earmark-text text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Total Applications</h6>
+                                <small class="text-muted" id="totalApplications">@Model.TotalApplications.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Approved Applications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-check-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Approved</h6>
+                                <small class="text-success fw-semibold" id="approvedApplications">@Model.ApprovedApplications.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Applications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box position-relative">
+                                    <i class="bi bi-hourglass-split text-dark"></i>
+                                    @if (Model.PendingApplications > 0)
+                                    {
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning"
+                                              style="font-size: 0.65rem; padding: 0.25em 0.45em;">
+                                            @Model.PendingApplications
+                                        </span>
+                                    }
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Pending</h6>
+                                <small class="text-warning fw-semibold" id="pendingApplications">@Model.PendingApplications.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                        @if (Model.PendingApplications > 0)
+                        {
+                            <div class="mt-2 px-3 pb-3">
+                                <a asp-action="Applications" class="text-warning small text-decoration-none">
+                                    View Pending <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Total Claims -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-clipboard2-check text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Total Claims</h6>
+                                <small class="text-muted" id="totalClaims">@Model.TotalClaims.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Claims -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box position-relative">
+                                    <i class="bi bi-exclamation-triangle text-dark"></i>
+                                    @if (Model.PendingClaims > 0)
+                                    {
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                              style="font-size: 0.65rem; padding: 0.25em 0.45em;">
+                                            @Model.PendingClaims
+                                        </span>
+                                    }
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Pending Claims</h6>
+                                <small class="text-danger fw-semibold" id="pendingClaims">@Model.PendingClaims.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                        @if (Model.PendingClaims > 0)
+                        {
+                            <div class="mt-2 px-3 pb-3">
+                                <a asp-action="Claims" class="text-danger small text-decoration-none">
+                                    View Claims <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Total Payments -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-currency-dollar text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Total Payments</h6>
+                                <small class="text-muted" id="totalPayments">@Model.TotalPayments.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Paid Amount -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-wallet2 text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Total Paid</h6>
+                                <small class="text-success fw-semibold" id="totalPaidAmount">Rs. @Model.TotalPaidAmount.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loan Requests -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-bank text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Loan Requests</h6>
+                                <small class="text-muted" id="loanRequests">@Model.LoanRequests.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Approved Loans -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-check2-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Approved Loans</h6>
+                                <small class="text-success fw-semibold" id="approvedLoans">@Model.ApprovedLoans.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+
+            
+
+<!-- ==================== CSS STYLES (EXACT COPY FROM ADMIN) ==================== -->
+<style>
+    /* Custom Card Styling - Same as Applications Page */
+    .custom-card {
+        background: #ffffff;
+        border-radius: 16px !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .custom-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+    /* Icon Box - Same as Applications Page */
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        transition: background 0.2s ease;
+    }
+
+    .custom-card:hover .icon-box {
+        background: #e9ecef;
+    }
+
+    /* Trend Icon - Same as Applications Page */
+    .trend-icon {
+        font-size: 1.5rem;
+        color: #28a745;
+        opacity: 0.6;
+        transition: opacity 0.2s ease;
+    }
+
+    .custom-card:hover .trend-icon {
+        opacity: 1;
+    }
+
+    /* Badge Styles */
+    .badge.bg-label-primary {
+        background-color: #cfe2ff !important;
+        color: #0d6efd !important;
+    }
+
+    .badge.bg-label-success {
+        background-color: #d1e7dd !important;
+        color: #198754 !important;
+    }
+
+    .badge.bg-label-secondary {
+        background-color: #e2e3e5 !important;
+        color: #6c757d !important;
+    }
+
+    /* Status Badge Colors */
+    .badge.bg-pending {
+        background-color: #fff3cd !important;
+        color: #856404 !important;
+    }
+
+    .badge.bg-approved {
+        background-color: #d1e7dd !important;
+        color: #198754 !important;
+    }
+
+    .badge.bg-rejected {
+        background-color: #f8d7da !important;
+        color: #842029 !important;
+    }
+
+    .badge.bg-processing {
+        background-color: #cff4fc !important;
+        color: #055160 !important;
+    }
+
+    /* Chart Containers */
+    #applicationsChart, #claimsChart, #paymentsChart, #policyChart, #loansChart {
+        min-height: 280px;
+    }
+
+    /* List Group Items */
+    .list-group-item {
+        background: transparent !important;
+    }
+
+    .list-group-item-action:hover {
+        background-color: #f8f9fa !important;
+        cursor: pointer;
+    }
+
+    /* Responsive Adjustments */
+    @@media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 0.5rem;
+        }
+
+            .card-header .btn,
+            .card-header .badge {
+                align-self: flex-end;
+            }
+    }
+
+    /* ================= RECENT ACTIVITY SECTION ================= */
+    .custom-card {
+        background: #fff;
+        border-radius: 24px !important;
+        border: 1px solid #eef1f6 !important;
+        box-shadow: 0 8px 30px rgba(16, 24, 40, 0.04);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+        .custom-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(16, 24, 40, 0.08);
+        }
+
+    .card-header {
+        border-bottom: 1px solid #f1f3f7 !important;
+        padding-bottom: 18px !important;
+    }
+
+    .card-body h6 {
+        font-size: 15px;
+        font-weight: 700;
+        color: #2f3e52;
+        margin-bottom: 18px !important;
+    }
+
+    .col-lg-4 {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .list-group {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .list-group-item {
+        border: 1px solid #edf1f7 !important;
+        border-radius: 18px !important;
+        background: #ffffff !important;
+        padding: 16px !important;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 10px rgba(16, 24, 40, 0.03);
+    }
+
+        .list-group-item:hover {
+            transform: translateY(-2px);
+            background: #fafcff !important;
+            border-color: #d9e7ff !important;
+        }
+
+        .list-group-item h6 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px !important;
+        }
+
+        .list-group-item p {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 8px !important;
+        }
+
+    .text-end p {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 4px !important;
+    }
+
+    .text-end small {
+        font-size: 12px;
+        color: #9ca3af !important;
+    }
+
+    .bg-light-subtle {
+        background: linear-gradient(to right, #f8fbff, #ffffff) !important;
+        border-left: 4px solid #0d6efd !important;
+    }
+
+    .badge {
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        padding: 7px 12px !important;
+        border-radius: 50px !important;
+        letter-spacing: 0.3px;
+    }
+
+        .badge.bg-pending {
+            background: #fff8e1 !important;
+            color: #b7791f !important;
+        }
+
+        .badge.bg-approved {
+            background: #dcfce7 !important;
+            color: #15803d !important;
+        }
+
+        .badge.bg-rejected {
+            background: #fee2e2 !important;
+            color: #dc2626 !important;
+        }
+
+        .badge.bg-processing {
+            background: #dbeafe !important;
+            color: #1d4ed8 !important;
+        }
+
+        .badge.bg-label-secondary {
+            background: #f3f4f6 !important;
+            color: #4b5563 !important;
+        }
+
+    .card-header .btn {
+        border-radius: 50px !important;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 8px 16px;
+        transition: all 0.25s ease;
+    }
+
+        .card-header .btn:hover {
+            transform: translateY(-2px);
+        }
+
+    .text-center.py-3 {
+        border: 2px dashed #e5e7eb;
+        border-radius: 18px;
+        padding: 30px !important;
+        background: #fafafa;
+    }
+
+    @@media (max-width: 992px) {
+        .col-lg-4 {
+            margin-bottom: 20px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .card-header .d-flex {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+        }
+
+        .card-header .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .list-group-item {
+            padding: 14px !important;
+        }
+
+            .list-group-item .d-flex {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+        .text-end {
+            text-align: left !important;
+        }
+    }
+</style>
+
+<!-- ==================== APEXCHARTS INITIALIZATION ==================== -->
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ==================== APPLICATIONS BY STATUS CHART ====================
+            const appLabels = [@string.Join(",", Model.ApplicationsByStatusData.Select(d => $"'{d.Label}'"))];
+            const appCounts = [@string.Join(",", Model.ApplicationsByStatusData.Select(d => d.Count))];
+            const appColors = [@string.Join(",", Model.ApplicationsByStatusData.Select(d => $"'{d.Color}'"))];
+
+            const applicationsOptions = {
+                series: appCounts,
+                chart: {
+                    type: 'donut',
+                    height: 280,
+                    fontFamily: 'Public Sans, sans-serif'
+                },
+                labels: appLabels,
+                colors: appColors,
+                legend: { position: 'bottom', fontSize: '11px' },
+                dataLabels: { enabled: false },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '65%',
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'Total',
+                                    formatter: function(w) {
+                                        return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                tooltip: {
+                    theme: 'light',
+                    y: { formatter: function(val) { return val + " applications"; } }
+                }
+            };
+            new ApexCharts(document.querySelector("#applicationsChart"), applicationsOptions).render();
+
+            // ==================== CLAIMS BY STATUS CHART ====================
+            const claimLabels = [@string.Join(",", Model.ClaimsByStatusData.Select(d => $"'{d.Label}'"))];
+            const claimCounts = [@string.Join(",", Model.ClaimsByStatusData.Select(d => d.Count))];
+            const claimColors = [@string.Join(",", Model.ClaimsByStatusData.Select(d => $"'{d.Color}'"))];
+
+            const claimsOptions = {
+                series: claimCounts,
+                chart: {
+                    type: 'bar',
+                    height: 280,
+                    toolbar: { show: false },
+                    fontFamily: 'Public Sans, sans-serif'
+                },
+                colors: claimColors,
+                plotOptions: {
+                    bar: {
+                        borderRadius: 6,
+                        columnWidth: '45%',
+                        distributed: true
+                    }
+                },
+                dataLabels: { enabled: false },
+                xaxis: {
+                    categories: claimLabels,
+                    labels: {
+                        style: { colors: '#6c757d', fontSize: '10px' },
+                        rotate: -45
+                    },
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: '#6c757d', fontSize: '11px' },
+                        formatter: function(val) { return Math.round(val); }
+                    }
+                },
+                grid: {
+                    borderColor: '#e9ecef',
+                    strokeDashArray: 4,
+                    padding: { left: 10, right: 10 }
+                },
+                tooltip: {
+                    theme: 'light',
+                    y: { formatter: function(val) { return val + " claims"; } }
+                }
+            };
+            new ApexCharts(document.querySelector("#claimsChart"), claimsOptions).render();
+
+            // ==================== MONTHLY PAYMENTS CHART ====================
+            const paymentLabels = [@string.Join(",", Model.MonthlyPaymentsData.Select(d => $"'{d.Label}'"))];
+            const paymentAmounts = [@string.Join(",", Model.MonthlyPaymentsData.Select(d => d.Amount))];
+
+            const paymentsOptions = {
+                series: [{
+                    name: 'Payments (Rs.)',
+                    data: paymentAmounts
+                }],
+                chart: {
+                    type: 'area',
+                    height: 280,
+                    toolbar: { show: false },
+                    fontFamily: 'Public Sans, sans-serif'
+                },
+                colors: ['#198754'],
+                dataLabels: { enabled: false },
+                stroke: { curve: 'smooth', width: 3, colors: ['#198754'] },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.4,
+                        opacityTo: 0.1,
+                        stops: [0, 90, 100]
+                    }
+                },
+                xaxis: {
+                    categories: paymentLabels,
+                    labels: { style: { colors: '#6c757d', fontSize: '11px' } },
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: '#6c757d', fontSize: '11px' },
+                        formatter: function(val) {
+                            if(val >= 1000000) return (val/1000000).toFixed(1) + 'M';
+                            if(val >= 1000) return (val/1000).toFixed(1) + 'K';
+                            return val;
+                        }
+                    }
+                },
+                grid: {
+                    borderColor: '#e9ecef',
+                    strokeDashArray: 4,
+                    padding: { left: 10, right: 10 }
+                },
+                tooltip: {
+                    theme: 'light',
+                    y: { formatter: function(val) { return 'Rs. ' + val.toLocaleString('en-PK'); } }
+                },
+                markers: {
+                    size: 4,
+                    colors: ['#198754'],
+                    strokeColors: '#fff',
+                    strokeWidth: 2
+                }
+            };
+            new ApexCharts(document.querySelector("#paymentsChart"), paymentsOptions).render();
+
+            // ==================== POLICY DISTRIBUTION CHART ====================
+            const policyLabels = [@string.Join(",", Model.PolicyDistributionData.Select(d => $"'{d.Label}'"))];
+            const policyCounts = [@string.Join(",", Model.PolicyDistributionData.Select(d => d.Count))];
+            const policyColors = [@string.Join(",", Model.PolicyDistributionData.Select(d => $"'{d.Color}'"))];
+
+            const policyOptions = {
+                series: policyCounts,
+                chart: {
+                    type: 'pie',
+                    height: 280,
+                    fontFamily: 'Public Sans, sans-serif'
+                },
+                labels: policyLabels,
+                colors: policyColors,
+                legend: { position: 'right', fontSize: '11px' },
+                dataLabels: { enabled: false },
+                tooltip: {
+                    theme: 'light',
+                    y: { formatter: function(val) { return val + " policies"; } }
+                }
+            };
+            new ApexCharts(document.querySelector("#policyChart"), policyOptions).render();
+
+            // ==================== LOAN STATUS CHART ====================
+            const loanLabels = [@string.Join(",", Model.LoanStatusData.Select(d => $"'{d.Label}'"))];
+            const loanCounts = [@string.Join(",", Model.LoanStatusData.Select(d => d.Count))];
+            const loanColors = [@string.Join(",", Model.LoanStatusData.Select(d => $"'{d.Color}'"))];
+
+            const loansOptions = {
+                series: [{
+                    name: 'Loans',
+                    data: loanCounts
+                }],
+                chart: {
+                    type: 'radialBar',
+                    height: 280,
+                    fontFamily: 'Public Sans, sans-serif'
+                },
+                colors: loanColors,
+                plotOptions: {
+                    radialBar: {
+                        dataLabels: {
+                            name: { fontSize: '14px', fontWeight: '600' },
+                            value: { fontSize: '16px', fontWeight: '700' },
+                            total: {
+                                show: true,
+                                label: 'Total',
+                                formatter: function(w) {
+                                    return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                }
+                            }
+                        }
+                    }
+                },
+                labels: loanLabels,
+                tooltip: {
+                    theme: 'light',
+                    y: { formatter: function(val) { return val + " loans"; } }
+                }
+            };
+            new ApexCharts(document.querySelector("#loansChart"), loansOptions).render();
+        });
+    </script>
+}

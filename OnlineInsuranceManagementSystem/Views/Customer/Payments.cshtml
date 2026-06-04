@@ -1,0 +1,876 @@
+﻿@model OnlineInsuranceManagementSystem.ViewModels.CustomerPaymentsIndexViewModel
+@{
+    ViewData["Title"] = "My Payments";
+    Layout = "~/Views/Shared/_CustomerLayout.cshtml";
+}
+
+<div class="card border-0 w-100 mb-3" style="border-radius: 30px; background-color: #f5f8fd;">
+    <div class="p-3 main-card">
+        <div class="container-fluid card-scroll-content px-3">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-3 flex-wrap gap-2">
+                <h4 class="mb-0">My Payments</h4>
+                <button class="btn btn-primary btn-sm d-flex align-items-center gap-1 rounded-pill px-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addPaymentModal">
+                    <i class="bx bx-plus"></i> Make Payment
+                </button>
+            </div>
+
+            <!-- TOP SUMMARY CARDS (EXACT SAME DESIGN AS ADMIN) -->
+            <div class="row g-3 mb-4">
+                <!-- Total Payments -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-credit-card text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Total Payments</h6>
+                                <small class="text-muted" id="totalPayments">@Model.TotalPayments</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Paid Payments -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-check-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Paid Payments</h6>
+                                <small class="text-muted" id="paidPayments">@Model.PaidPayments</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pending Payments -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-hourglass-split text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Pending Payments</h6>
+                                <small class="text-muted" id="pendingPayments">@Model.PendingPayments</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Failed Payments -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-x-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Failed Payments</h6>
+                                <small class="text-muted" id="failedPayments">@Model.FailedPayments</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter (EXACT SAME DESIGN AS ADMIN) -->
+            <div class="card custom-card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-3">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Payment ID</label>
+                            <input type="text" id="searchPaymentId"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter payment ID..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Policy/Transaction</label>
+                            <input type="text" id="searchName"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter policy or transaction ID..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Filter Status</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill active" data-filter="all">All</button>
+                                <button class="btn btn-sm btn-outline-success rounded-pill" data-filter="paid">Paid</button>
+                                <button class="btn btn-sm btn-outline-warning rounded-pill" data-filter="pending">Pending</button>
+                                <button class="btn btn-sm btn-outline-danger rounded-pill" data-filter="failed">Failed</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table (EXACT SAME DESIGN AS ADMIN) -->
+            <div class="card custom-card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h4 class="mb-1 fw-semibold">My Payments</h4>
+                            <small class="text-muted">Track your payment history</small>
+                        </div>
+                        <!-- Export Buttons (SAME FUNCTION AS ADMIN) -->
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                    onclick="exportTable('excel', 'paymentsTable', 'MyPayments')">
+                                <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                    onclick="exportTable('pdf', 'paymentsTable', 'MyPayments')">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body px-4">
+                    <div class="table-responsive p-3">
+                        <table class="table align-middle mb-0" id="paymentsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Payment ID</th>
+                                    <th>Policy Name</th>
+                                    <th>Insurance Type</th>
+                                    <th>Amount</th>
+                                    <th>Payment Method</th>
+                                    <th>Transaction ID</th>
+                                    <th>Payment Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var payment in Model.Payments)
+                                {
+                                    <tr data-status="@payment.Status.ToLower()">
+                                        <td>@payment.PaymentIdDisplay</td>
+                                        <td>@payment.PolicyName</td>
+                                        <td>@payment.InsuranceTypeName</td>
+                                        <td class="fw-semibold text-primary">$@payment.AmountDisplay</td>
+                                        <td>@(string.IsNullOrEmpty(payment.PaymentMethod) ? "-" : payment.PaymentMethod)</td>
+                                        <td class="text-muted small">@(string.IsNullOrEmpty(payment.TransactionId) ? "-" : payment.TransactionId)</td>
+                                        <td>@payment.PaymentDateDisplay</td>
+                                        <td>
+                                            <span class="badge @payment.StatusBadgeClass">@payment.StatusText</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm d-flex gap-2">
+                                                <!-- ✅ VIEW DETAILS BUTTON -->
+                                                <button class="btn btn-outline-info view-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#viewPaymentModal"
+                                                        data-paymentid="@payment.PaymentId"
+                                                        data-policyname="@payment.PolicyName"
+                                                        data-insurancetype="@payment.InsuranceTypeName"
+                                                        data-amount="@payment.Amount.ToString("F2")"
+                                                        data-paymentmethod="@(payment.PaymentMethod ?? "-")"
+                                                        data-transactionid="@(payment.TransactionId ?? "-")"
+                                                        data-paymentdate="@payment.PaymentDateDisplay"
+                                                        data-status="@payment.Status"
+                                                        title="View Details">
+                                                    View
+                                                </button>
+
+                                                <!-- ✅ DOWNLOAD RECEIPT BUTTON -->
+                                                <button class="btn btn-outline-success receipt-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#receiptModal"
+                                                        data-paymentid="@payment.PaymentId"
+                                                        title="Download Receipt">
+                                                    <i class="bi bi-receipt"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination (EXACT SAME AS ADMIN) -->
+                    <div class="d-flex justify-content-between align-items-center px-4 py-3 border-top">
+                        <small class="text-muted">Total Payments: @Model.Payments.Count</small>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MAKE PAYMENT MODAL (Replaces Admin Add Modal) ==================== -->
+<div class="modal fade" id="addPaymentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Make New Payment</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form id="makePaymentForm">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Policy Dropdown -->
+                    <select name="PolicyId" id="paymentPolicyId" class="form-select mb-2 rounded-pill" required>
+                        <option value="">Select Policy</option>
+                        @if (Model.ActivePolicies.Any())
+                        {
+                            @foreach (var policy in Model.ActivePolicies)
+                            {
+                                <option value="@policy.PolicyId"
+                                        data-premium="@policy.PremiumAmount"
+                                        data-coverage="@policy.CoverageAmount"
+                                        data-insurance="@policy.InsuranceTypeName">
+                                    @policy.PolicyName - Premium: $@policy.PremiumFormatted (@policy.InsuranceTypeName)
+                                </option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="" disabled>No eligible policies</option>
+                        }
+                    </select>
+                    <small class="text-muted ms-2" id="policyPremiumInfo"></small>
+
+                    <!-- Amount -->
+                    <input type="number" name="Amount" id="paymentAmount"
+                           class="form-control mb-2 rounded-pill"
+                           placeholder="Enter payment amount"
+                           step="0.01" min="0" required />
+
+                    <!-- Payment Method -->
+                    <select name="PaymentMethod" id="paymentMethod" class="form-select mb-2 rounded-pill" required>
+                        <option value="">Select Payment Method</option>
+                        <option value="Credit Card">Credit Card</option>
+                        <option value="Debit Card">Debit Card</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="PayPal">PayPal</option>
+                        <option value="Cash">Cash</option>
+                    </select>
+
+                    <!-- Transaction ID (Auto-generated, optional override) -->
+                    <input type="text" name="TransactionId" id="paymentTransactionId"
+                           class="form-control mb-2 rounded-pill"
+                           placeholder="Transaction ID (optional)"
+                           readonly />
+
+                    <!-- Payment Date (Auto-filled, read-only) -->
+                    <input type="date" name="PaymentDate" id="paymentDate"
+                           class="form-control mb-2 rounded-pill"
+                           value="@DateTime.Now.ToString("yyyy-MM-dd")"
+                           readonly />
+
+                    <div class="alert alert-info rounded-3 small mb-3">
+                        <i class="bx bx-info-circle me-1"></i>
+                        Your payment will be processed immediately. A receipt will be generated upon success.
+                    </div>
+
+                    <div class="modal-footer border-0 pt-3">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4" id="submitPaymentBtn">
+                            <i class="bx bx-credit-card me-1"></i> Process Payment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== VIEW PAYMENT DETAILS MODAL (Same Structure as Admin) ==================== -->
+<div class="modal fade" id="viewPaymentModal" tabindex="-1" aria-labelledby="viewPaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bx bx-credit-card text-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0" id="viewPaymentModalLabel">Payment Details</h5>
+                        <small class="text-muted" id="viewPaymentIdDisplay">#PAY-XXXX</small>
+                    </div>
+                </div>
+                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body - Card Style -->
+            <div class="modal-body pt-3">
+                <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+                        <!-- Policy Name -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-shield me-1"></i>Policy Name</label>
+                            <p class="form-control-plaintext fw-semibold mb-0" id="viewPolicyName">-</p>
+                        </div>
+                        <!-- Insurance Type -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-category me-1"></i>Insurance Type</label>
+                            <p class="form-control-plaintext mb-0" id="viewInsuranceType">-</p>
+                        </div>
+                        <!-- Amount -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-dollar me-1"></i>Amount</label>
+                            <p class="form-control-plaintext fw-semibold text-primary mb-0" id="viewAmount">-</p>
+                        </div>
+                        <!-- Payment Method -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-credit-card me-1"></i>Payment Method</label>
+                            <p class="form-control-plaintext mb-0" id="viewPaymentMethod">-</p>
+                        </div>
+                        <!-- Transaction ID -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-hash me-1"></i>Transaction ID</label>
+                            <p class="form-control-plaintext mb-0" id="viewTransactionId">-</p>
+                        </div>
+                        <!-- Payment Date & Status -->
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-calendar me-1"></i>Payment Date</label>
+                                <p class="form-control-plaintext mb-0" id="viewPaymentDate">-</p>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-badge-check me-1"></i>Status</label>
+                                <span id="viewStatusBadge" class="badge rounded-pill">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    Close
+                </button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== RECEIPT MODAL (Same Structure as Admin View Modal) ==================== -->
+<div class="modal fade" id="receiptModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Payment Receipt</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+                        <!-- Receipt Header -->
+                        <div class="text-center mb-4">
+                            <div class="bg-primary-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                <i class="bx bx-receipt text-primary" style="font-size: 28px;"></i>
+                            </div>
+                            <h6 class="fw-semibold mb-1">Payment Confirmation</h6>
+                            <small class="text-muted" id="receiptPaymentId">#PAY-XXXX</small>
+                        </div>
+
+                        <!-- Receipt Details -->
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">Policy</label>
+                                <p class="form-control-plaintext fw-semibold mb-0" id="receiptPolicyName">-</p>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">Insurance Type</label>
+                                <p class="form-control-plaintext mb-0" id="receiptInsuranceType">-</p>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">Amount Paid</label>
+                                <p class="form-control-plaintext fw-semibold text-primary mb-0" id="receiptAmount">-</p>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">Payment Method</label>
+                                <p class="form-control-plaintext mb-0" id="receiptPaymentMethod">-</p>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small text-muted mb-1">Transaction ID</label>
+                                <p class="form-control-plaintext mb-0" id="receiptTransactionId">-</p>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">Payment Date</label>
+                                <p class="form-control-plaintext mb-0" id="receiptPaymentDate">-</p>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">Status</label>
+                                <span id="receiptStatusBadge" class="badge rounded-pill">-</span>
+                            </div>
+                        </div>
+
+                        <!-- Receipt Footer -->
+                        <div class="mt-4 pt-3 border-top text-center">
+                            <small class="text-muted">Generated: <span id="receiptGeneratedAt">-</span></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    Close
+                </button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" id="printReceiptBtn">
+                    <i class="bi bi-printer me-1"></i> Print Receipt
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CSS STYLES (EXACT SAME AS ADMIN) ==================== -->
+<style>
+    .delete-modal {
+        border-radius: 22px;
+        border: none;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+        background: #ffffff;
+        overflow: visible;
+        animation: popIn 0.3s ease;
+    }
+
+    .delete-icon-wrapper {
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+
+    .delete-icon {
+        width: 85px;
+        height: 85px;
+        background: #fff5f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 6px solid white;
+    }
+
+        .delete-icon i {
+            font-size: 34px;
+            color: #ff3b3b;
+        }
+
+    @@keyframes popIn {
+        from {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* View Modal Enhancements */
+    #viewPaymentModal .form-control-plaintext,
+    #receiptModal .form-control-plaintext {
+        font-size: 1.05rem;
+        padding: 0.25rem 0;
+        border-bottom: 1px dashed #dee2e6;
+        border-radius: 0;
+    }
+
+        #viewPaymentModal .form-control-plaintext:hover,
+        #receiptModal .form-control-plaintext:hover {
+            border-bottom-color: #0d6efd;
+            transition: border-color 0.2s ease;
+        }
+
+    #viewPaymentModal .card,
+    #receiptModal .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        #viewPaymentModal .card:hover,
+        #receiptModal .card:hover {
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+    @@media (max-width: 576px) {
+        #viewPaymentModal .modal-body .card-body,
+        #receiptModal .modal-body .card-body {
+            padding: 1.25rem !important;
+        }
+
+        #viewPaymentModal .form-control-plaintext,
+        #receiptModal .form-control-plaintext {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<!-- ==================== JAVASCRIPT (SAME BEHAVIOR AS ADMIN) ==================== -->
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ==================== SEARCH FUNCTIONALITY (EXACT SAME AS ADMIN) ====================
+            const searchPaymentId = document.getElementById('searchPaymentId');
+            const searchName = document.getElementById('searchName');
+
+            function filterTable() {
+                const paymentIdVal = searchPaymentId.value.toLowerCase();
+                const nameVal = searchName.value.toLowerCase();
+
+                document.querySelectorAll("#paymentsTable tbody tr").forEach(row => {
+                    const paymentId = row.cells[0]?.textContent.toLowerCase() || '';
+                    const policyName = row.cells[1]?.textContent.toLowerCase() || '';
+                    const insuranceType = row.cells[2]?.textContent.toLowerCase() || '';
+                    const transactionId = row.cells[5]?.textContent.toLowerCase() || '';
+
+                    const matches = (paymentId.includes(paymentIdVal)) &&
+                                   (policyName.includes(nameVal) || insuranceType.includes(nameVal) || transactionId.includes(nameVal));
+
+                    row.style.display = matches ? "" : "none";
+                });
+            }
+
+            searchPaymentId.addEventListener("input", filterTable);
+            searchName.addEventListener("input", filterTable);
+
+
+            // ==================== PAGINATION (EXACT SAME AS ADMIN) ====================
+            const rowsPerPage = 10;
+            const tableRows = document.querySelectorAll("#paymentsTable tbody tr");
+            const pagination = document.getElementById("pagination");
+            let currentPage = 1;
+
+            function displayTablePage(page) {
+                currentPage = page;
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+
+                tableRows.forEach((row, index) => {
+                    if (row.style.display === "none") {
+                        row.dataset.hiddenByFilter = "true";
+                    } else {
+                        row.dataset.hiddenByFilter = "false";
+                    }
+
+                    const isVisible = row.dataset.hiddenByFilter !== "true";
+                    const isInPage = index >= start && index < end;
+                    row.style.display = (isVisible && isInPage) ? "" : "none";
+                });
+                updatePaginationButtons();
+            }
+
+            function updatePaginationButtons() {
+                const visibleRows = Array.from(tableRows).filter(row => row.dataset.hiddenByFilter !== "true");
+                const pageCount = Math.ceil(visibleRows.length / rowsPerPage) || 1;
+
+                if (currentPage > pageCount) currentPage = 1;
+                pagination.innerHTML = "";
+
+                const prevLi = document.createElement("li");
+                prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+                prevLi.innerHTML = `<a class="page-link rounded-start-pill" href="#">Prev</a>`;
+                prevLi.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (currentPage > 1) displayTablePage(currentPage - 1);
+                });
+                pagination.appendChild(prevLi);
+
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(pageCount, startPage + 4);
+                if (endPage - startPage < 4 && pageCount > 5) startPage = Math.max(1, endPage - 4);
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const li = document.createElement("li");
+                    li.className = `page-item ${currentPage === i ? "active" : ""}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        displayTablePage(i);
+                    });
+                    pagination.appendChild(li);
+                }
+
+                const nextLi = document.createElement("li");
+                nextLi.className = `page-item ${currentPage === pageCount ? "disabled" : ""}`;
+                nextLi.innerHTML = `<a class="page-link rounded-end-pill" href="#">Next</a>`;
+                nextLi.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (currentPage < pageCount) displayTablePage(currentPage + 1);
+                });
+                pagination.appendChild(nextLi);
+            }
+
+            displayTablePage(1);
+
+            const originalFilterTable = filterTable;
+            filterTable = function() {
+                originalFilterTable();
+                currentPage = 1;
+                displayTablePage(1);
+            };
+
+
+            // ==================== STATUS FILTER (EXACT SAME AS ADMIN) ====================
+            document.querySelectorAll("[data-filter]").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
+                    this.classList.add("active");
+
+                    const filter = this.getAttribute('data-filter');
+                    const rows = document.querySelectorAll("#paymentsTable tbody tr");
+
+                    rows.forEach(row => {
+                        const rowStatus = row.getAttribute('data-status');
+                        let showRow = (filter === 'all') || (filter === rowStatus);
+
+                        const paymentIdVal = searchPaymentId.value.toLowerCase();
+                        const nameVal = searchName.value.toLowerCase();
+                        const paymentId = row.cells[0]?.textContent.toLowerCase() || '';
+                        const policyName = row.cells[1]?.textContent.toLowerCase() || '';
+                        const insuranceType = row.cells[2]?.textContent.toLowerCase() || '';
+                        const transactionId = row.cells[5]?.textContent.toLowerCase() || '';
+                        const nameMatch = policyName.includes(nameVal) || insuranceType.includes(nameVal) || transactionId.includes(nameVal);
+                        const paymentIdMatch = paymentId.includes(paymentIdVal);
+
+                        if (showRow && nameMatch && paymentIdMatch) {
+                            row.style.display = '';
+                            row.dataset.hiddenByFilter = 'false';
+                        } else {
+                            row.style.display = 'none';
+                            row.dataset.hiddenByFilter = 'true';
+                        }
+                    });
+
+                    currentPage = 1;
+                    displayTablePage(1);
+                });
+            });
+
+
+            // ==================== MAKE PAYMENT FORM (AJAX) ====================
+            document.getElementById('makePaymentForm')?.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const submitBtn = document.getElementById('submitPaymentBtn');
+                const originalBtnText = submitBtn.innerHTML;
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin me-1"></i> Processing...';
+
+                try {
+                    const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                    const policyId = document.getElementById('paymentPolicyId').value;
+                    const amount = document.getElementById('paymentAmount').value;
+                    const paymentMethod = document.getElementById('paymentMethod').value;
+                    const transactionId = document.getElementById('paymentTransactionId').value;
+
+                    if (!policyId || !amount || !paymentMethod) {
+                        throw new Error('Please fill all required fields');
+                    }
+
+                    const formData = new FormData();
+                    formData.append('PolicyId', policyId);
+                    formData.append('Amount', amount);
+                    formData.append('PaymentMethod', paymentMethod);
+                    if (transactionId) formData.append('TransactionId', transactionId);
+                    formData.append('__RequestVerificationToken', csrfToken);
+
+                    const response = await fetch('/Customer/CreatePayment', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showAlert('success', result.message);
+
+                        const modalInstance = bootstrap.Modal.getInstance(document.getElementById('addPaymentModal'));
+                        modalInstance.hide();
+
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showAlert('danger', result.message || 'Payment failed. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Payment error:', error);
+                    showAlert('danger', 'Network error. Please check your connection.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            });
+
+
+            // ==================== POLICY PREMIUM INFO DISPLAY ====================
+            document.getElementById('paymentPolicyId')?.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const premium = selectedOption.getAttribute('data-premium');
+                const coverage = selectedOption.getAttribute('data-coverage');
+
+                // Auto-fill amount with premium if not already set
+                if (premium && !document.getElementById('paymentAmount').value) {
+                    document.getElementById('paymentAmount').value = parseFloat(premium).toFixed(2);
+                }
+
+                // Generate transaction ID preview
+                const timestamp = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 14);
+                document.getElementById('paymentTransactionId').value = `TXN-${timestamp}-${Date.now().toString().slice(-4)}`;
+
+                if (premium) {
+                    document.getElementById('policyPremiumInfo').textContent =
+                        `Coverage Amount: $${parseFloat(coverage).toFixed(2)}`;
+                } else {
+                    document.getElementById('policyPremiumInfo').textContent = '';
+                }
+            });
+
+
+            // ==================== VIEW MODAL - Populate Payment Data ====================
+            const viewModal = document.getElementById('viewPaymentModal');
+            viewModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+
+                document.getElementById('viewPaymentIdDisplay').textContent = `#PAY-${button.getAttribute('data-paymentid')}`;
+                document.getElementById('viewPolicyName').textContent = button.getAttribute('data-policyname') || '-';
+                document.getElementById('viewInsuranceType').textContent = button.getAttribute('data-insurancetype') || '-';
+                document.getElementById('viewAmount').textContent = `$${parseFloat(button.getAttribute('data-amount')).toFixed(2)}`;
+                document.getElementById('viewPaymentMethod').textContent = button.getAttribute('data-paymentmethod') || '-';
+                document.getElementById('viewTransactionId').textContent = button.getAttribute('data-transactionid') || '-';
+                document.getElementById('viewPaymentDate').textContent = button.getAttribute('data-paymentdate') || '-';
+
+                // Status Badge
+                const status = button.getAttribute('data-status')?.toLowerCase();
+                const statusBadge = document.getElementById('viewStatusBadge');
+                if (status === 'paid') {
+                    statusBadge.className = 'badge bg-success-subtle text-success rounded-pill';
+                    statusBadge.textContent = 'Paid';
+                } else if (status === 'failed') {
+                    statusBadge.className = 'badge bg-danger-subtle text-danger rounded-pill';
+                    statusBadge.textContent = 'Failed';
+                } else {
+                    statusBadge.className = 'badge bg-warning-subtle text-warning rounded-pill';
+                    statusBadge.textContent = 'Pending';
+                }
+
+                // Download receipt button in view modal
+                document.getElementById('viewDownloadReceiptBtn').onclick = function() {
+                    const paymentId = button.getAttribute('data-paymentid');
+                    const modalInstance = bootstrap.Modal.getInstance(viewModal);
+                    modalInstance.hide();
+                    setTimeout(() => {
+                        const fakeReceiptBtn = document.createElement('button');
+                        fakeReceiptBtn.setAttribute('data-bs-toggle', 'modal');
+                        fakeReceiptBtn.setAttribute('data-bs-target', '#receiptModal');
+                        fakeReceiptBtn.setAttribute('data-paymentid', paymentId);
+                        document.body.appendChild(fakeReceiptBtn);
+                        fakeReceiptBtn.click();
+                        fakeReceiptBtn.remove();
+                    }, 150);
+                };
+            });
+
+
+            // ==================== RECEIPT MODAL - Fetch & Display Receipt ====================
+            const receiptModal = document.getElementById('receiptModal');
+            receiptModal.addEventListener('show.bs.modal', async function (event) {
+                const button = event.relatedTarget;
+                const paymentId = button.getAttribute('data-paymentid');
+
+                try {
+                    const response = await fetch(`/Customer/DownloadReceipt?paymentId=${paymentId}`);
+                    const data = await response.json();
+
+                    if (data.error) throw new Error(data.error);
+
+                    // Populate receipt fields
+                    document.getElementById('receiptPaymentId').textContent = data.paymentId;
+                    document.getElementById('receiptPolicyName').textContent = data.policyName;
+                    document.getElementById('receiptInsuranceType').textContent = data.insuranceType;
+                    document.getElementById('receiptAmount').textContent = `$${data.amount}`;
+                    document.getElementById('receiptPaymentMethod').textContent = data.paymentMethod;
+                    document.getElementById('receiptTransactionId').textContent = data.transactionId;
+                    document.getElementById('receiptPaymentDate').textContent = data.paymentDate;
+                    document.getElementById('receiptGeneratedAt').textContent = data.generatedAt;
+
+                    // Status Badge
+                    const statusBadge = document.getElementById('receiptStatusBadge');
+                    const status = data.status.toLowerCase();
+                    if (status === 'paid') {
+                        statusBadge.className = 'badge bg-success-subtle text-success rounded-pill';
+                        statusBadge.textContent = 'Paid';
+                    } else if (status === 'failed') {
+                        statusBadge.className = 'badge bg-danger-subtle text-danger rounded-pill';
+                        statusBadge.textContent = 'Failed';
+                    } else {
+                        statusBadge.className = 'badge bg-warning-subtle text-warning rounded-pill';
+                        statusBadge.textContent = 'Pending';
+                    }
+                } catch (error) {
+                    console.error('Receipt error:', error);
+                    document.getElementById('receiptPolicyName').textContent = 'Error loading receipt';
+                }
+            });
+
+
+            // ==================== PRINT RECEIPT FUNCTIONALITY ====================
+            document.getElementById('printReceiptBtn')?.addEventListener('click', function() {
+                // Simple print - in production, use jsPDF or similar for PDF generation
+                window.print();
+            });
+
+
+            // ==================== UTILITY: Show Alert ====================
+            function showAlert(type, message) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow-sm`;
+                alertDiv.style.zIndex = '9999';
+                alertDiv.role = 'alert';
+                alertDiv.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+                document.body.appendChild(alertDiv);
+                setTimeout(() => { if (alertDiv.parentNode) alertDiv.remove(); }, 5000);
+            }
+
+
+            // ==================== EXPORT FUNCTIONS (EXACT SAME AS ADMIN) ====================
+            window.exportTable = function(format, tableId, filename) {
+                const table = document.getElementById(tableId);
+                if (!table) return;
+
+                if (format === 'excel') {
+                    let csv = [];
+                    const rows = table.querySelectorAll("tr");
+                    for (let row of rows) {
+                        let cols = row.querySelectorAll("td, th");
+                        let data = [];
+                        for (let col of cols) {
+                            let text = col.innerText.replace(/"/g, '""');
+                            data.push('"' + text + '"');
+                        }
+                        csv.push(data.join(","));
+                    }
+                    const csvFile = new Blob([csv.join("\n")], {type: "text/csv"});
+                    const downloadLink = document.createElement("a");
+                    downloadLink.href = URL.createObjectURL(csvFile);
+                    downloadLink.download = `${filename}_${new Date().toISOString().slice(0,10)}.csv`;
+                    downloadLink.click();
+                }
+            };
+
+        });
+    </script>
+}

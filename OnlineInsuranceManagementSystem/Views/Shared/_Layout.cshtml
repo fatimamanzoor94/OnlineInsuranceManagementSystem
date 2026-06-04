@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OIMS | Online Insurance Management System</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="@Url.Content("~/css/site.css")" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="@Url.Content("~/images/Logo.png")">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+        theme: {
+        extend: {
+        colors: {
+        primary: '#08979D',
+        secondary: '#2F9D94',
+        accent: '#025f67',
+        success: '#23BBB7',
+        background: '#F6F6F6',
+        muted: '#36454f',
+        deep: '#063154',
+        border: '#bcc5cc',
+        },
+        fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        }
+        }
+        }
+        }
+    </script>
+</head>
+
+<body>
+
+    @RenderBody()
+
+    <!-- JS -->
+    <script src="@Url.Content("~/js/site.js")"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>
+

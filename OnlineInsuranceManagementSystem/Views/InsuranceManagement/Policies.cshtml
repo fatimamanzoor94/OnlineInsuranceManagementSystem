@@ -1,0 +1,727 @@
+@model List<OnlineInsuranceManagementSystem.Models.Policy>
+@{
+    ViewData["Title"] = "Policies Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card border-0 w-100 mb-3" style="border-radius: 30px; background-color: #f5f8fd;">
+    <div class="p-3 main-card">
+        <div class="container-fluid card-scroll-content px-3">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-3 flex-wrap gap-2">
+                <h4 class="mb-0">Policies Management</h4>
+                <button class="btn btn-primary btn-sm d-flex align-items-center gap-1 rounded-pill px-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addPolicyModal">
+                    <i class="bx bx-plus"></i> Add Policy
+                </button>
+            </div>
+
+            <!-- Search & Filter -->
+            <div class="card custom-card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-3">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Policy Name</label>
+                            <input type="text" id="searchPolicyName"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter policy name..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Insurance Type</label>
+                            <select id="searchInsuranceType" class="form-control form-control-sm rounded-pill px-3">
+                                <option value="">All Types</option>
+                                @foreach (var type in ViewBag.InsuranceTypes as List<OnlineInsuranceManagementSystem.Models.InsuranceType>)
+                                {
+                                    <option value="@type.Name">@type.Name</option>
+                                }
+                            </select>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="card custom-card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h4 class="mb-1 fw-semibold">All Policies</h4>
+                            <small class="text-muted">Manage your insurance policies</small>
+                        </div>
+                        <!-- Export Buttons -->
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                    onclick="exportTable('excel', 'policiesTable', 'Policies')">
+                                <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                    onclick="exportTable('pdf', 'policiesTable', 'Policies')">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body px-4">
+                    <div class="table-responsive p-3">
+                        <table class="table align-middle mb-0" id="policiesTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Policy ID</th>
+                                    <th>Policy Name</th>
+                                    <th>Insurance Type</th>
+                                    <th>Premium Amount</th>
+                                    <th>Duration</th>
+                                    <th>Coverage Amount</th>
+                                    <th>Status</th>
+                                    <th>Created Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var policy in Model)
+                                {
+                                    var insuranceType = ViewBag.InsuranceTypes as List<OnlineInsuranceManagementSystem.Models.InsuranceType>;
+                                    var typeName = insuranceType?.FirstOrDefault(t => t.InsuranceTypeId == policy.InsuranceTypeId)?.Name ?? "Unknown";
+
+                                    <tr>
+                                        <td>#POL-@policy.PolicyId</td>
+                                        <td>@policy.PolicyName</td>
+                                        <td>@typeName</td>
+                                        <td>$@policy.PremiumAmount.ToString("N2")</td>
+                                        <td>@policy.Duration Months</td>
+                                        <td>$@policy.CoverageAmount.ToString("N2")</td>
+                                        <td>
+                                            @if (policy.Status)
+                                            {
+                                                <span class="badge bg-success-subtle text-success">Active</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                                            }
+                                        </td>
+                                        <td>@policy.CreatedAt.ToString("dd-MMM-yyyy")</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm d-flex gap-2">
+                                                <!-- VIEW BUTTON -->
+                                                <button class="btn btn-outline-info view-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#viewPolicyModal"
+                                                        data-policyid="@policy.PolicyId"
+                                                        data-policyname="@policy.PolicyName"
+                                                        data-insurancetypeid="@policy.InsuranceTypeId"
+                                                        data-insurancetypename="@typeName"
+                                                        data-premiumamount="@policy.PremiumAmount.ToString("F2")"
+                                                        data-duration="@policy.Duration"
+                                                        data-coverageamount="@policy.CoverageAmount.ToString("F2")"
+                                                        data-terms="@policy.Terms"
+                                                        data-status="@policy.Status"
+                                                        data-createdat="@policy.CreatedAt.ToString("dd-MMM-yyyy")"
+                                                        title="View Details">
+                                                    View
+                                                </button>
+
+                                                <!-- EDIT BUTTON -->
+                                                <button class="btn btn-outline-warning edit-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editPolicyModal"
+                                                        data-policyid="@policy.PolicyId"
+                                                        data-policyname="@policy.PolicyName"
+                                                        data-insurancetypeid="@policy.InsuranceTypeId"
+                                                        data-premiumamount="@policy.PremiumAmount.ToString("F2")"
+                                                        data-duration="@policy.Duration"
+                                                        data-coverageamount="@policy.CoverageAmount.ToString("F2")"
+                                                        data-terms="@policy.Terms"
+                                                        data-status="@policy.Status"
+                                                        title="Edit">
+                                                    Edit
+                                                </button>
+
+                                                <!-- DELETE BUTTON -->
+                                                <button type="button"
+                                                        class="btn btn-outline-danger delete-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deletePolicyModal"
+                                                        data-policyid="@policy.PolicyId"
+                                                        data-policyname="@policy.PolicyName"
+                                                        title="Delete">
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== ADD POLICY MODAL ==================== -->
+<div class="modal fade" id="addPolicyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Add New Policy</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form asp-action="CreatePolicy" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <input type="text" name="PolicyName" class="form-control mb-2 rounded-pill px-3" placeholder="Policy Name" required maxlength="100" />
+
+                    <select name="InsuranceTypeId" class="form-select mb-2 rounded-pill px-3" required>
+                        <option value="">-- Select Insurance Type --</option>
+                        @foreach (var type in ViewBag.InsuranceTypes as List<OnlineInsuranceManagementSystem.Models.InsuranceType>)
+                        {
+                            <option value="@type.InsuranceTypeId">@type.Name</option>
+                        }
+                    </select>
+
+                    <div class="row g-2 mb-2">
+                        <div class="col">
+                            <input type="number" name="PremiumAmount" step="0.01" min="0" class="form-control rounded-pill px-3" placeholder="Premium Amount ($)" required />
+                        </div>
+                        <div class="col">
+                            <input type="number" name="Duration" min="1" class="form-control rounded-pill px-3" placeholder="Duration (Months)" required />
+                        </div>
+                    </div>
+
+                    <input type="number" name="CoverageAmount" step="0.01" min="0" class="form-control mb-2 rounded-pill px-3" placeholder="Coverage Amount ($)" required />
+
+                    <textarea name="Terms" class="form-control mb-2 rounded-3 px-3" placeholder="Policy Terms & Conditions" rows="3" maxlength="2000"></textarea>
+
+                    <select name="Status" class="form-select mb-2 rounded-pill px-3">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+
+                    <div class="modal-footer border-0 pt-3">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">Save Policy</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== EDIT POLICY MODAL ==================== -->
+<div class="modal fade" id="editPolicyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Edit Policy</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form asp-action="EditPolicy" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="editPolicyId" name="PolicyId" />
+
+                    <input type="text" id="editPolicyName" name="PolicyName" class="form-control mb-2 rounded-pill px-3" placeholder="Policy Name" required maxlength="100" />
+
+                    <select id="editInsuranceTypeId" name="InsuranceTypeId" class="form-select mb-2 rounded-pill px-3" required>
+                        <option value="">-- Select Insurance Type --</option>
+                        @foreach (var type in ViewBag.InsuranceTypes as List<OnlineInsuranceManagementSystem.Models.InsuranceType>)
+                        {
+                            <option value="@type.InsuranceTypeId">@type.Name</option>
+                        }
+                    </select>
+
+                    <div class="row g-2 mb-2">
+                        <div class="col">
+                            <input type="number" id="editPremiumAmount" name="PremiumAmount" step="0.01" min="0" class="form-control rounded-pill px-3" placeholder="Premium Amount ($)" required />
+                        </div>
+                        <div class="col">
+                            <input type="number" id="editDuration" name="Duration" min="1" class="form-control rounded-pill px-3" placeholder="Duration (Months)" required />
+                        </div>
+                    </div>
+
+                    <input type="number" id="editCoverageAmount" name="CoverageAmount" step="0.01" min="0" class="form-control mb-2 rounded-pill px-3" placeholder="Coverage Amount ($)" required />
+
+                    <textarea id="editTerms" name="Terms" class="form-control mb-2 rounded-3 px-3" placeholder="Policy Terms & Conditions" rows="3" maxlength="2000"></textarea>
+
+                    <select id="editStatus" name="Status" class="form-select mb-2 rounded-pill px-3">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+
+                    <div class="modal-footer border-0 pt-3">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">Update Policy</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== DELETE POLICY MODAL ==================== -->
+<div class="modal fade" id="deletePolicyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content delete-modal position-relative">
+            <div class="delete-icon-wrapper">
+                <div class="icon-box">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+            </div>
+            <div class="modal-body text-center pt-5 pb-4">
+                <h4 class="fw-bold">Delete Policy?</h4>
+                <p class="text-muted">
+                    You are about to delete <strong id="deletePolicyName"></strong><br />
+                    This action cannot be undone.
+                </p>
+                <form asp-action="DeletePolicy" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="deletePolicyId" name="id" />
+                    <div class="d-flex gap-2 justify-content-center mt-3">
+                        <button type="button" class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger px-4 rounded-pill">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== VIEW POLICY DETAILS MODAL ==================== -->
+<div class="modal fade" id="viewPolicyModal" tabindex="-1" aria-labelledby="viewPolicyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bx bx-shield-quarter text-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0" id="viewPolicyModalLabel">Policy Details</h5>
+                        <small class="text-muted" id="viewPolicyIdDisplay">#POL-XXXX</small>
+                    </div>
+                </div>
+                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body - Card Style -->
+            <div class="modal-body pt-3">
+                <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+                        <!-- Policy Name -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-tag me-1"></i>Policy Name</label>
+                            <p class="form-control-plaintext fw-semibold mb-0" id="viewPolicyName">-</p>
+                        </div>
+
+                        <!-- Insurance Type -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-category me-1"></i>Insurance Type</label>
+                            <p class="form-control-plaintext mb-0" id="viewInsuranceType">-</p>
+                        </div>
+
+                        <!-- Premium & Coverage -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-dollar me-1"></i>Premium Amount</label>
+                                <p class="form-control-plaintext fw-semibold mb-0" id="viewPremiumAmount">-</p>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-wallet me-1"></i>Coverage Amount</label>
+                                <p class="form-control-plaintext fw-semibold mb-0" id="viewCoverageAmount">-</p>
+                            </div>
+                        </div>
+
+                        <!-- Duration -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-time me-1"></i>Duration</label>
+                            <p class="form-control-plaintext mb-0" id="viewDuration">-</p>
+                        </div>
+
+                        <!-- Terms -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-file me-1"></i>Terms & Conditions</label>
+                            <p class="form-control-plaintext mb-0" id="viewTerms" style="white-space: pre-wrap; max-height: 120px; overflow-y: auto;">-</p>
+                        </div>
+
+                        <!-- Status & Created Date -->
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-badge-check me-1"></i>Status</label>
+                                <span id="viewStatusBadge" class="badge rounded-pill">-</span>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-calendar me-1"></i>Created Date</label>
+                                <p class="form-control-plaintext fw-medium mb-0" id="viewCreatedAt">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    Close
+                </button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" id="viewEditPolicyBtn">
+                    Edit Policy
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CSS STYLES ==================== -->
+<style>
+    /* Delete Modal Animation */
+    .delete-modal {
+        border-radius: 22px;
+        border: none;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+        background: #ffffff;
+        overflow: visible;
+        animation: popIn 0.3s ease;
+    }
+
+    .delete-icon-wrapper {
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+
+    .icon-box {
+        width: 85px;
+        height: 85px;
+        background: #fff5f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 6px solid white;
+    }
+
+        .icon-box i {
+            font-size: 34px;
+            color: #ff3b3b;
+        }
+
+    @@keyframes popIn {
+        from {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* View Modal Enhancements */
+    #viewPolicyModal .form-control-plaintext {
+        font-size: 1.05rem;
+        padding: 0.25rem 0;
+        border-bottom: 1px dashed #dee2e6;
+        border-radius: 0;
+    }
+
+        #viewPolicyModal .form-control-plaintext:hover {
+            border-bottom-color: #0d6efd;
+            transition: border-color 0.2s ease;
+        }
+
+    #viewPolicyModal .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        #viewPolicyModal .card:hover {
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+    #viewPolicyModal #viewTerms {
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    @@media (max-width: 576px) {
+        #viewPolicyModal .modal-body .card-body {
+            padding: 1.25rem !important;
+        }
+
+        #viewPolicyModal .form-control-plaintext {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ==================== SEARCH FUNCTIONALITY ====================
+            const searchPolicyName = document.getElementById('searchPolicyName');
+            const searchInsuranceType = document.getElementById('searchInsuranceType');
+
+            function filterTable() {
+                const nameVal = searchPolicyName.value.toLowerCase();
+                const typeVal = searchInsuranceType.value;
+
+                document.querySelectorAll("#policiesTable tbody tr").forEach(row => {
+                    const name = row.cells[1]?.textContent.toLowerCase() || '';
+                    const type = row.cells[2]?.textContent.toLowerCase() || '';
+
+                    const nameMatch = name.includes(nameVal);
+                    const typeMatch = typeVal === "" || type.includes(typeVal.toLowerCase());
+
+                    row.style.display = (nameMatch && typeMatch) ? "" : "none";
+                });
+            }
+
+            searchPolicyName.addEventListener("input", filterTable);
+            searchInsuranceType.addEventListener("change", filterTable);
+
+
+            // ==================== PAGINATION ====================
+            const rowsPerPage = 10;
+            const tableRows = document.querySelectorAll("#policiesTable tbody tr");
+            const pagination = document.getElementById("pagination");
+            let currentPage = 1;
+
+            function displayTablePage(page) {
+                currentPage = page;
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+
+                tableRows.forEach((row, index) => {
+                    // Only show if not hidden by search/filter
+                    if (row.style.display === "none") {
+                        row.dataset.hiddenByFilter = "true";
+                    } else {
+                        row.dataset.hiddenByFilter = "false";
+                    }
+
+                    const isVisible = row.dataset.hiddenByFilter !== "true";
+                    const isInPage = index >= start && index < end;
+
+                    row.style.display = (isVisible && isInPage) ? "" : "none";
+                });
+                updatePaginationButtons();
+            }
+
+            function updatePaginationButtons() {
+                // Count only visible rows (not filtered out)
+                const visibleRows = Array.from(tableRows).filter(row => row.dataset.hiddenByFilter !== "true");
+                const pageCount = Math.ceil(visibleRows.length / rowsPerPage) || 1;
+
+                // Reset currentPage if out of bounds
+                if (currentPage > pageCount) currentPage = 1;
+
+                pagination.innerHTML = "";
+
+                // Prev Button
+                const prevLi = document.createElement("li");
+                prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+                prevLi.innerHTML = `<a class="page-link rounded-start-pill" href="#">Prev</a>`;
+                prevLi.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (currentPage > 1) displayTablePage(currentPage - 1);
+                });
+                pagination.appendChild(prevLi);
+
+                // Page Numbers (show max 5 around current)
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(pageCount, startPage + 4);
+
+                if (endPage - startPage < 4 && pageCount > 5) {
+                    startPage = Math.max(1, endPage - 4);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const li = document.createElement("li");
+                    li.className = `page-item ${currentPage === i ? "active" : ""}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        displayTablePage(i);
+                    });
+                    pagination.appendChild(li);
+                }
+
+                // Next Button
+                const nextLi = document.createElement("li");
+                nextLi.className = `page-item ${currentPage === pageCount ? "disabled" : ""}`;
+                nextLi.innerHTML = `<a class="page-link rounded-end-pill" href="#">Next</a>`;
+                nextLi.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (currentPage < pageCount) displayTablePage(currentPage + 1);
+                });
+                pagination.appendChild(nextLi);
+            }
+
+            // Initial pagination
+            displayTablePage(1);
+
+            // Re-apply pagination after filter changes
+            const originalFilterTable = filterTable;
+            filterTable = function() {
+                originalFilterTable();
+                currentPage = 1;
+                displayTablePage(1);
+            };
+
+
+            // ==================== STATUS FILTER ====================
+            document.querySelectorAll("[data-filter]").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
+                    this.classList.add("active");
+
+                    const filter = this.getAttribute('data-filter');
+                    const rows = document.querySelectorAll("#policiesTable tbody tr");
+
+                    rows.forEach(row => {
+                        const statusBadge = row.cells[6]?.querySelector('.badge');
+                        const isActive = statusBadge && statusBadge.classList.contains('bg-success-subtle');
+
+                        let showRow = false;
+
+                        if (filter === 'all') {
+                            showRow = true;
+                        } else if (filter === 'active' && isActive) {
+                            showRow = true;
+                        } else if (filter === 'inactive' && !isActive) {
+                            showRow = true;
+                        }
+
+                        // Also respect search filters
+                        const nameVal = searchPolicyName.value.toLowerCase();
+                        const typeVal = searchInsuranceType.value;
+                        const name = row.cells[1]?.textContent.toLowerCase() || '';
+                        const type = row.cells[2]?.textContent.toLowerCase() || '';
+                        const nameMatch = name.includes(nameVal);
+                        const typeMatch = typeVal === "" || type.includes(typeVal.toLowerCase());
+
+                        if (showRow && nameMatch && typeMatch) {
+                            row.style.display = '';
+                            row.dataset.hiddenByFilter = 'false';
+                        } else {
+                            row.style.display = 'none';
+                            row.dataset.hiddenByFilter = 'true';
+                        }
+                    });
+
+                    // Reset to page 1 and update pagination
+                    currentPage = 1;
+                    displayTablePage(1);
+                });
+            });
+
+
+            // ==================== EDIT MODAL - Populate Data ====================
+            const editModal = document.getElementById('editPolicyModal');
+            editModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+
+                document.getElementById('editPolicyId').value = button.getAttribute('data-policyid');
+                document.getElementById('editPolicyName').value = button.getAttribute('data-policyname');
+                document.getElementById('editInsuranceTypeId').value = button.getAttribute('data-insurancetypeid');
+                document.getElementById('editPremiumAmount').value = button.getAttribute('data-premiumamount');
+                document.getElementById('editDuration').value = button.getAttribute('data-duration');
+                document.getElementById('editCoverageAmount').value = button.getAttribute('data-coverageamount');
+                document.getElementById('editTerms').value = button.getAttribute('data-terms') || '';
+
+                const status = button.getAttribute('data-status');
+                document.getElementById('editStatus').value = (status && status.toLowerCase() === 'true') ? 'true' : 'false';
+            });
+
+
+            // ==================== DELETE MODAL - Populate Data ====================
+            const deleteModal = document.getElementById('deletePolicyModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                document.getElementById('deletePolicyId').value = button.getAttribute('data-policyid');
+                document.getElementById('deletePolicyName').textContent = button.getAttribute('data-policyname');
+            });
+
+
+            // ==================== VIEW MODAL - Populate Data ====================
+            const viewModal = document.getElementById('viewPolicyModal');
+
+            viewModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+
+                const policyId = button.getAttribute('data-policyid');
+                const policyName = button.getAttribute('data-policyname');
+                const insuranceTypeName = button.getAttribute('data-insurancetypename');
+                const premiumAmount = button.getAttribute('data-premiumamount');
+                const duration = button.getAttribute('data-duration');
+                const coverageAmount = button.getAttribute('data-coverageamount');
+                const terms = button.getAttribute('data-terms') || 'No terms specified';
+                const statusRaw = button.getAttribute('data-status');
+                const status = (statusRaw === 'True' || statusRaw === 'true' || statusRaw === '1');
+                const createdAt = button.getAttribute('data-createdat');
+
+                // Populate fields
+                document.getElementById('viewPolicyIdDisplay').textContent = `#POL-${policyId}`;
+                document.getElementById('viewPolicyName').textContent = policyName || '-';
+                document.getElementById('viewInsuranceType').textContent = insuranceTypeName || '-';
+                document.getElementById('viewPremiumAmount').textContent = premiumAmount ? `$${parseFloat(premiumAmount).toFixed(2)}` : '-';
+                document.getElementById('viewDuration').textContent = duration ? `${duration} Months` : '-';
+                document.getElementById('viewCoverageAmount').textContent = coverageAmount ? `$${parseFloat(coverageAmount).toFixed(2)}` : '-';
+                document.getElementById('viewTerms').textContent = terms;
+
+                // Status Badge
+                const statusBadge = document.getElementById('viewStatusBadge');
+                if (status) {
+                    statusBadge.className = 'badge bg-success-subtle text-success rounded-pill';
+                    statusBadge.textContent = 'Active';
+                } else {
+                    statusBadge.className = 'badge bg-danger-subtle text-danger rounded-pill';
+                    statusBadge.textContent = 'Inactive';
+                }
+
+                // Created Date
+                document.getElementById('viewCreatedAt').textContent = createdAt || '-';
+
+                // Edit button in view modal -> open edit modal
+                document.getElementById('viewEditPolicyBtn').onclick = function() {
+                    const modalInstance = bootstrap.Modal.getInstance(viewModal);
+                    modalInstance.hide();
+
+                    setTimeout(() => {
+                        // Reuse the same data attributes to trigger edit modal
+                        const fakeEditBtn = document.createElement('button');
+                        fakeEditBtn.setAttribute('data-bs-toggle', 'modal');
+                        fakeEditBtn.setAttribute('data-bs-target', '#editPolicyModal');
+                        fakeEditBtn.setAttribute('data-policyid', policyId);
+                        fakeEditBtn.setAttribute('data-policyname', policyName);
+                        fakeEditBtn.setAttribute('data-insurancetypeid', button.getAttribute('data-insurancetypeid'));
+                        fakeEditBtn.setAttribute('data-premiumamount', premiumAmount);
+                        fakeEditBtn.setAttribute('data-duration', duration);
+                        fakeEditBtn.setAttribute('data-coverageamount', coverageAmount);
+                        fakeEditBtn.setAttribute('data-terms', terms);
+                        fakeEditBtn.setAttribute('data-status', statusRaw);
+                        document.body.appendChild(fakeEditBtn);
+                        fakeEditBtn.click();
+                        fakeEditBtn.remove();
+                    }, 150);
+                };
+            });
+
+        });
+    </script>
+}

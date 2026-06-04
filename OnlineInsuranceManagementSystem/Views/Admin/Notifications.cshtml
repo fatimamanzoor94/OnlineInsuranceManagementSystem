@@ -1,0 +1,883 @@
+@model List<OnlineInsuranceManagementSystem.ViewModels.NotificationViewModel>
+@{
+    ViewData["Title"] = "Notifications Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card border-0 w-100 mb-3" style="border-radius: 30px; background-color: #f5f8fd;">
+    <div class="p-3 main-card">
+        <div class="container-fluid card-scroll-content px-3">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-3 flex-wrap gap-2">
+                <h4 class="mb-0">Notifications Management</h4>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary btn-sm d-flex align-items-center gap-1 rounded-pill px-3"
+                            onclick="refreshNotifications()"
+                            title="Refresh Notifications">
+                        <i class="bx bx-refresh"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- TOP SUMMARY CARDS (Same as Applications.cshtml) -->
+            <div class="row g-3 mb-4">
+                <!-- Total Notifications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-bell text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Total Notifications</h6>
+                                <small class="text-muted" id="totalNotifications">@ViewBag.TotalNotifications</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Unread Notifications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-envelope text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Unread Notifications</h6>
+                                <small class="text-muted" id="unreadNotifications">@ViewBag.UnreadNotifications</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Read Notifications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-check-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Read Notifications</h6>
+                                <small class="text-muted" id="readNotifications">@ViewBag.ReadNotifications</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Today's Notifications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-calendar-day text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Today's Notifications</h6>
+                                <small class="text-muted" id="todayNotifications">@ViewBag.TodayNotifications</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter (Same as Applications.cshtml) -->
+            <div class="card custom-card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-3">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search Notification</label>
+                            <input type="text" id="searchNotification"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Search message or title..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Filter by Module</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill active" data-filter="all">All</button>
+                                <button class="btn btn-sm btn-outline-primary rounded-pill" data-filter="applications">Applications</button>
+                                <button class="btn btn-sm btn-outline-success rounded-pill" data-filter="claims">Claims</button>
+                                <button class="btn btn-sm btn-outline-info rounded-pill" data-filter="payments">Payments</button>
+                                <button class="btn btn-sm btn-outline-warning rounded-pill" data-filter="messages">Messages</button>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Filter Status</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill active" data-status="all">All</button>
+                                <button class="btn btn-sm btn-outline-warning rounded-pill" data-status="unread">Unread</button>
+                                <button class="btn btn-sm btn-outline-success rounded-pill" data-status="read">Read</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table (Same as Applications.cshtml) -->
+            <div class="card custom-card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h4 class="mb-1 fw-semibold">System Notifications</h4>
+                            <small class="text-muted">Review and manage system-generated notifications</small>
+                        </div>
+                        <!-- Export Buttons -->
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-success rounded-pill px-3"
+                                    onclick="markAllAsRead()">
+                                <i class="bi bi-check-all me-1"></i> Mark All Read
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                    onclick="exportTable('excel', 'notificationsTable', 'Notifications')">
+                                <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                    onclick="exportTable('pdf', 'notificationsTable', 'Notifications')">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body px-4">
+                    <div class="table-responsive p-3">
+                        <table class="table align-middle mb-0" id="notificationsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Notification ID</th>
+                                    <th>Title</th>
+                                    <th>Message</th>
+                                    <th>Module</th>
+                                    <th>Type</th>
+                                    <th>Date & Time</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var notification in Model)
+                                {
+                                    <tr data-status="@(notification.IsRead ? "read" : "unread")"
+                                        data-module="@(notification.RelatedModule?.ToLower() ?? "general")"
+                                        data-date="@notification.CreatedDate.ToString("yyyy-MM-dd")">
+                                        <td><span class="fw-medium">@notification.NotificationIdDisplay</span></td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                @if (!notification.IsRead)
+                                                {
+                                                    <span class="badge bg-danger rounded-circle" style="width: 8px; height: 8px;"></span>
+                                                }
+                                                <span class="fw-semibold">@notification.Title</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-muted small">
+                                            @notification.MessagePreview
+                                            <span class="d-none full-message">@notification.Message</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge @notification.ModuleBadgeClass rounded-pill">@notification.RelatedModule</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge @notification.PriorityBadgeClass rounded-pill">@notification.Priority</span>
+                                        </td>
+                                        <td>@notification.CreatedDateDisplay</td>
+                                        <td>
+                                            <span class="badge @notification.StatusBadgeClass rounded-pill">@notification.StatusText</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm d-flex gap-2">
+                                                <!-- VIEW BUTTON -->
+                                                <button class="btn btn-outline-info view-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#viewNotificationModal"
+                                                        data-notificationid="@notification.NotificationId"
+                                                        data-title="@notification.Title"
+                                                        data-message="@notification.Message"
+                                                        data-type="@notification.NotificationType"
+                                                        data-module="@notification.RelatedModule"
+                                                        data-date="@notification.CreatedDateDisplay"
+                                                        data-status="@notification.IsRead.ToString().ToLower()"
+                                                        data-priority="@notification.Priority"
+                                                        data-actionurl="@notification.ActionUrl"
+                                                        title="View Details">
+                                                    View
+                                                </button>
+
+                                                <!-- MARK READ/UNREAD BUTTON -->
+                                                @if (notification.IsRead)
+                                                {
+                                                    <button class="btn btn-outline-warning mark-unread-btn"
+                                                            data-notificationid="@notification.NotificationId"
+                                                            title="Mark as Unread">
+                                                        <i class="bi bi-envelope"></i>
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-outline-primary mark-read-btn"
+                                                            data-notificationid="@notification.NotificationId"
+                                                            title="Mark as Read">
+                                                        <i class="bi bi-check-lg"></i>
+                                                    </button>
+                                                }
+
+                                                <!-- DELETE BUTTON -->
+                                                <button type="button"
+                                                        class="btn btn-outline-danger delete-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteNotificationModal"
+                                                        data-notificationid="@notification.NotificationId"
+                                                        data-notificationinfo="@notification.Title"
+                                                        title="Delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (!Model.Any())
+                                {
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted py-5">
+                                            <i class="bi bi-bell-slash fs-1 d-block mb-3"></i>
+                                            <h6 class="fw-semibold">No notifications yet</h6>
+                                            <small class="text-muted">System notifications will appear here automatically</small>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination (Same as Applications.cshtml) -->
+                    <div class="d-flex justify-content-between align-items-center px-4 py-3 border-top">
+                        <small class="text-muted">Total Notifications: @Model.Count</small>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== VIEW NOTIFICATION MODAL (Same as Applications View Modal) ==================== -->
+<div class="modal fade" id="viewNotificationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bx bx-bell text-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0" id="viewNotificationModalLabel">Notification Details</h5>
+                        <small class="text-muted" id="viewNotificationIdDisplay">#NOT-XXXX</small>
+                    </div>
+                </div>
+                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body - Card Style -->
+            <div class="modal-body pt-3">
+                <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+                        <!-- Title -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-heading me-1"></i>Title</label>
+                            <p class="form-control-plaintext fw-semibold mb-0" id="viewTitle">-</p>
+                        </div>
+                        <!-- Message -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-message-detail me-1"></i>Message</label>
+                            <div class="p-3 bg-white rounded-3 border" id="viewMessage" style="min-height: 80px; white-space: pre-wrap;">-</div>
+                        </div>
+                        <!-- Type & Module -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-category me-1"></i>Type</label>
+                                <p class="form-control-plaintext mb-0" id="viewType">-</p>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-folder me-1"></i>Module</label>
+                                <p class="form-control-plaintext mb-0" id="viewModule">-</p>
+                            </div>
+                        </div>
+                        <!-- Priority & Date -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-flag me-1"></i>Priority</label>
+                                <span id="viewPriorityBadge" class="badge rounded-pill">-</span>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-calendar me-1"></i>Created Date</label>
+                                <p class="form-control-plaintext mb-0" id="viewCreatedDate">-</p>
+                            </div>
+                        </div>
+                        <!-- Status -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-badge-check me-1"></i>Status</label>
+                            <span id="viewStatusBadge" class="badge rounded-pill">-</span>
+                        </div>
+                        <!-- Action Link (if available) -->
+                        <div id="viewActionSection" class="d-none">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-link me-1"></i>Quick Action</label>
+                            <a href="#" id="viewActionUrl" class="btn btn-sm btn-primary rounded-pill" target="_blank">
+                                <i class="bx bx-arrow-to-right me-1"></i>Go to Record
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" id="viewMarkReadBtn">
+                    <i class="bx bx-check me-1"></i> Mark as Read
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== DELETE NOTIFICATION MODAL ==================== -->
+<div class="modal fade" id="deleteNotificationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content delete-modal position-relative">
+            <div class="delete-icon-wrapper">
+                <div class="icon-box delete-icon">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+            </div>
+            <div class="modal-body text-center pt-5 pb-4">
+                <h4 class="fw-bold">Delete Notification?</h4>
+                <p class="text-muted">
+                    You are about to delete <strong id="deleteNotificationInfo"></strong><br />
+                    This action cannot be undone.
+                </p>
+                <form asp-action="DeleteNotification" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="deleteNotificationId" name="id" />
+                    <div class="d-flex gap-2 justify-content-center mt-3">
+                        <button type="button" class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger px-4 rounded-pill">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CLEAR ALL MODAL ==================== -->
+<div class="modal fade" id="clearAllModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content delete-modal position-relative">
+            <div class="delete-icon-wrapper">
+                <div class="icon-box delete-icon bg-danger-subtle">
+                    <i class="fas fa-trash-alt text-danger"></i>
+                </div>
+            </div>
+            <div class="modal-body text-center pt-5 pb-4">
+                <h4 class="fw-bold">Clear All Notifications?</h4>
+                <p class="text-muted">
+                    You are about to delete <strong>ALL notifications</strong><br />
+                    This action cannot be undone.
+                </p>
+                <form asp-action="ClearAllNotifications" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="d-flex gap-2 justify-content-center mt-3">
+                        <button type="button" class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger px-4 rounded-pill">Clear All</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CSS STYLES (Exact match with Applications.cshtml) ==================== -->
+<style>
+    /* Custom Card Styling - Same as Applications Page */
+    .custom-card {
+        background: #ffffff;
+        border-radius: 16px !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .custom-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+    /* Icon Box - Same as Applications Page */
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        transition: background 0.2s ease;
+    }
+
+    .custom-card:hover .icon-box {
+        background: #e9ecef;
+    }
+
+    /* Trend Icon */
+    .trend-icon {
+        font-size: 1.5rem;
+        color: #28a745;
+        opacity: 0.6;
+        transition: opacity 0.2s ease;
+    }
+
+    .custom-card:hover .trend-icon {
+        opacity: 1;
+    }
+
+    /* Badge Styles */
+    .badge.bg-label-primary {
+        background-color: #cfe2ff !important;
+        color: #0d6efd !important;
+    }
+
+    .badge.bg-label-success {
+        background-color: #d1e7dd !important;
+        color: #198754 !important;
+    }
+
+    .badge.bg-label-info {
+        background-color: #cff4fc !important;
+        color: #0dcaf0 !important;
+    }
+
+    .badge.bg-label-warning {
+        background-color: #fff3cd !important;
+        color: #ffc107 !important;
+    }
+
+    .badge.bg-label-danger {
+        background-color: #f8d7da !important;
+        color: #dc3545 !important;
+    }
+
+    .badge.bg-label-secondary {
+        background-color: #e2e3e5 !important;
+        color: #6c757d !important;
+    }
+
+    /* Table Styling */
+    #notificationsTable thead th {
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        border-bottom: 2px solid #e9ecef !important;
+    }
+
+    #notificationsTable tbody td {
+        vertical-align: middle;
+        padding: 1rem 0.75rem;
+    }
+
+    /* View Modal Enhancements */
+    #viewNotificationModal .form-control-plaintext {
+        font-size: 1.05rem;
+        padding: 0.25rem 0;
+        border-bottom: 1px dashed #dee2e6;
+    }
+
+        #viewNotificationModal .form-control-plaintext:hover {
+            border-bottom-color: #0d6efd;
+            transition: border-color 0.2s ease;
+        }
+
+    #viewMessage {
+        line-height: 1.6;
+        color: #333;
+    }
+
+    /* Delete Modal Animation */
+    .delete-modal {
+        border-radius: 22px;
+        border: none;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+        background: #ffffff;
+        overflow: visible;
+        animation: popIn 0.3s ease;
+    }
+
+    .delete-icon-wrapper {
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+
+    .delete-icon {
+        width: 85px;
+        height: 85px;
+        background: #fff5f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 6px solid white;
+    }
+
+        .delete-icon i {
+            font-size: 34px;
+            color: #ff3b3b;
+        }
+
+    @@keyframes popIn {
+        from {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 0.5rem;
+        }
+
+            .card-header .btn {
+                align-self: flex-end;
+            }
+    }
+</style>
+
+<!-- ==================== JAVASCRIPT (Same behavior as Applications.cshtml) ==================== -->
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ==================== SEARCH & FILTER ====================
+            const searchInput = document.getElementById('searchNotification');
+            const moduleFilters = document.querySelectorAll('[data-filter]');
+            const statusFilters = document.querySelectorAll('[data-status]');
+
+            function filterTable() {
+                const searchTerm = searchInput?.value.toLowerCase() || '';
+                const activeModule = document.querySelector('[data-filter].active')?.dataset.filter || 'all';
+                const activeStatus = document.querySelector('[data-status].active')?.dataset.status || 'all';
+
+                document.querySelectorAll("#notificationsTable tbody tr").forEach(row => {
+                    const rowText = row.textContent.toLowerCase();
+                    const rowModule = row.dataset.module || 'general';
+                    const rowStatus = row.dataset.status || 'read';
+
+                    const matchesSearch = rowText.includes(searchTerm);
+                    const matchesModule = activeModule === 'all' || rowModule === activeModule;
+                    const matchesStatus = activeStatus === 'all' || rowStatus === activeStatus;
+
+                    row.style.display = (matchesSearch && matchesModule && matchesStatus) ? "" : "none";
+                });
+            }
+
+            if (searchInput) searchInput.addEventListener("input", filterTable);
+            moduleFilters.forEach(btn => btn.addEventListener("click", function() {
+                moduleFilters.forEach(b => b.classList.remove("active"));
+                this.classList.add("active");
+                filterTable();
+            }));
+            statusFilters.forEach(btn => btn.addEventListener("click", function() {
+                statusFilters.forEach(b => b.classList.remove("active"));
+                this.classList.add("active");
+                filterTable();
+            }));
+
+            // ==================== PAGINATION ====================
+            const rowsPerPage = 10;
+            const tableRows = document.querySelectorAll("#notificationsTable tbody tr");
+            const pagination = document.getElementById("pagination");
+            let currentPage = 1;
+
+            function displayTablePage(page) {
+                currentPage = page;
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                let visibleIndex = 0;
+
+                tableRows.forEach((row) => {
+                    if (row.style.display !== "none") {
+                        row.style.display = (visibleIndex >= start && visibleIndex < end) ? "" : "none";
+                        visibleIndex++;
+                    }
+                });
+                updatePaginationButtons();
+            }
+
+            function updatePaginationButtons() {
+                if (!pagination) return;
+                pagination.innerHTML = "";
+                const visibleRows = Array.from(tableRows).filter(r => r.style.display !== "none");
+                const pageCount = Math.ceil(visibleRows.length / rowsPerPage);
+                if (pageCount <= 1) return;
+
+                // Prev
+                const prevLi = document.createElement("li");
+                prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+                prevLi.innerHTML = `<a class="page-link rounded-start-pill" href="#">Prev</a>`;
+                prevLi.addEventListener("click", e => { e.preventDefault(); if (currentPage > 1) displayTablePage(currentPage - 1); });
+                pagination.appendChild(prevLi);
+
+                // Numbers
+                for (let i = 1; i <= pageCount; i++) {
+                    const li = document.createElement("li");
+                    li.className = `page-item ${currentPage === i ? "active" : ""}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.addEventListener("click", e => { e.preventDefault(); displayTablePage(i); });
+                    pagination.appendChild(li);
+                }
+
+                // Next
+                const nextLi = document.createElement("li");
+                nextLi.className = `page-item ${currentPage === pageCount ? "disabled" : ""}`;
+                nextLi.innerHTML = `<a class="page-link rounded-end-pill" href="#">Next</a>`;
+                nextLi.addEventListener("click", e => { e.preventDefault(); if (currentPage < pageCount) displayTablePage(currentPage + 1); });
+                pagination.appendChild(nextLi);
+            }
+
+            displayTablePage(1);
+
+            // ==================== MARK READ/UNREAD (AJAX) ====================
+            document.querySelectorAll('.mark-read-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const id = this.dataset.notificationid;
+                    const row = this.closest('tr');
+
+                    try {
+                        const response = await fetch('/Admin/MarkNotificationAsRead?id=' + id, {
+                            method: 'POST',
+                            headers: {
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                            }
+                        });
+                        if (response.ok) {
+                            // Update UI
+                            row.dataset.status = 'read';
+                            const badge = row.querySelector('td:nth-child(7) .badge');
+                            badge.className = 'badge bg-success-subtle text-success rounded-pill';
+                            badge.textContent = 'Read';
+
+                            // Update button
+                            this.outerHTML = `<button class="btn btn-outline-warning mark-unread-btn"
+                                data-notificationid="${id}" title="Mark as Unread"><i class="bi bi-envelope"></i></button>`;
+
+                            attachRowEventListeners(row.querySelector('.mark-unread-btn'));
+                            updateStats();
+                        }
+                    } catch (err) {
+                        console.error('Error marking as read:', err);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.mark-unread-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const id = this.dataset.notificationid;
+                    const row = this.closest('tr');
+
+                    try {
+                        const response = await fetch('/Admin/MarkNotificationAsUnread?id=' + id, {
+                            method: 'POST',
+                            headers: {
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                            }
+                        });
+                        if (response.ok) {
+                            row.dataset.status = 'unread';
+                            const badge = row.querySelector('td:nth-child(7) .badge');
+                            badge.className = 'badge bg-warning-subtle text-warning rounded-pill';
+                            badge.textContent = 'Unread';
+
+                            this.outerHTML = `<button class="btn btn-outline-primary mark-read-btn"
+                                data-notificationid="${id}" title="Mark as Read"><i class="bi bi-check-lg"></i></button>`;
+
+                            attachRowEventListeners(row.querySelector('.mark-read-btn'));
+                            updateStats();
+                        }
+                    } catch (err) {
+                        console.error('Error marking as unread:', err);
+                    }
+                });
+            });
+
+            // ==================== MARK ALL AS READ ====================
+            window.markAllAsRead = async function() {
+                try {
+                    const response = await fetch('/Admin/MarkAllNotificationsAsRead', {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || '',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    if (response.ok) {
+                        // Update all rows
+                        document.querySelectorAll('#notificationsTable tbody tr').forEach(row => {
+                            row.dataset.status = 'read';
+                            const badge = row.querySelector('td:nth-child(7) .badge');
+                            badge.className = 'badge bg-success-subtle text-success rounded-pill';
+                            badge.textContent = 'Read';
+
+                            const btnGroup = row.querySelector('.btn-group');
+                            if (btnGroup) {
+                                btnGroup.innerHTML = `
+                                    <button class="btn btn-outline-info view-btn" data-bs-toggle="modal" data-bs-target="#viewNotificationModal">View</button>
+                                    <button class="btn btn-outline-warning mark-unread-btn"><i class="bi bi-envelope"></i></button>
+                                    <button class="btn btn-outline-danger delete-btn"><i class="bi bi-trash"></i></button>
+                                `;
+                            }
+                        });
+                        updateStats();
+                        alert('All notifications marked as read!');
+                    }
+                } catch (err) {
+                    console.error('Error marking all as read:', err);
+                }
+            };
+
+            // ==================== DELETE MODAL ====================
+            const deleteModal = document.getElementById('deleteNotificationModal');
+            deleteModal?.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                document.getElementById('deleteNotificationId').value = button.dataset.notificationid;
+                document.getElementById('deleteNotificationInfo').textContent = button.dataset.notificationinfo;
+            });
+
+            // ==================== VIEW MODAL ====================
+            const viewModal = document.getElementById('viewNotificationModal');
+            viewModal?.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+
+                document.getElementById('viewNotificationIdDisplay').textContent = '#NOT-' + button.dataset.notificationid;
+                document.getElementById('viewTitle').textContent = button.dataset.title || '-';
+                document.getElementById('viewMessage').textContent = button.dataset.message || '-';
+                document.getElementById('viewType').textContent = button.dataset.type || '-';
+                document.getElementById('viewModule').textContent = button.dataset.module || '-';
+                document.getElementById('viewCreatedDate').textContent = button.dataset.date || '-';
+
+                // Priority Badge
+                const priority = button.dataset.priority?.toLowerCase();
+                const priorityBadge = document.getElementById('viewPriorityBadge');
+                if (priority === 'critical') {
+                    priorityBadge.className = 'badge bg-danger text-white rounded-pill';
+                } else if (priority === 'high') {
+                    priorityBadge.className = 'badge bg-warning text-dark rounded-pill';
+                } else if (priority === 'normal') {
+                    priorityBadge.className = 'badge bg-info text-white rounded-pill';
+                } else {
+                    priorityBadge.className = 'badge bg-secondary text-white rounded-pill';
+                }
+                priorityBadge.textContent = button.dataset.priority || 'Normal';
+
+                // Status Badge
+                const isRead = button.dataset.status === 'true';
+                const statusBadge = document.getElementById('viewStatusBadge');
+                if (isRead) {
+                    statusBadge.className = 'badge bg-success-subtle text-success rounded-pill';
+                    statusBadge.textContent = 'Read';
+                } else {
+                    statusBadge.className = 'badge bg-warning-subtle text-warning rounded-pill';
+                    statusBadge.textContent = 'Unread';
+                }
+
+                // Action URL
+                const actionSection = document.getElementById('viewActionSection');
+                const actionUrl = button.dataset.actionurl;
+                if (actionUrl && actionUrl !== '#') {
+                    document.getElementById('viewActionUrl').href = actionUrl;
+                    actionSection.classList.remove('d-none');
+                } else {
+                    actionSection.classList.add('d-none');
+                }
+
+                // Mark Read Button
+                const markReadBtn = document.getElementById('viewMarkReadBtn');
+                if (!isRead) {
+                    markReadBtn.style.display = 'inline-block';
+                    markReadBtn.onclick = async function() {
+                        const id = button.dataset.notificationid;
+                        try {
+                            await fetch('/Admin/MarkNotificationAsRead?id=' + id, { method: 'POST' });
+                            bootstrap.Modal.getInstance(viewModal).hide();
+                            // Refresh row
+                            const row = document.querySelector(`tr[data-notificationid="${id}"]`) ||
+                                       Array.from(document.querySelectorAll('#notificationsTable tbody tr'))
+                                            .find(r => r.querySelector('.view-btn')?.dataset.notificationid === id);
+                            if (row) {
+                                row.dataset.status = 'read';
+                                const badge = row.querySelector('td:nth-child(7) .badge');
+                                badge.className = 'badge bg-success-subtle text-success rounded-pill';
+                                badge.textContent = 'Read';
+                                updateStats();
+                            }
+                        } catch (err) {
+                            console.error('Error:', err);
+                        }
+                    };
+                } else {
+                    markReadBtn.style.display = 'none';
+                }
+            });
+
+            // ==================== UPDATE STATS ====================
+            function updateStats() {
+                const visibleRows = Array.from(tableRows).filter(row => row.style.display !== 'none');
+                const total = visibleRows.length;
+                const unread = visibleRows.filter(row => row.dataset.status === 'unread').length;
+                const read = visibleRows.filter(row => row.dataset.status === 'read').length;
+                const today = visibleRows.filter(row => row.dataset.date === new Date().toISOString().split('T')[0]).length;
+
+                document.getElementById('totalNotifications').textContent = total;
+                document.getElementById('unreadNotifications').textContent = unread;
+                document.getElementById('readNotifications').textContent = read;
+                document.getElementById('todayNotifications').textContent = today;
+            }
+
+            // ==================== ATTACH EVENT LISTENERS TO DYNAMIC BUTTONS ====================
+            function attachRowEventListeners(btn) {
+                if (!btn) return;
+                if (btn.classList.contains('mark-read-btn') || btn.classList.contains('mark-unread-btn')) {
+                    btn.addEventListener('click', function() {
+                        // Trigger the click handler we already defined
+                        this.click();
+                    });
+                }
+            }
+
+            // Attach to existing buttons
+            document.querySelectorAll('.mark-read-btn, .mark-unread-btn').forEach(attachRowEventListeners);
+
+            // ==================== REFRESH ====================
+            window.refreshNotifications = function() {
+                location.reload();
+            };
+
+            // Initial stats update
+            updateStats();
+        });
+    </script>
+}

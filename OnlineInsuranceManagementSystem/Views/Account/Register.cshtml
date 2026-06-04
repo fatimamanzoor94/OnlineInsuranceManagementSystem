@@ -1,0 +1,536 @@
+﻿@model OnlineInsuranceManagementSystem.ViewModels.RegisterViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OIMS | Register</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="~/images/Logo.png">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+        theme: {
+        extend: {
+        colors: {
+        primary: '#08979D',
+        secondary: '#2F9D94',
+        accent: '#025f67',
+        success: '#23BBB7',
+        background: '#F6F6F6',
+        muted: '#36454f',
+        deep: '#063154',
+        border: '#bcc5cc',
+        },
+        fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        }
+        }
+        }
+        }
+    </script>
+
+    <style>
+        /* ========== ROOT VARIABLES ========== */
+        :root {
+        --primary: #08979D;
+        --secondary: #2F9D94;
+        --accent: #025f67;
+        --success: #23BBB7;
+        --background: #F6F6F6;
+        --text-muted: #898F99;
+        --deep: #063154;
+        --border: #bcc5cc;
+        }
+
+        * {
+        box-sizing: border-box;
+        }
+
+        body {
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        position: relative;
+        background-image: url('../images/Bg21.jfif');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        }
+
+        body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgba(4, 31, 37, 0.89);
+        z-index: 0;
+        }
+
+        body > * {
+        position: relative;
+        z-index: 1;
+        }
+
+        .floating-shape {
+        position: fixed;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        pointer-events: none;
+        z-index: 0;
+        }
+
+        .glass {
+        background: rgba(246, 246, 246, 0.95);
+        border: 1px solid var(--border);
+        }
+
+        .form-input {
+        transition: all 0.3s ease;
+        border: 2px solid var(--border);
+        background-color: white;
+        }
+
+        .form-input:focus {
+        border-color: var(--secondary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(47, 157, 148, 0.15);
+        }
+
+        .btn-accent {
+        background-color: var(--success);
+        color: white;
+        transition: all 0.3s ease;
+        border: 2px solid var(--success);
+        }
+
+        .btn-accent:hover {
+        background-color: var(--primary);
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        }
+
+        .tab-nav-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        background: rgba(246, 246, 246, 0.9);
+        border: 1px solid var(--border);
+        border-radius: 9999px;
+        padding: 0.25rem;
+        gap: 0.25rem;
+        }
+
+        .tab-glider {
+        position: absolute;
+        top: 0.25rem;
+        bottom: 0.25rem;
+        background: var(--primary);
+        border-radius: 9999px;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease;
+        pointer-events: none;
+        z-index: 0;
+        }
+
+        .tab-link {
+        position: relative;
+        z-index: 1;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        border-radius: 9999px;
+        transition: color 0.2s ease;
+        text-decoration: none;
+        white-space: nowrap;
+        }
+
+        .tab-link:hover {
+        color: var(--primary);
+        }
+
+        .tab-link.active {
+        color: white;
+        }
+
+        .tab-radio {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        }
+
+        .hamburger span {
+        transition: all 0.3s ease;
+        background-color: #4b5563;
+        }
+
+        .hamburger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+        opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .spinner {
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+        0% {
+        transform: rotate(0deg);
+        }
+
+        100% {
+        transform: rotate(360deg);
+        }
+        }
+
+        @@keyframes fadeInUp {
+        from {
+        opacity: 0;
+        transform: translateY(40px);
+        }
+
+        to {
+        opacity: 1;
+        transform: translateY(0);
+        }
+        }
+
+        .modal-content {
+        animation: fadeInUp 0.5s ease;
+        border: 1px solid var(--border);
+        width: 100%;
+        }
+
+        .register-wrapper {
+        min-height: calc(100vh - 80px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        }
+
+        @@media (min-width: 1024px) {
+        .register-wrapper {
+        min-height: calc(100vh - 96px);
+        }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Floating Shapes (same as hero section) -->
+    <div class="floating-shape" style="top: 10%; left: 5%; width: 80px; height: 80px; animation: float 3s ease-in-out infinite;"></div>
+    <div class="floating-shape" style="bottom: 15%; right: 8%; width: 120px; height: 120px; animation: float 4s ease-in-out infinite 1s;"></div>
+    <div class="floating-shape" style="top: 20%; right: 15%; width: 60px; height: 60px; animation: float 3.5s ease-in-out infinite 0.5s;"></div>
+    <div class="floating-shape" style="bottom: 30%; left: 10%; width: 40px; height: 40px; animation: float 2.8s ease-in-out infinite 1.5s;"></div>
+
+    <style>
+        @@keyframes float {
+        0%, 100% {
+        transform: translateY(0px);
+        }
+
+        50% {
+        transform: translateY(-15px);
+        }
+        }
+    </style>
+
+    <!-- ========== REGISTER FORM (COMPLETELY UNCHANGED) ========== -->
+    <div class="register-wrapper">
+        <div class="w-full max-w-md sm:max-w-lg md:max-w-xl bg-white rounded-2xl sm:rounded-3xl overflow-hidden modal-content mx-auto shadow-2xl">
+
+            <!-- Header -->
+            <div class="bg-accent px-4 py-6 sm:p-8 text-white text-center relative">
+                <a href="/Home/Index"
+                   class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+                    <i class="fas fa-times"></i>
+                </a>
+                <div class="w-11 h-11 sm:w-12 sm:h-12 mx-auto rounded-full bg-white/20 flex items-center justify-center mb-3">
+                    <i class="fas fa-user-plus text-lg"></i>
+                </div>
+                <h3 class="text-2xl sm:text-3xl font-bold">@(ViewBag.Role == "Agent" ? "Agent Registration" : "Customer Registration")</h3>
+                <p class="text-white/80 text-sm mt-1">@(ViewBag.Role == "Agent" ? "Join as Insurance Agent" : "Join as Insurance Customer")</p>
+            </div>
+
+            <!-- Form -->
+            <div class="p-4 sm:p-6 lg:p-8">
+                @if (ViewBag.Message != null)
+                {
+                    <div class="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-xl mb-5">
+                        @ViewBag.Message
+                    </div>
+                }
+
+                <form method="post" id="registerForm" class="space-y-5">
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="role" value="@ViewBag.Role" />
+
+
+                    <!-- Full Name -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input asp-for="FullName"
+                                   placeholder="John Doe"
+                                   class="form-input text-sm w-full pl-11 pr-4 py-2.5 rounded-lg">
+                        </div>
+                        <span asp-validation-for="FullName" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input asp-for="Email"
+                                   placeholder="you@example.com"
+                                   class="form-input text-sm w-full pl-11 pr-4 py-2.5 rounded-lg">
+                        </div>
+                        <span asp-validation-for="Email" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- Password Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Password -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                            <div class="relative">
+                                <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input asp-for="Password"
+                                       type="password"
+                                       id="password"
+                                       placeholder="••••••••"
+                                       class="form-input text-sm w-full pl-11 pr-12 py-2.5 rounded-lg">
+                                <button type="button"
+                                        onclick="togglePassword()"
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
+                                    <i id="eyeIcon" class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <!-- Password Strength -->
+                            <div class="mt-2">
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div id="strengthBar" class="h-2 rounded-full transition-all duration-300"></div>
+                                </div>
+                                <p id="strengthText" class="text-sm mt-1"></p>
+                            </div>
+                            <span asp-validation-for="Password" class="text-red-500 text-sm"></span>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
+                            <div class="relative">
+                                <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input asp-for="ConfirmPassword"
+                                       type="password"
+                                       placeholder="••••••••"
+                                       class="form-input text-sm w-full pl-11 pr-4 py-2.5 rounded-lg">
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" class="text-red-500 text-sm"></span>
+                        </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
+                        <div class="relative">
+                            <i class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input asp-for="Phone"
+                                   placeholder="03XXXXXXXXX"
+                                   class="form-input text-sm w-full pl-11 pr-4 py-2.5 rounded-lg">
+                        </div>
+                        <span asp-validation-for="Phone" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- Role -->
+                    @* <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Account Type</label>
+                        <select asp-for="Role"
+                                class="form-input text-sm w-full px-4 py-2.5 rounded-lg">
+                            <option value="">Select Role</option>
+                            <option value="User">Customer</option>
+                            <option value="Agent">Insurance Agent</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-red-500 text-sm"></span>
+                    </div> *@
+
+                    <!-- Terms -->
+                    <div class="flex items-start gap-3">
+                        <input type="checkbox"
+                               asp-for="AcceptTerms"
+                               class="mt-1 w-4 h-4 accent-teal-600">
+                        <label class="text-sm text-gray-600">
+                            I agree to the
+                            <span class="text-primary font-semibold">Terms & Conditions</span>
+                        </label>
+                    </div>
+                    <span asp-validation-for="AcceptTerms" class="text-red-500 text-sm"></span>
+
+                    <!-- Button -->
+                    <button type="submit"
+                            id="submitBtn"
+                            class="w-full btn-accent py-2.5 rounded-lg text-white font-semibold text-sm sm:text-base flex items-center justify-center">
+                        <span id="btnText">Create Account</span>
+                        <div id="spinner" class="spinner hidden ml-2"></div>
+                    </button>
+                </form>
+
+                <!-- Footer -->
+                <p class="text-center text-gray-500 text-sm mt-6">
+                    Already have an account?
+                    <a href="/Account/Login" class="text-primary font-semibold hover:underline">Sign In</a>
+                </p>
+                <p class="text-center text-gray-500 text-xs mt-4">
+                    <a href="/Home/Index" class="hover:text-primary transition-colors flex items-center justify-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Validation Scripts -->
+    <partial name="_ValidationScriptsPartial" />
+
+    <!-- JavaScript (unchanged from original) -->
+    <script>
+        // Toggle Password
+        function togglePassword() {
+        const password = document.getElementById("password");
+        const eyeIcon = document.getElementById("eyeIcon");
+        if (password.type === "password") {
+        password.type = "text";
+        eyeIcon.classList.remove("fa-eye");
+        eyeIcon.classList.add("fa-eye-slash");
+        } else {
+        password.type = "password";
+        eyeIcon.classList.remove("fa-eye-slash");
+        eyeIcon.classList.add("fa-eye");
+        }
+        }
+
+        // Password Strength
+        document.getElementById("password").addEventListener("keyup", function () {
+        let password = this.value;
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+        let bar = document.getElementById("strengthBar");
+        let text = document.getElementById("strengthText");
+
+        if (strength <= 2) {
+        bar.style.width = "30%";
+        bar.style.background = "red";
+        text.innerHTML = "Weak Password";
+        } else if (strength <= 4) {
+        bar.style.width = "70%";
+        bar.style.background = "orange";
+        text.innerHTML = "Medium Password";
+        } else {
+        bar.style.width = "100%";
+        bar.style.background = "green";
+        text.innerHTML = "Strong Password";
+        }
+        });
+
+        // ========== NAVBAR FUNCTIONALITY (from Index.cshtml) ==========
+        const tabLinks = document.querySelectorAll('.tab-link');
+        const tabRadios = document.querySelectorAll('.tab-radio');
+        const glider = document.getElementById('tabGlider');
+
+        function updateGlider(activeTab) {
+        if (!glider || !activeTab) return;
+        const parentRect = activeTab.parentElement.getBoundingClientRect();
+        const tabRect = activeTab.getBoundingClientRect();
+        const left = tabRect.left - parentRect.left;
+        glider.style.transform = `translateX(${left}px)`;
+        glider.style.width = `${tabRect.width}px`;
+        }
+
+        function setActiveTab(index) {
+        tabLinks.forEach((link, i) => {
+        if (i == index) {
+        link.classList.add('active');
+        link.setAttribute('aria-selected', 'true');
+        updateGlider(link);
+        } else {
+        link.classList.remove('active');
+        link.setAttribute('aria-selected', 'false');
+        }
+        });
+        if (tabRadios[index]) tabRadios[index].checked = true;
+        }
+
+        tabLinks.forEach((link, index) => {
+        link.addEventListener('click', (e) => {
+        e.preventDefault();
+        setActiveTab(index);
+        const targetId = link.getAttribute('href');
+        if (targetId && targetId !== '#') {
+        window.location.href = targetId;
+        }
+        });
+        });
+
+        // Initialize glider on load
+        document.addEventListener('DOMContentLoaded', function() {
+        const activeTab = document.querySelector('.tab-link.active');
+        if (activeTab) updateGlider(activeTab);
+        else if (tabLinks.length) updateGlider(tabLinks[0]);
+        });
+
+        // Hamburger menu toggle
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
+        if (hamburger && mobileMenu) {
+        hamburger.addEventListener('click', function() {
+        this.classList.toggle('active');
+        mobileMenu.classList.toggle('hidden');
+        const expanded = mobileMenu.classList.contains('hidden') ? 'false' : 'true';
+        hamburger.setAttribute('aria-expanded', expanded);
+        });
+        }
+    </script>
+</body>
+</html>
+

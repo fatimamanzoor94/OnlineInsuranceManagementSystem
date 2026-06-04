@@ -1,0 +1,738 @@
+@model List<OnlineInsuranceManagementSystem.ViewModels.MessageViewModel>
+@{
+    ViewData["Title"] = "Messages Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card border-0 w-100 mb-3" style="border-radius: 30px; background-color: #f5f8fd;">
+    <div class="p-3 main-card">
+        <div class="container-fluid card-scroll-content px-3">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-3 flex-wrap gap-2">
+                <h4 class="mb-0">Messages Management</h4>
+                <button class="btn btn-primary btn-sm d-flex align-items-center gap-1 rounded-pill px-3"
+                        onclick="refreshMessages()"
+                        title="Refresh Messages">
+                    <i class="bx bx-refresh"></i> Refresh
+                </button>
+            </div>
+
+            <!-- TOP SUMMARY CARDS -->
+            <div class="row g-3 mb-4">
+                <!-- Total Messages -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-chat-dots text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Total Messages</h6>
+                                <small class="text-muted" id="totalMessages">@ViewBag.TotalMessages</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Today Messages -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-calendar-day text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Today Messages</h6>
+                                <small class="text-muted" id="todayMessages">@ViewBag.TodayMessages</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Read Messages -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-check-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Read Messages</h6>
+                                <small class="text-muted" id="readMessages">@ViewBag.ReadMessages</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Unread Messages -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-envelope text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Unread Messages</h6>
+                                <small class="text-muted" id="unreadMessages">@ViewBag.UnreadMessages</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter -->
+            <div class="card custom-card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-3">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Message ID</label>
+                            <input type="text" id="searchMessageId"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter message ID..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Name/Email/Subject</label>
+                            <input type="text" id="searchName"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter name, email or subject..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Filter Status</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill active" data-filter="all">All</button>
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill" data-filter="read">Read</button>
+                                <button class="btn btn-sm btn-outline-primary rounded-pill" data-filter="unread">Unread</button>
+                                <button class="btn btn-sm btn-outline-success rounded-pill" data-filter="today">Today</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="card custom-card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h4 class="mb-1 fw-semibold">All Messages</h4>
+                            <small class="text-muted">Manage contact messages from landing page</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                    onclick="exportTable('excel', 'messagesTable', 'Messages')">
+                                <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                    onclick="exportTable('pdf', 'messagesTable', 'Messages')">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body px-4">
+                    <div class="table-responsive p-3">
+                        <table class="table align-middle mb-0" id="messagesTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Message ID</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Subject</th>
+                                    <th>Message Preview</th>
+                                    <th>Sent Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var message in Model)
+                                {
+                                    <tr data-status="@(message.IsRead ? "read" : "unread")"
+                                        data-date="@message.SentDate.ToString("yyyy-MM-dd")">
+                                        <td>@message.MessageIdDisplay</td>
+                                        <td class="fw-semibold">@message.FullName</td>
+                                        <td>@message.Email</td>
+                                        <td>@message.Subject</td>
+                                        <td class="text-muted small">
+                                            @message.MessagePreview
+                                            <span class="d-none full-message">@message.MessageText</span>
+                                        </td>
+                                        <td>@message.SentDateDisplay</td>
+                                        <td>
+                                            <span class="badge @message.StatusBadgeClass">@message.StatusText</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm d-flex gap-2">
+                                                <button class="btn btn-outline-info view-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#viewMessageModal"
+                                                        data-messageid="@message.MessageId"
+                                                        data-fullname="@message.FullName"
+                                                        data-email="@message.Email"
+                                                        data-subject="@message.Subject"
+                                                        data-messagetext="@message.MessageText"
+                                                        data-sentdate="@message.SentDateDisplay"
+                                                        data-isread="@message.IsRead.ToString().ToLower()"
+                                                        title="View Details">
+                                                    View
+                                                </button>
+
+                                                <button type="button"
+                                                        class="btn btn-outline-danger delete-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteMessageModal"
+                                                        data-messageid="@message.MessageId"
+                                                        data-messageinfo="@message.FullName - @message.Subject"
+                                                        title="Delete">
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-between align-items-center px-4 py-3 border-top">
+                        <small class="text-muted">Total Messages: @Model.Count</small>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- VIEW MESSAGE MODAL -->
+<div class="modal fade" id="viewMessageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bx bx-envelope text-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0">Message Details</h5>
+                        <small class="text-muted" id="viewMessageIdDisplay">#MSG-XXXX</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-user me-1"></i>Full Name</label>
+                            <p class="form-control-plaintext fw-semibold mb-0" id="viewFullName">-</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-envelope me-1"></i>Email</label>
+                            <p class="form-control-plaintext mb-0"><a href="#" id="viewEmailLink">-</a></p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-subject me-1"></i>Subject</label>
+                            <p class="form-control-plaintext fw-semibold mb-0" id="viewSubject">-</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-message-detail me-1"></i>Message</label>
+                            <div class="p-3 bg-white rounded-3 border" id="viewMessageText" style="min-height: 100px; white-space: pre-wrap;">-</div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-calendar me-1"></i>Sent Date</label>
+                                <p class="form-control-plaintext mb-0" id="viewSentDate">-</p>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-badge-check me-1"></i>Status</label>
+                                <span id="viewStatusBadge" class="badge rounded-pill">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="replyEmailBtn" class="btn btn-primary rounded-pill px-4">
+                    <i class="bx bx-reply me-1"></i> Reply via Email
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal fade" id="deleteMessageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content delete-modal position-relative">
+            <div class="delete-icon-wrapper">
+                <div class="icon-box delete-icon">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+            </div>
+            <div class="modal-body text-center pt-5 pb-4">
+                <h4 class="fw-bold">Delete Message?</h4>
+                <p class="text-muted">You are about to delete <strong id="deleteMessageInfo"></strong><br />This action cannot be undone.</p>
+                <form asp-action="DeleteMessage" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="deleteMessageId" name="id" />
+                    <div class="d-flex gap-2 justify-content-center mt-3">
+                        <button type="button" class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger px-4 rounded-pill">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- REPLY MESSAGE MODAL -->
+<div class="modal fade" id="replyMessageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bx bx-reply text-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0">Reply to Message</h5>
+                        <small class="text-muted" id="replyMessageIdDisplay">#MSG-XXXX</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <div>
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="replyMessageId" />
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted mb-1"><i class="bx bx-user me-1"></i>To</label>
+                        <input type="text" id="replyToName" class="form-control form-control-sm rounded-3 bg-light" readonly />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted mb-1"><i class="bx bx-subject me-1"></i>Subject</label>
+                        <input type="text" id="replySubject" class="form-control form-control-sm rounded-3 bg-light" readonly />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted mb-1"><i class="bx bx-message-detail me-1"></i>Original Message</label>
+                        <div class="p-3 bg-light rounded-3 border" id="replyOriginalMessage" style="max-height: 150px; overflow-y: auto; font-size: 0.9rem;"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted mb-1"><i class="bx bx-pencil me-1"></i>Your Reply <span class="text-danger">*</span></label>
+                        <textarea id="replyMessageText" class="form-control rounded-3" rows="6" placeholder="Type your reply here..."></textarea>
+                    </div>
+
+                    <div class="modal-footer border-0 pt-0 px-0">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary rounded-pill px-4" id="sendReplyBtn">
+                            <i class="bx bx-send me-1"></i> Send Reply
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal fade" id="replySuccessModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content success-modal border-0">
+
+            <div class="success-icon-wrapper">
+                <div class="success-icon">
+                    <i class="bx bx-check"></i>
+                </div>
+            </div>
+
+            <div class="modal-body text-center pt-5 pb-4">
+                <h4 class="fw-bold mb-2">Reply Sent Successfully!</h4>
+                <p class="text-muted mb-4">
+                    Your email response has been delivered successfully to the customer.
+                </p>
+
+                <button type="button"
+                        class="btn btn-primary px-4 rounded-pill"
+                        data-bs-dismiss="modal">
+                    Continue
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .delete-modal {
+        border-radius: 22px;
+        border: none;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+        background: #ffffff;
+        overflow: visible;
+        animation: popIn 0.3s ease;
+    }
+
+    .delete-icon-wrapper {
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+
+    .delete-icon {
+        width: 85px;
+        height: 85px;
+        background: #fff5f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 6px solid white;
+    }
+
+        .delete-icon i {
+            font-size: 34px;
+            color: #ff3b3b;
+        }
+
+    @@keyframes popIn {
+        from {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    #viewMessageModal .form-control-plaintext {
+        font-size: 1.05rem;
+        padding: 0.25rem 0;
+        border-bottom: 1px dashed #dee2e6;
+    }
+
+        #viewMessageModal .form-control-plaintext:hover {
+            border-bottom-color: #0d6efd;
+            transition: border-color 0.2s ease;
+        }
+
+    #viewMessageText {
+        line-height: 1.6;
+        color: #333;
+    }
+
+
+    /* //Success Modal */
+    .success-modal {
+        border-radius: 20px;
+        overflow: visible;
+        animation: popIn .3s ease;
+    }
+
+    .success-icon-wrapper {
+        position: absolute;
+        top: -28px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+
+    .success-icon {
+        width: 60px;
+        height: 60px;
+        background: #ecfdf3;
+        border-radius: 50%;
+        border: 4px solid #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .success-icon i {
+            font-size: 30px;
+            color: #22c55e;
+        }
+
+</style>
+
+@section Scripts {
+    <script>
+        // Global functions - MUST be outside DOMContentLoaded
+        window.openReplyModal = function(messageId, fullName, email, subject, originalMessage) {
+            console.log('Opening reply modal for:', messageId);
+            document.getElementById('replyMessageId').value = messageId;
+            document.getElementById('replyMessageIdDisplay').textContent = '#MSG-' + messageId.toString().padStart(4, '0');
+            document.getElementById('replyToName').value = fullName;
+            document.getElementById('replySubject').value = 'Re: ' + subject;
+            document.getElementById('replyOriginalMessage').textContent = originalMessage;
+            document.getElementById('replyMessageText').value = '';
+
+            const replyModal = new bootstrap.Modal(document.getElementById('replyMessageModal'));
+            replyModal.show();
+        };
+
+        window.submitReplyForm = function() {
+            console.log('Submit reply clicked');
+
+            const messageId = document.getElementById('replyMessageId').value;
+            const replyMessage = document.getElementById('replyMessageText').value;
+            const sendBtn = document.getElementById('sendReplyBtn');
+
+            if (!replyMessage || !replyMessage.trim()) {
+                alert('Please enter a reply message');
+                return;
+            }
+
+            if (!messageId) {
+                alert('Message ID not found');
+                return;
+            }
+
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<i class="bx bx-loader bx-spin me-1"></i> Sending...';
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+            const formData = new FormData();
+            formData.append('messageId', messageId);
+            formData.append('replyMessage', replyMessage);
+            if (token) {
+                formData.append('__RequestVerificationToken', token);
+            }
+
+            console.log('Sending to /Admin/ReplyToMessage');
+            console.log('Message ID:', messageId);
+            console.log('Reply:', replyMessage);
+
+            fetch('/Admin/ReplyToMessage', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (response.ok) {
+                    const replyModal = bootstrap.Modal.getInstance(document.getElementById('replyMessageModal'));
+                    if (replyModal) replyModal.hide();
+
+                            const successModal = new bootstrap.Modal(
+            document.getElementById('replySuccessModal')
+        );
+
+        successModal.show();
+
+        document
+            .getElementById('replySuccessModal')
+            .addEventListener('hidden.bs.modal', function () {
+                location.reload();
+            }, { once: true });
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="bx bx-send me-1"></i> Send Reply';
+            });
+        };
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Search & Filter
+            const searchMessageId = document.getElementById('searchMessageId');
+            const searchName = document.getElementById('searchName');
+
+            function filterTable() {
+                const messageIdVal = searchMessageId.value.toLowerCase();
+                const nameVal = searchName.value.toLowerCase();
+
+                document.querySelectorAll("#messagesTable tbody tr").forEach(row => {
+                    const messageId = row.cells[0]?.textContent.toLowerCase() || '';
+                    const fullName = row.cells[1]?.textContent.toLowerCase() || '';
+                    const email = row.cells[2]?.textContent.toLowerCase() || '';
+                    const subject = row.cells[3]?.textContent.toLowerCase() || '';
+
+                    const matches = (messageId.includes(messageIdVal)) &&
+                                   (fullName.includes(nameVal) || email.includes(nameVal) || subject.includes(nameVal));
+
+                    row.style.display = matches ? "" : "none";
+                });
+            }
+
+            searchMessageId.addEventListener("input", filterTable);
+            searchName.addEventListener("input", filterTable);
+
+            // Pagination
+            const rowsPerPage = 10;
+            const tableRows = document.querySelectorAll("#messagesTable tbody tr");
+            const pagination = document.getElementById("pagination");
+            let currentPage = 1;
+
+            function displayTablePage(page) {
+                currentPage = page;
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+
+                tableRows.forEach((row, index) => {
+                    row.style.display = (index >= start && index < end) ? "" : "none";
+                });
+                updatePaginationButtons();
+            }
+
+            function updatePaginationButtons() {
+                pagination.innerHTML = "";
+                const pageCount = Math.ceil(tableRows.length / rowsPerPage);
+
+                const prevLi = document.createElement("li");
+                prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+                prevLi.innerHTML = `<a class="page-link rounded-start-pill" href="#">Prev</a>`;
+                prevLi.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (currentPage > 1) displayTablePage(currentPage - 1);
+                });
+                pagination.appendChild(prevLi);
+
+                for (let i = 1; i <= pageCount; i++) {
+                    const li = document.createElement("li");
+                    li.className = `page-item ${currentPage === i ? "active" : ""}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        displayTablePage(i);
+                    });
+                    pagination.appendChild(li);
+                }
+
+                const nextLi = document.createElement("li");
+                nextLi.className = `page-item ${currentPage === pageCount ? "disabled" : ""}`;
+                nextLi.innerHTML = `<a class="page-link rounded-end-pill" href="#">Next</a>`;
+                nextLi.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (currentPage < pageCount) displayTablePage(currentPage + 1);
+                });
+                pagination.appendChild(nextLi);
+            }
+
+            displayTablePage(1);
+
+            // Filter
+            document.querySelectorAll("[data-filter]").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
+                    this.classList.add("active");
+
+                    const filter = this.getAttribute('data-filter');
+                    const rows = document.querySelectorAll("#messagesTable tbody tr");
+                    const today = new Date().toISOString().split('T')[0];
+
+                    rows.forEach(row => {
+                        const rowStatus = row.getAttribute('data-status');
+                        const rowDate = row.getAttribute('data-date');
+
+                        if (filter === 'all') {
+                            row.style.display = '';
+                        } else if (filter === 'read' && rowStatus === 'read') {
+                            row.style.display = '';
+                        } else if (filter === 'unread' && rowStatus === 'unread') {
+                            row.style.display = '';
+                        } else if (filter === 'today' && rowDate === today) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            // View Modal
+            const viewModal = document.getElementById('viewMessageModal');
+            viewModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+
+                const messageId = button.getAttribute('data-messageid');
+                const fullName = button.getAttribute('data-fullname');
+                const email = button.getAttribute('data-email');
+                const subject = button.getAttribute('data-subject');
+                const messageText = button.getAttribute('data-messagetext');
+                const sentDate = button.getAttribute('data-sentdate');
+                const isRead = button.getAttribute('data-isread') === 'true';
+
+                document.getElementById('viewMessageIdDisplay').textContent = '#MSG-' + messageId;
+                document.getElementById('viewFullName').textContent = fullName || '-';
+
+                const emailLink = document.getElementById('viewEmailLink');
+                emailLink.textContent = email || '-';
+                emailLink.href = email ? 'mailto:' + email : '#';
+
+                document.getElementById('viewSubject').textContent = subject || '-';
+                document.getElementById('viewMessageText').textContent = messageText || '-';
+                document.getElementById('viewSentDate').textContent = sentDate || '-';
+
+                // Reply button
+                const replyBtn = document.getElementById('replyEmailBtn');
+                replyBtn.onclick = function(e) {
+                    e.preventDefault();
+                    const viewModalInstance = bootstrap.Modal.getInstance(viewModal);
+                    viewModalInstance.hide();
+                    setTimeout(() => {
+                        window.openReplyModal(messageId, fullName, email, subject, messageText);
+                    }, 300);
+                };
+
+                // Status Badge
+                const statusBadge = document.getElementById('viewStatusBadge');
+                if (isRead) {
+                    statusBadge.className = 'badge bg-secondary-subtle text-secondary rounded-pill';
+                    statusBadge.textContent = 'Read';
+                } else {
+                    statusBadge.className = 'badge bg-primary-subtle text-primary rounded-pill';
+                    statusBadge.textContent = 'Unread';
+                }
+
+                // Mark as read
+                if (!isRead && messageId) {
+                    fetch('/Admin/MarkMessageAsRead?id=' + messageId, {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                        }
+                    }).catch(err => console.log('Mark as read error:', err));
+                }
+            });
+
+            // Delete Modal
+            const deleteModal = document.getElementById('deleteMessageModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                document.getElementById('deleteMessageId').value = button.getAttribute('data-messageid');
+                document.getElementById('deleteMessageInfo').textContent = button.getAttribute('data-messageinfo');
+            });
+
+            // Refresh
+            window.refreshMessages = function() {
+                location.reload();
+            };
+
+            // Send Reply Button
+            const sendReplyBtn = document.getElementById('sendReplyBtn');
+            if (sendReplyBtn) {
+                sendReplyBtn.addEventListener('click', window.submitReplyForm);
+            }
+        });
+    </script>
+}

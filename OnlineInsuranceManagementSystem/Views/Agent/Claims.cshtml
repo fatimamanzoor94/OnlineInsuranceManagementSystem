@@ -1,0 +1,826 @@
+﻿@model List<OnlineInsuranceManagementSystem.ViewModels.AgentClaimViewModel>
+@{
+    ViewData["Title"] = "My Claims";
+    Layout = "~/Views/Shared/_AgentLayout.cshtml";
+}
+
+<div class="card border-0 w-100 mb-3" style="border-radius: 30px; background-color: #f5f8fd;">
+    <div class="p-3 main-card">
+        <div class="container-fluid card-scroll-content px-3">
+
+            <!-- Header (NO Add Button for Agent) -->
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-3 flex-wrap gap-2">
+                <h4 class="mb-0">Claims Review</h4>
+                <small class="text-muted">Review and recommend claims for your customers</small>
+            </div>
+
+            <!-- TOP SUMMARY CARDS (Same design as Admin) -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-clipboard2-check text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Total Claims</h6>
+                                <small class="text-muted" id="totalClaims">@ViewBag.TotalClaims</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-hourglass-split text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Pending Review</h6>
+                                <small class="text-muted" id="pendingClaims">@ViewBag.PendingClaims</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-info-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Recommended</h6>
+                                <small class="text-muted" id="recommendedClaims">@ViewBag.RecommendedClaims</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-check-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Finalized</h6>
+                                <small class="text-muted">
+                                    @(ViewBag.ApprovedClaims + ViewBag.RejectedClaims)
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter (Same design as Admin) -->
+            <div class="card custom-card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-3">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Claim ID</label>
+                            <input type="text" id="searchClaimId"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter claim ID..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Customer/Policy</label>
+                            <input type="text" id="searchName"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter customer or policy name..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Filter Status</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill active" data-filter="all">All</button>
+                                <button class="btn btn-sm btn-outline-warning rounded-pill" data-filter="pending">Pending</button>
+                                <button class="btn btn-sm btn-outline-info rounded-pill" data-filter="recommended">Recommended</button>
+                                <button class="btn btn-sm btn-outline-success rounded-pill" data-filter="approved">Approved</button>
+                                <button class="btn btn-sm btn-outline-danger rounded-pill" data-filter="rejected">Rejected</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table (Same design as Admin) -->
+            <div class="card custom-card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h4 class="mb-1 fw-semibold">Assigned Claims</h4>
+                            <small class="text-muted">Claims from your assigned applications</small>
+                        </div>
+                        <!-- Export Buttons (Same as Admin) -->
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                    onclick="exportTable('excel', 'claimsTable', 'MyClaims')">
+                                <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                    onclick="exportTable('pdf', 'claimsTable', 'MyClaims')">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body px-4">
+                    <div class="table-responsive p-3">
+                        <table class="table align-middle mb-0" id="claimsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Claim ID</th>
+                                    <th>Customer Name</th>
+                                    <th>Policy Name</th>
+                                    <th>Claim Amount</th>
+                                    <th>Claim Date</th>
+                                    <th>Status</th>
+                                    <th>Reason</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var claim in Model)
+                                {
+                                    <tr data-status="@claim.Status?.ToLower().Replace("-", "")">
+                                        <td>@claim.ClaimIdDisplay</td>
+                                        <td>@claim.UserName</td>
+                                        <td>@claim.PolicyName</td>
+                                        <td class="fw-semibold text-primary">@claim.ClaimAmountDisplay</td>
+                                        <td>@claim.ClaimDateDisplay</td>
+                                        <td>
+                                            <span class="badge @claim.StatusBadgeClass" title="@claim.Status">
+                                                @claim.StatusText
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small" style="max-width: 150px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                @(string.IsNullOrEmpty(claim.Reason) ? "-" : claim.Reason)
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm d-flex gap-2">
+                                                <!-- ✅ VIEW BUTTON -->
+                                                <button class="btn btn-outline-info view-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#viewClaimModal"
+                                                        data-claimid="@claim.ClaimId"
+                                                        data-username="@claim.UserName"
+                                                        data-policyname="@claim.PolicyName"
+                                                        data-claimamount="@claim.ClaimAmount.ToString("F2")"
+                                                        data-claimdate="@claim.ClaimDateDisplay"
+                                                        data-status="@claim.Status"
+                                                        data-reason="@(claim.Reason ?? "-")"
+                                                        data-remarks="@(claim.AgentRemarks ?? "-")"
+                                                        title="View Details">
+                                                    View
+                                                </button>
+
+                                                <!-- ✅ ADD REMARKS BUTTON -->
+                                                <button class="btn btn-outline-secondary remarks-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#remarksModal"
+                                                        data-claimid="@claim.ClaimId"
+                                                        data-currentremarks="@(claim.AgentRemarks ?? "")"
+                                                        title="Add/Edit Remarks">
+                                                    Remarks
+                                                </button>
+
+                                                <!-- ✅ RECOMMEND APPROVE (Only if Pending) -->
+                                                @if (claim.Status?.ToLower() == "pending")
+                                                {
+                                                    <button class="btn btn-outline-success recommend-btn"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#recommendModal"
+                                                            data-claimid="@claim.ClaimId"
+                                                            data-recommendation="Approve"
+                                                            title="Recommend Approval">
+                                                        <i class="bi bi-hand-thumbs-up"></i>
+                                                    </button>
+                                                }
+
+                                                <!-- ✅ RECOMMEND REJECT (Only if Pending) -->
+                                                @if (claim.Status?.ToLower() == "pending")
+                                                {
+                                                    <button class="btn btn-outline-danger recommend-btn"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#recommendModal"
+                                                            data-claimid="@claim.ClaimId"
+                                                            data-recommendation="Reject"
+                                                            title="Recommend Rejection">
+                                                        <i class="bi bi-hand-thumbs-down"></i>
+                                                    </button>
+                                                }
+
+                                                <!-- ✅ Show "Recommended" badge if already recommended -->
+                                                @if (claim.Status?.ToLower().Contains("recommended") == true)
+                                                {
+                                                    <span class="badge bg-info-subtle text-info rounded-pill px-2" title="Awaiting Admin approval">
+                                                        <i class="bi bi-clock-history"></i>
+                                                    </span>
+                                                }
+
+                                                <!-- ✅ Show "Finalized" badge if approved/rejected -->
+                                                @if (claim.Status?.ToLower() == "approved" || claim.Status?.ToLower() == "rejected")
+                                                {
+                                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2" title="Final decision by Admin">
+                                                        <i class="bi bi-lock"></i>
+                                                    </span>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination (Same as Admin) -->
+                    <div class="d-flex justify-content-between align-items-center px-4 py-3 border-top">
+                        <small class="text-muted">Total Claims: @Model.Count</small>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== VIEW CLAIM DETAILS MODAL ==================== -->
+<div class="modal fade" id="viewClaimModal" tabindex="-1" aria-labelledby="viewClaimModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bx bx-clipboard text-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0" id="viewClaimModalLabel">Claim Details</h5>
+                        <small class="text-muted" id="viewClaimIdDisplay">#CLM-XXXX</small>
+                    </div>
+                </div>
+                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-user me-1"></i>Customer Name</label>
+                            <p class="form-control-plaintext fw-semibold mb-0" id="viewUserName">-</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-shield me-1"></i>Policy Name</label>
+                            <p class="form-control-plaintext mb-0" id="viewPolicyName">-</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-dollar me-1"></i>Claim Amount</label>
+                            <p class="form-control-plaintext fw-semibold text-primary mb-0" id="viewClaimAmount">-</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-calendar me-1"></i>Claim Date</label>
+                            <p class="form-control-plaintext mb-0" id="viewClaimDate">-</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-note me-1"></i>Reason</label>
+                            <p class="form-control-plaintext mb-0" id="viewReason" style="white-space: pre-wrap;">-</p>
+                        </div>
+
+                        <!-- ✅ Agent Remarks Section -->
+                        <hr class="my-3" />
+                        <h6 class="mb-3 text-primary"><i class="bx bx-comment me-1"></i>Agent Remarks</h6>
+                        <div class="mb-3">
+                            <p class="form-control-plaintext mb-0" id="viewRemarks" style="white-space: pre-wrap; min-height: 60px;">-</p>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-badge-check me-1"></i>Status</label>
+                                <span id="viewStatusBadge" class="badge rounded-pill">-</span>
+                            </div>
+                        </div>
+
+                        <!-- ✅ Agent Info Note -->
+                        <div class="alert alert-light border mt-3 mb-0 small">
+                            <i class="bx bx-info-circle me-1"></i>
+                            You can recommend approval or rejection. Final decision requires Admin approval.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== ADD REMARKS MODAL ==================== -->
+<div class="modal fade" id="remarksModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Add/Edit Remarks</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form id="remarksForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="remarksClaimId" name="claimId" />
+                    <div class="mb-3">
+                        <label for="remarksText" class="form-label"></label>
+                        <textarea id="remarksText" name="remarks" class="form-control rounded-3" rows="4"
+                                  placeholder="Enter your observations, documents needed, or follow-up notes..."></textarea>
+                        <small class="text-muted">These remarks are visible to Admin for final decision</small>
+                    </div>
+                    <div class="alert alert-primary mt-3 mb-0 small">
+                        <i class="bx bx-lightbulb me-1"></i>
+                        Tip: Include document references, customer contact notes, or verification status.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 pt-3">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" id="saveRemarksBtn">Save Remarks</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== RECOMMEND CLAIM MODAL ==================== -->
+<div class="modal fade" id="recommendModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="recommendModalTitle">Recommend Claim</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form id="recommendForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="recommendClaimId" name="claimId" />
+                    <input type="hidden" id="recommendAction" name="recommendation" />
+
+                    <div class="text-center mb-4">
+                        <div class="bg-light-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                             style="width: 70px; height: 70px;" id="recommendIcon">
+                            <i class="bi bi-hand-thumbs-up fs-4" id="recommendIconClass"></i>
+                        </div>
+                        <h6 id="recommendMessage">Are you sure you want to recommend <strong id="recommendType">APPROVAL</strong> for this claim?</h6>
+                        <p class="text-muted small mb-0">This recommendation will be sent to Admin for final approval.</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="recommendNotes" class="form-label small">Optional Notes for Admin</label>
+                        <textarea id="recommendNotes" class="form-control rounded-3" rows="3"
+                                  placeholder="Add any supporting notes for your recommendation..."></textarea>
+                    </div>
+
+                    <div class="alert alert-warning small mb-0">
+                        <i class="bx bx-error-circle me-1"></i>
+                        <strong>Note:</strong> This is a recommendation only. Admin will make the final decision.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 pt-3">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" id="submitRecommendBtn">Submit Recommendation</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CSS STYLES (Same as Admin) ==================== -->
+<style>
+    .custom-card {
+        border-radius: 20px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        background: white;
+    }
+
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        background: #eef2ff;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    .table > :not(caption) > * > * {
+        padding: 1rem 0.75rem;
+    }
+
+    .page-link {
+        border-radius: 30px !important;
+        margin: 0 2px;
+        color: #4b5563;
+    }
+
+    .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    /* View Modal Enhancements */
+    #viewClaimModal .form-control-plaintext {
+        font-size: 1.05rem;
+        padding: 0.25rem 0;
+        border-bottom: 1px dashed #dee2e6;
+        border-radius: 0;
+    }
+
+        #viewClaimModal .form-control-plaintext:hover {
+            border-bottom-color: #0d6efd;
+            transition: border-color 0.2s ease;
+        }
+
+    #viewClaimModal .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        #viewClaimModal .card:hover {
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+    #viewClaimModal #viewReason,
+    #viewClaimModal #viewRemarks {
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    @@media (max-width: 576px) {
+        #viewClaimModal .modal-body .card-body {
+            padding: 1.25rem !important;
+        }
+
+        #viewClaimModal .form-control-plaintext {
+            font-size: 1rem;
+        }
+
+        .btn-group {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+            .btn-group .btn {
+                width: 100%;
+            }
+    }
+</style>
+
+<!-- ==================== JAVASCRIPT (Same Logic as Admin + Agent Features) ==================== -->
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+        // ==================== SEARCH FUNCTIONALITY ====================
+        const searchClaimId = document.getElementById('searchClaimId');
+        const searchName = document.getElementById('searchName');
+
+        function filterTable() {
+        const claimIdVal = searchClaimId.value.toLowerCase();
+        const nameVal = searchName.value.toLowerCase();
+
+        document.querySelectorAll("#claimsTable tbody tr").forEach(row => {
+        const claimId = row.cells[0]?.textContent.toLowerCase() || '';
+        const customerName = row.cells[1]?.textContent.toLowerCase() || '';
+        const policyName = row.cells[2]?.textContent.toLowerCase() || '';
+
+        const matches = (claimId.includes(claimIdVal)) &&
+        (customerName.includes(nameVal) || policyName.includes(nameVal));
+
+        row.style.display = matches ? "" : "none";
+        });
+        updatePaginationAfterFilter();
+        }
+
+        searchClaimId.addEventListener("input", filterTable);
+        searchName.addEventListener("input", filterTable);
+
+
+        // ==================== STATUS FILTER ====================
+        document.querySelectorAll("[data-filter]").forEach(btn => {
+        btn.addEventListener("click", function () {
+        document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
+        this.classList.add("active");
+
+        const filter = this.getAttribute('data-filter');
+        const rows = document.querySelectorAll("#claimsTable tbody tr");
+
+        rows.forEach(row => {
+        const rowStatus = row.getAttribute('data-status');
+
+        let showRow = false;
+        if (filter === 'all') {
+        showRow = true;
+        } else if (filter === 'recommended') {
+        showRow = rowStatus?.includes('recommended');
+        } else {
+        showRow = filter === rowStatus;
+        }
+
+        row.style.display = showRow ? '' : 'none';
+        });
+        updatePaginationAfterFilter();
+        });
+        });
+
+
+        // ==================== PAGINATION ====================
+        let currentPage = 1;
+        const rowsPerPage = 10;
+
+        function updatePaginationAfterFilter() {
+        const visibleRows = Array.from(document.querySelectorAll("#claimsTable tbody tr"))
+        .filter(row => row.style.display !== "none");
+        const pageCount = Math.ceil(visibleRows.length / rowsPerPage);
+        currentPage = Math.min(currentPage, pageCount) || 1;
+        displayTablePage(currentPage, visibleRows);
+        renderPaginationControls(pageCount, visibleRows);
+        }
+
+        function displayTablePage(page, visibleRows) {
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        document.querySelectorAll("#claimsTable tbody tr").forEach(row => {
+        if (row.style.display === "none") return;
+        const index = visibleRows.indexOf(row);
+        row.style.display = (index >= start && index < end) ? "" : "none";
+        });
+        }
+
+        function renderPaginationControls(pageCount, visibleRows) {
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+        if (pageCount <= 1) return;
+
+        const prevLi = document.createElement("li");
+        prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+        prevLi.innerHTML = `<a class="page-link rounded-start-pill" href="#">Prev</a>`;
+        prevLi.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (currentPage > 1) { currentPage--; displayTablePage(currentPage, visibleRows); renderPaginationControls(pageCount, visibleRows); }
+        });
+        pagination.appendChild(prevLi);
+
+        for (let i = 1; i <= pageCount; i++) {
+        const li = document.createElement("li");
+        li.className = `page-item ${currentPage === i ? "active" : ""}`;
+        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        li.addEventListener("click", (e) => {
+        e.preventDefault(); currentPage = i; displayTablePage(currentPage, visibleRows); renderPaginationControls(pageCount, visibleRows);
+        });
+        pagination.appendChild(li);
+        }
+
+        const nextLi = document.createElement("li");
+        nextLi.className = `page-item ${currentPage === pageCount ? "disabled" : ""}`;
+        nextLi.innerHTML = `<a class="page-link rounded-end-pill" href="#">Next</a>`;
+        nextLi.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (currentPage < pageCount) { currentPage++; displayTablePage(currentPage, visibleRows); renderPaginationControls(pageCount, visibleRows); }
+        });
+        pagination.appendChild(nextLi);
+        }
+
+        function initPagination() {
+        const allRows = Array.from(document.querySelectorAll("#claimsTable tbody tr"));
+        const visibleRows = allRows.filter(row => row.style.display !== "none");
+        const pageCount = Math.ceil(visibleRows.length / rowsPerPage);
+        currentPage = 1;
+        displayTablePage(1, visibleRows);
+        renderPaginationControls(pageCount, visibleRows);
+        }
+        initPagination();
+
+
+        // ==================== VIEW MODAL - Populate Data ====================
+        const viewModal = document.getElementById('viewClaimModal');
+        viewModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+
+        const claimId = button.getAttribute('data-claimid');
+        const userName = button.getAttribute('data-username');
+        const policyName = button.getAttribute('data-policyname');
+        const claimAmount = button.getAttribute('data-claimamount');
+        const claimDate = button.getAttribute('data-claimdate');
+        const status = button.getAttribute('data-status');
+        const reason = button.getAttribute('data-reason');
+        const remarks = button.getAttribute('data-remarks');
+
+        document.getElementById('viewClaimIdDisplay').textContent = `#CLM-${claimId}`;
+        document.getElementById('viewUserName').textContent = userName || '-';
+        document.getElementById('viewPolicyName').textContent = policyName || '-';
+        document.getElementById('viewClaimAmount').textContent = `$${parseFloat(claimAmount).toFixed(2)}`;
+        document.getElementById('viewClaimDate').textContent = claimDate || '-';
+        document.getElementById('viewReason').textContent = reason || '-';
+        document.getElementById('viewRemarks').textContent = remarks || '-';
+
+        const statusBadge = document.getElementById('viewStatusBadge');
+        const statusLower = status?.toLowerCase();
+
+        if (statusLower === 'approved') {
+        statusBadge.className = 'badge bg-success-subtle text-success rounded-pill';
+        statusBadge.textContent = 'Approved';
+        } else if (statusLower === 'rejected') {
+        statusBadge.className = 'badge bg-danger-subtle text-danger rounded-pill';
+        statusBadge.textContent = 'Rejected';
+        } else if (statusLower === 'recommended-approve') {
+        statusBadge.className = 'badge bg-info-subtle text-info rounded-pill';
+        statusBadge.textContent = 'Rec: Approve';
+        } else if (statusLower === 'recommended-reject') {
+        statusBadge.className = 'badge bg-warning-subtle text-warning rounded-pill';
+        statusBadge.textContent = 'Rec: Reject';
+        } else {
+        statusBadge.className = 'badge bg-secondary-subtle text-secondary rounded-pill';
+        statusBadge.textContent = 'Pending';
+        }
+        });
+
+
+        // ==================== REMARKS MODAL - Save via AJAX ====================
+        const remarksModal = document.getElementById('remarksModal');
+        remarksModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const claimId = button.getAttribute('data-claimid');
+        const currentRemarks = button.getAttribute('data-currentremarks') || '';
+
+        document.getElementById('remarksClaimId').value = claimId;
+        document.getElementById('remarksText').value = currentRemarks;
+        });
+
+        document.getElementById('saveRemarksBtn').addEventListener('click', async function() {
+        const claimId = document.getElementById('remarksClaimId').value;
+        const remarks = document.getElementById('remarksText').value;
+        const token = document.querySelector('#remarksForm input[name="__RequestVerificationToken"]').value;
+
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+
+        try {
+        const response = await fetch('/Agent/AddRemarks', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'RequestVerificationToken': token
+        },
+        body: `claimId=${claimId}&remarks=${encodeURIComponent(remarks)}`
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+        showToast('Remarks saved successfully!', 'success');
+        setTimeout(() => location.reload(), 1000);
+        } else {
+        showToast(result.message || 'Failed to save remarks', 'error');
+        }
+        } catch (error) {
+        showToast('Network error. Please try again.', 'error');
+        } finally {
+        this.disabled = false;
+        this.textContent = 'Save Remarks';
+        }
+        });
+
+
+        // ==================== RECOMMEND MODAL - Setup & Submit ====================
+        const recommendModal = document.getElementById('recommendModal');
+        recommendModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const claimId = button.getAttribute('data-claimid');
+        const recommendation = button.getAttribute('data-recommendation');
+
+        document.getElementById('recommendClaimId').value = claimId;
+        document.getElementById('recommendAction').value = recommendation;
+        document.getElementById('recommendType').textContent = recommendation.toUpperCase();
+        document.getElementById('recommendModalTitle').textContent = `Recommend ${recommendation}`;
+
+        // Update icon and message
+        const icon = document.getElementById('recommendIconClass');
+        const iconContainer = document.getElementById('recommendIcon');
+        if (recommendation === 'Approve') {
+        icon.className = 'bi bi-hand-thumbs-up fs-4 text-success';
+        iconContainer.className = 'bg-success-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-3';
+        document.getElementById('recommendMessage').innerHTML =
+        'Are you sure you want to recommend <strong>APPROVAL</strong> for this claim?';
+        } else {
+        icon.className = 'bi bi-hand-thumbs-down fs-4 text-danger';
+        iconContainer.className = 'bg-danger-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-3';
+        document.getElementById('recommendMessage').innerHTML =
+        'Are you sure you want to recommend <strong>REJECTION</strong> for this claim?';
+        }
+        });
+
+        document.getElementById('submitRecommendBtn').addEventListener('click', async function() {
+        const claimId = document.getElementById('recommendClaimId').value;
+        const recommendation = document.getElementById('recommendAction').value;
+        const notes = document.getElementById('recommendNotes').value;
+        const token = document.querySelector('#recommendForm input[name="__RequestVerificationToken"]').value;
+
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Submitting...';
+
+        try {
+        const response = await fetch('/Agent/RecommendClaim', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'RequestVerificationToken': token
+        },
+        body: `claimId=${claimId}&recommendation=${recommendation}&notes=${encodeURIComponent(notes)}`
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+        showToast(result.message, 'success');
+        setTimeout(() => location.reload(), 1200);
+        } else {
+        showToast(result.message || 'Failed to submit recommendation', 'error');
+        }
+        } catch (error) {
+        showToast('Network error. Please try again.', 'error');
+        } finally {
+        this.disabled = false;
+        this.textContent = 'Submit Recommendation';
+        }
+        });
+
+
+        // ==================== TOAST NOTIFICATION HELPER ====================
+        function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-bg-${type} border-0 position-fixed bottom-0 end-0 m-3`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.innerHTML = `
+        <div class="d-flex">
+        <div class="toast-body">${message}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+        `;
+        document.body.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+        bsToast.show();
+        toast.addEventListener('hidden.bs.toast', () => toast.remove());
+        }
+
+
+        // ==================== EXPORT FUNCTIONS (Same as Admin) ====================
+        window.exportTable = function (type, tableId, filename) {
+        const table = document.getElementById(tableId);
+        const rows = table.querySelectorAll('tbody tr');
+        const data = [];
+
+        const headerRow = table.querySelector('thead tr');
+        const headers = Array.from(headerRow.querySelectorAll('th')).map(th => th.innerText.trim());
+        data.push(headers);
+
+        for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        if (row.style.display === "none") continue;
+
+        const rowData = [];
+        const cols = row.querySelectorAll('td');
+        for (let j = 0; j < cols.length - 1; j++) {
+        let text = cols[j].innerText.trim();
+        if (j === 0 && text.startsWith('#CLM-')) text = text.replace('#CLM-', '');
+        rowData.push(text);
+        }
+        data.push(rowData);
+        }
+
+        if (type === 'excel') {
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Claims');
+        XLSX.writeFile(wb, `${filename}.xlsx`);
+        } else if (type === 'pdf') {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape' });
+        doc.autoTable({
+        head: [data[0]],
+        body: data.slice(1),
+        theme: 'striped',
+        styles: { fontSize: 8, cellPadding: 2 },
+        headStyles: { fillColor: [13, 110, 253] }
+        });
+        doc.save(`${filename}.pdf`);
+        }
+        };
+        });
+    </script>
+}

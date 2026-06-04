@@ -1,0 +1,946 @@
+@model List<OnlineInsuranceManagementSystem.ViewModels.AgentApplicationViewModel>
+@{
+    ViewData["Title"] = "Applications Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    // Populate dropdowns from ViewBag
+    var customers = ViewBag.Customers as List<OnlineInsuranceManagementSystem.Models.User> ?? new();
+    var policies = ViewBag.Policies as List<OnlineInsuranceManagementSystem.Models.Policy> ?? new();
+    var agents = ViewBag.Agents as List<OnlineInsuranceManagementSystem.Models.User> ?? new();
+}
+
+<div class="card border-0 w-100 mb-3" style="border-radius: 30px; background-color: #f5f8fd;">
+    <div class="p-3 main-card">
+        <div class="container-fluid card-scroll-content px-3">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-3 flex-wrap gap-2">
+                <h4 class="mb-0">Applications Management</h4>
+                <button class="btn btn-primary btn-sm d-flex align-items-center gap-1 rounded-pill px-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addApplicationModal">
+                    <i class="bx bx-plus"></i> Add Application
+                </button>
+            </div>
+
+            <!-- TOP SUMMARY CARDS (Same design as Customers page) -->
+            <div class="row g-3 mb-4">
+                <!-- Total Applications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-file-earmark-text text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Total Applications</h6>
+                                <small class="text-muted" id="totalApplications">@ViewBag.TotalApplications</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pending Applications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-hourglass-split text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Pending Applications</h6>
+                                <small class="text-muted" id="pendingApplications">@ViewBag.PendingApplications</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Approved Applications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-check-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Approved Applications</h6>
+                                <small class="text-muted" id="approvedApplications">@ViewBag.ApprovedApplications</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Rejected Applications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-x-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Rejected Applications</h6>
+                                <small class="text-muted" id="rejectedApplications">@ViewBag.RejectedApplications</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter (Same design as Customers page) -->
+            <div class="card custom-card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-3">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Application ID</label>
+                            <input type="text" id="searchAppId"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter application ID..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Customer/Policy</label>
+                            <input type="text" id="searchName"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter customer or policy name..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Filter Status</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill active" data-filter="all">All</button>
+                                <button class="btn btn-sm btn-outline-warning rounded-pill" data-filter="pending">Pending</button>
+                                <button class="btn btn-sm btn-outline-success rounded-pill" data-filter="approved">Approved</button>
+                                <button class="btn btn-sm btn-outline-danger rounded-pill" data-filter="rejected">Rejected</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table (Same design as Customers page) -->
+            <div class="card custom-card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h4 class="mb-1 fw-semibold">All Applications</h4>
+                            <small class="text-muted">Manage insurance applications submitted by users</small>
+                        </div>
+                        <!-- Export Buttons (Same function as Customers page) -->
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                    onclick="exportTable('excel', 'applicationsTable', 'Applications')">
+                                <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                    onclick="exportTable('pdf', 'applicationsTable', 'Applications')">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body px-4">
+                    <div class="table-responsive p-3">
+                        <table class="table align-middle mb-0" id="applicationsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Application ID</th>
+                                    <th>Customer Name</th>
+                                    <th>Policy Name</th>
+                                    <th>Agent Name</th>
+                                    <th>Apply Date</th>
+                                    <th>Status</th>
+                                    <th>Remarks</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var app in Model)
+                                {
+                                    <tr data-status="@app.Status.ToLower()">
+                                        <td>@app.ApplicationIdDisplay</td>
+                                        <td>@app.UserName</td>
+                                        <td>@app.PolicyName</td>
+                                        <td>@(string.IsNullOrEmpty(app.AgentName) ? "-" : app.AgentName)</td>
+                                        <td>@app.ApplyDateDisplay</td>
+                                        <td>
+                                            <span class="badge @app.StatusBadgeClass">@app.StatusText</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small">@(string.IsNullOrEmpty(app.Remarks) ? "-" : app.Remarks)</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm d-flex gap-2">
+                                                <!-- VIEW BUTTON -->
+                                                <button class="btn btn-outline-info view-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#viewApplicationModal"
+                                                        data-appid="@app.ApplicationId"
+                                                        data-username="@app.UserName"
+                                                        data-policyname="@app.PolicyName"
+                                                        data-agentname="@(app.AgentName ?? "-")"
+                                                        data-applydate="@app.ApplyDateDisplay"
+                                                        data-assigneddate="@(app.AssignedDateDisplay)"
+                                                        data-status="@app.Status"
+                                                        data-remarks="@(app.Remarks ?? "-")"
+                                                        title="View Details">
+                                                    View
+                                                </button>
+
+                                                <!-- ✅ ASSIGN AGENT BUTTON (Only show if not assigned) -->
+                                                @if (app.AgentId == null)
+                                                {
+                                                    <button class="btn btn-outline-primary assign-agent-btn"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#assignAgentModal"
+                                                            data-appid="@app.ApplicationId"
+                                                            data-appinfo="@app.UserName - @app.PolicyName"
+                                                            title="Assign Agent">
+                                                        Assign
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-outline-secondary" disabled title="Already Assigned">
+                                                        Assigned
+                                                    </button>
+                                                }
+
+                                                <!-- EDIT BUTTON -->
+                                                <button class="btn btn-outline-warning edit-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editApplicationModal"
+                                                        data-appid="@app.ApplicationId"
+                                                        data-userid="@app.UserId"
+                                                        data-policyid="@app.PolicyId"
+                                                        data-agentid="@(app.AgentId?.ToString() ?? "")"
+                                                        data-applydate="@app.ApplyDate.ToString("yyyy-MM-dd")"
+                                                        data-status="@app.Status"
+                                                        data-remarks="@(app.Remarks ?? "")"
+                                                        title="Edit">
+                                                    Edit
+                                                </button>
+
+                                                <!-- DELETE BUTTON -->
+                                                <button type="button"
+                                                        class="btn btn-outline-danger delete-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteApplicationModal"
+                                                        data-appid="@app.ApplicationId"
+                                                        data-appinfo="@app.UserName - @app.PolicyName"
+                                                        title="Delete">
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination (Same as Customers page) -->
+                    <div class="d-flex justify-content-between align-items-center px-4 py-3 border-top">
+                        <small class="text-muted">Total Applications: @Model.Count</small>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== ADD APPLICATION MODAL ==================== -->
+<div class="modal fade" id="addApplicationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Add New Application</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form asp-action="CreateApplication" method="post">
+                    <!-- User Dropdown -->
+                    <select name="UserId" class="form-select mb-2 rounded-pill" required>
+                        <option value="">Select Customer</option>
+                        @foreach (var customer in customers.Where(c => c.Role == "Customer"))
+                        {
+                            <option value="@customer.UserId">@customer.FullName</option>
+                        }
+                    </select>
+
+                    <!-- Policy Dropdown -->
+                    <select name="PolicyId" class="form-select mb-2 rounded-pill" required>
+                        <option value="">Select Policy</option>
+                        @foreach (var policy in policies)
+                        {
+                            <option value="@policy.PolicyId">@policy.PolicyName</option>
+                        }
+                    </select>
+
+                    <!-- Agent Dropdown (Optional) -->
+                    <select name="AgentId" class="form-select mb-2 rounded-pill">
+                        <option value="">Select Agent (Optional)</option>
+                        @foreach (var agent in agents.Where(a => a.Role == "Agent"))
+                        {
+                            <option value="@agent.UserId">@agent.FullName</option>
+                        }
+                    </select>
+
+                    <!-- Application Date -->
+                    <input type="date" name="ApplyDate" class="form-control mb-2 rounded-pill"
+                           value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+
+                    <!-- Status Dropdown -->
+                    <select name="Status" class="form-select mb-2 rounded-pill">
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+
+                    <!-- Remarks Textarea -->
+                    <textarea name="Remarks" class="form-control mb-2 rounded-3"
+                              placeholder="Add remarks (optional)" rows="3"></textarea>
+
+                    <div class="modal-footer border-0 pt-3">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">Save Application</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== EDIT APPLICATION MODAL ==================== -->
+<div class="modal fade" id="editApplicationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Edit Application</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form asp-action="UpdateApplication" method="post">
+                    <input type="hidden" id="editApplicationId" name="ApplicationId" />
+
+                    <!-- User Dropdown -->
+                    <select id="editUserId" name="UserId" class="form-select mb-2 rounded-pill" required>
+                        <option value="">Select Customer</option>
+                        @foreach (var customer in customers.Where(c => c.Role == "Customer"))
+                        {
+                            <option value="@customer.UserId">@customer.FullName</option>
+                        }
+                    </select>
+
+                    <!-- Policy Dropdown -->
+                    <select id="editPolicyId" name="PolicyId" class="form-select mb-2 rounded-pill" required>
+                        <option value="">Select Policy</option>
+                        @foreach (var policy in policies)
+                        {
+                            <option value="@policy.PolicyId">@policy.PolicyName</option>
+                        }
+                    </select>
+
+                    <!-- Agent Dropdown (Optional) -->
+                    <select id="editAgentId" name="AgentId" class="form-select mb-2 rounded-pill">
+                        <option value="">Select Agent (Optional)</option>
+                        @foreach (var agent in agents.Where(a => a.Role == "Agent"))
+                        {
+                            <option value="@agent.UserId">@agent.FullName</option>
+                        }
+                    </select>
+
+                    <!-- Application Date -->
+                    <input type="date" id="editApplyDate" name="ApplyDate" class="form-control mb-2 rounded-pill" required />
+
+                    <!-- Status Dropdown -->
+                    <select id="editStatus" name="Status" class="form-select mb-2 rounded-pill">
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+
+                    <!-- Remarks Textarea -->
+                    <textarea id="editRemarks" name="Remarks" class="form-control mb-2 rounded-3"
+                              placeholder="Add remarks (optional)" rows="3"></textarea>
+
+                    <div class="modal-footer border-0 pt-3">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">Update Application</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== DELETE APPLICATION MODAL ==================== -->
+<div class="modal fade" id="deleteApplicationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content delete-modal position-relative">
+            <div class="delete-icon-wrapper">
+                <div class="icon-box delete-icon">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+            </div>
+            <div class="modal-body text-center pt-5 pb-4">
+                <h4 class="fw-bold">Delete Application?</h4>
+                <p class="text-muted">
+                    You are about to delete <strong id="deleteApplicationInfo"></strong><br />
+                    This action cannot be undone.
+                </p>
+                <form asp-action="DeleteApplication" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="deleteApplicationId" name="id" />
+                    <div class="d-flex gap-2 justify-content-center mt-3">
+                        <button type="button" class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger px-4 rounded-pill">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== VIEW APPLICATION DETAILS MODAL ==================== -->
+<div class="modal fade" id="viewApplicationModal" tabindex="-1" aria-labelledby="viewApplicationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bx bx-file text-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0" id="viewApplicationModalLabel">Application Details</h5>
+                        <small class="text-muted" id="viewApplicationIdDisplay">#APP-XXXX</small>
+                    </div>
+                </div>
+                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body - Card Style -->
+            <div class="modal-body pt-3">
+                <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+                        <!-- Customer Name -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-user me-1"></i>Customer Name</label>
+                            <p class="form-control-plaintext fw-semibold mb-0" id="viewUserName">-</p>
+                        </div>
+                        <!-- Policy Name -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-shield me-1"></i>Policy Name</label>
+                            <p class="form-control-plaintext mb-0" id="viewPolicyName">-</p>
+                        </div>
+                        <!-- Agent Name -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-person me-1"></i>Agent Name</label>
+                            <p class="form-control-plaintext mb-0" id="viewAgentName">-</p>
+                        </div>
+                        <!-- Apply Date -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-calendar me-1"></i>Application Date</label>
+                            <p class="form-control-plaintext mb-0" id="viewApplyDate">-</p>
+                        </div>
+                        <!-- Status & Remarks -->
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-badge-check me-1"></i>Status</label>
+                                <span id="viewStatusBadge" class="badge rounded-pill">-</span>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-note me-1"></i>Remarks</label>
+                                <p class="form-control-plaintext mb-0" id="viewRemarks">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    Close
+                </button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" id="viewEditApplicationBtn">
+                    Edit Application
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CSS STYLES (Same as Customers page) ==================== -->
+<style>
+    .delete-modal {
+        border-radius: 22px;
+        border: none;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+        background: #ffffff;
+        overflow: visible;
+        animation: popIn 0.3s ease;
+    }
+
+    .delete-icon-wrapper {
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+
+    .delete-icon {
+        width: 85px;
+        height: 85px;
+        background: #fff5f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 6px solid white;
+    }
+
+        .delete-icon i {
+            font-size: 34px;
+            color: #ff3b3b;
+        }
+
+    @@keyframes popIn {
+        from {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* View Modal Enhancements */
+    #viewApplicationModal .form-control-plaintext {
+        font-size: 1.05rem;
+        padding: 0.25rem 0;
+        border-bottom: 1px dashed #dee2e6;
+        border-radius: 0;
+    }
+
+        #viewApplicationModal .form-control-plaintext:hover {
+            border-bottom-color: #0d6efd;
+            transition: border-color 0.2s ease;
+        }
+
+    #viewApplicationModal .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        #viewApplicationModal .card:hover {
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+    @@media (max-width: 576px) {
+        #viewApplicationModal .modal-body .card-body {
+            padding: 1.25rem !important;
+        }
+
+        #viewApplicationModal .form-control-plaintext {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<!-- ==================== ASSIGN AGENT MODAL ==================== -->
+<div class="modal fade" id="assignAgentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Assign Agent</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form id="assignAgentForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="assignApplicationId" name="ApplicationId" />
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Application</label>
+                        <p class="form-control-plaintext fw-semibold" id="assignApplicationInfo">-</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="assignAgentSelect" class="form-label small text-muted">Select Approved Agent</label>
+                        <select id="assignAgentSelect" name="AgentId" class="form-select rounded-pill" required>
+                            <option value="">-- Loading agents... --</option>
+                        </select>
+                        <small class="text-muted">Only approved & active agents are shown</small>
+                    </div>
+
+                    <div class="alert alert-info d-none" id="assignSuccessAlert" role="alert">
+                        <i class="bx bx-check-circle me-1"></i>
+                        <span id="assignSuccessMessage"></span>
+                    </div>
+                    <div class="alert alert-danger d-none" id="assignErrorAlert" role="alert">
+                        <i class="bx bx-error-circle me-1"></i>
+                        <span id="assignErrorMessage"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 pt-3">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" id="confirmAssignBtn">
+                    <span id="assignBtnText">Assign Agent</span>
+                    <span id="assignBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== JAVASCRIPT (Same behavior as Customers page) ==================== -->
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ==================== SEARCH FUNCTIONALITY ====================
+            const searchAppId = document.getElementById('searchAppId');
+            const searchName = document.getElementById('searchName');
+
+            function filterTable() {
+                const appIdVal = searchAppId.value.toLowerCase();
+                const nameVal = searchName.value.toLowerCase();
+
+                document.querySelectorAll("#applicationsTable tbody tr").forEach(row => {
+                    const appId = row.cells[0]?.textContent.toLowerCase() || '';
+                    const customerName = row.cells[1]?.textContent.toLowerCase() || '';
+                    const policyName = row.cells[2]?.textContent.toLowerCase() || '';
+
+                    const matches = (appId.includes(appIdVal)) &&
+                                   (customerName.includes(nameVal) || policyName.includes(nameVal));
+
+                    row.style.display = matches ? "" : "none";
+                });
+            }
+
+            searchAppId.addEventListener("input", filterTable);
+            searchName.addEventListener("input", filterTable);
+
+
+            // ==================== PAGINATION ====================
+            const rowsPerPage = 10;
+            const tableRows = document.querySelectorAll("#applicationsTable tbody tr");
+            const pagination = document.getElementById("pagination");
+            let currentPage = 1;
+
+            function displayTablePage(page) {
+                currentPage = page;
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+
+                tableRows.forEach((row, index) => {
+                    row.style.display = (index >= start && index < end) ? "" : "none";
+                });
+                updatePaginationButtons();
+            }
+
+            function updatePaginationButtons() {
+                pagination.innerHTML = "";
+                const pageCount = Math.ceil(tableRows.length / rowsPerPage);
+
+                // Prev Button
+                const prevLi = document.createElement("li");
+                prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+                prevLi.innerHTML = `<a class="page-link rounded-start-pill" href="#">Prev</a>`;
+                prevLi.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (currentPage > 1) displayTablePage(currentPage - 1);
+                });
+                pagination.appendChild(prevLi);
+
+                // Page Numbers
+                for (let i = 1; i <= pageCount; i++) {
+                    const li = document.createElement("li");
+                    li.className = `page-item ${currentPage === i ? "active" : ""}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        displayTablePage(i);
+                    });
+                    pagination.appendChild(li);
+                }
+
+                // Next Button
+                const nextLi = document.createElement("li");
+                nextLi.className = `page-item ${currentPage === pageCount ? "disabled" : ""}`;
+                nextLi.innerHTML = `<a class="page-link rounded-end-pill" href="#">Next</a>`;
+                nextLi.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (currentPage < pageCount) displayTablePage(currentPage + 1);
+                });
+                pagination.appendChild(nextLi);
+            }
+
+            displayTablePage(1);
+
+
+            // ==================== STATUS FILTER ====================
+            document.querySelectorAll("[data-filter]").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
+                    this.classList.add("active");
+
+                    const filter = this.getAttribute('data-filter');
+                    const rows = document.querySelectorAll("#applicationsTable tbody tr");
+
+                    rows.forEach(row => {
+                        const rowStatus = row.getAttribute('data-status');
+
+                        if (filter === 'all') {
+                            row.style.display = '';
+                        } else if (filter === rowStatus) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+
+            // ==================== EDIT MODAL - Populate Data ====================
+            const editModal = document.getElementById('editApplicationModal');
+            editModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+
+                document.getElementById('editApplicationId').value = button.getAttribute('data-appid');
+                document.getElementById('editUserId').value = button.getAttribute('data-userid');
+                document.getElementById('editPolicyId').value = button.getAttribute('data-policyid');
+
+                const agentId = button.getAttribute('data-agentid');
+                document.getElementById('editAgentId').value = agentId || '';
+
+                document.getElementById('editApplyDate').value = button.getAttribute('data-applydate');
+                document.getElementById('editStatus').value = button.getAttribute('data-status');
+                document.getElementById('editRemarks').value = button.getAttribute('data-remarks');
+            });
+
+
+            // ==================== DELETE MODAL - Populate Data ====================
+            const deleteModal = document.getElementById('deleteApplicationModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                document.getElementById('deleteApplicationId').value = button.getAttribute('data-appid');
+                document.getElementById('deleteApplicationInfo').textContent = button.getAttribute('data-appinfo');
+            });
+
+
+            // ==================== VIEW MODAL - Populate Data ====================
+            const viewModal = document.getElementById('viewApplicationModal');
+
+            viewModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+
+                const appId = button.getAttribute('data-appid');
+                const userName = button.getAttribute('data-username');
+                const policyName = button.getAttribute('data-policyname');
+                const agentName = button.getAttribute('data-agentname');
+                const applyDate = button.getAttribute('data-applydate');
+                const status = button.getAttribute('data-status');
+                const remarks = button.getAttribute('data-remarks');
+
+                // Populate fields
+                document.getElementById('viewApplicationIdDisplay').textContent = `#APP-${appId}`;
+                document.getElementById('viewUserName').textContent = userName || '-';
+                document.getElementById('viewPolicyName').textContent = policyName || '-';
+                document.getElementById('viewAgentName').textContent = agentName || '-';
+                document.getElementById('viewApplyDate').textContent = applyDate || '-';
+                document.getElementById('viewRemarks').textContent = remarks || '-';
+
+                // Status Badge
+                const statusBadge = document.getElementById('viewStatusBadge');
+                const statusLower = status?.toLowerCase();
+
+                if (statusLower === 'approved') {
+                    statusBadge.className = 'badge bg-success-subtle text-success rounded-pill';
+                    statusBadge.textContent = 'Approved';
+                } else if (statusLower === 'rejected') {
+                    statusBadge.className = 'badge bg-danger-subtle text-danger rounded-pill';
+                    statusBadge.textContent = 'Rejected';
+                } else {
+                    statusBadge.className = 'badge bg-warning-subtle text-warning rounded-pill';
+                    statusBadge.textContent = 'Pending';
+                }
+
+                // Edit button in view modal -> open edit modal
+                document.getElementById('viewEditApplicationBtn').onclick = function() {
+                    const modalInstance = bootstrap.Modal.getInstance(viewModal);
+                    modalInstance.hide();
+
+                    setTimeout(() => {
+                        const fakeEditBtn = document.createElement('button');
+                        fakeEditBtn.setAttribute('data-bs-toggle', 'modal');
+                        fakeEditBtn.setAttribute('data-bs-target', '#editApplicationModal');
+                        fakeEditBtn.setAttribute('data-appid', appId);
+                        fakeEditBtn.setAttribute('data-userid', button.getAttribute('data-userid'));
+                        fakeEditBtn.setAttribute('data-policyid', button.getAttribute('data-policyid'));
+                        fakeEditBtn.setAttribute('data-agentid', button.getAttribute('data-agentid'));
+                        fakeEditBtn.setAttribute('data-applydate', applyDate);
+                        fakeEditBtn.setAttribute('data-status', status);
+                        fakeEditBtn.setAttribute('data-remarks', remarks);
+                        document.body.appendChild(fakeEditBtn);
+                        fakeEditBtn.click();
+                        fakeEditBtn.remove();
+                    }, 150);
+                };
+            });
+
+        });
+
+                // ==================== ASSIGN AGENT FUNCTIONALITY ====================
+
+        const assignModal = document.getElementById('assignAgentModal');
+        const assignAgentSelect = document.getElementById('assignAgentSelect');
+        const confirmAssignBtn = document.getElementById('confirmAssignBtn');
+        const assignBtnSpinner = document.getElementById('assignBtnSpinner');
+        const assignBtnText = document.getElementById('assignBtnText');
+
+        // Load agents when modal opens
+        assignModal.addEventListener('show.bs.modal', async function(event) {
+            const button = event.relatedTarget;
+            const appId = button.getAttribute('data-appid');
+            const appInfo = button.getAttribute('data-appinfo');
+
+            document.getElementById('assignApplicationId').value = appId;
+            document.getElementById('assignApplicationInfo').textContent = appInfo;
+
+            // Reset previous state
+            assignAgentSelect.innerHTML = '<option value="">-- Loading agents... --</option>';
+            assignAgentSelect.disabled = true;
+            confirmAssignBtn.disabled = true;
+            hideAssignAlerts();
+
+            try {
+                // Fetch approved agents via AJAX
+                const response = await fetch('/Admin/GetApprovedAgents', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.ok) {
+                    const agents = await response.json();
+                    assignAgentSelect.innerHTML = '<option value="">-- Select an Agent --</option>';
+
+                    if (agents.length === 0) {
+                        assignAgentSelect.innerHTML = '<option value="">No approved agents available</option>';
+                    } else {
+                        agents.forEach(agent => {
+                            const option = document.createElement('option');
+                            option.value = agent.id;
+                            option.textContent = `${agent.name} (${agent.email})`;
+                            assignAgentSelect.appendChild(option);
+                        });
+                    }
+                    assignAgentSelect.disabled = false;
+                    confirmAssignBtn.disabled = false;
+                } else {
+                    throw new Error('Failed to load agents');
+                }
+            } catch (error) {
+                console.error('Error loading agents:', error);
+                assignAgentSelect.innerHTML = '<option value="">Error loading agents</option>';
+                showAssignError('Could not load agents. Please try again.');
+            }
+        });
+
+        // Handle assignment submission
+        confirmAssignBtn.addEventListener('click', async function() {
+            const appId = document.getElementById('assignApplicationId').value;
+            const agentId = assignAgentSelect.value;
+
+            if (!agentId) {
+                showAssignError('Please select an agent first.');
+                return;
+            }
+
+            // Show loading state
+            assignBtnSpinner.classList.remove('d-none');
+            assignBtnText.textContent = 'Assigning...';
+            confirmAssignBtn.disabled = true;
+            hideAssignAlerts();
+
+            try {
+                const token = document.querySelector('#assignAgentForm input[name="__RequestVerificationToken"]').value;
+
+                const response = await fetch('/Admin/AssignAgent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify({
+                        ApplicationId: parseInt(appId),
+                        AgentId: parseInt(agentId)
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAssignSuccess(result.message);
+
+                    // Update UI: Change button to "Assigned" and refresh after delay
+                    setTimeout(() => {
+                        location.reload(); // Refresh to show updated assignment
+                    }, 1500);
+                } else {
+                    showAssignError(result.message || 'Assignment failed. Please try again.');
+                    resetAssignButton();
+                }
+            } catch (error) {
+                console.error('Assignment error:', error);
+                showAssignError('Network error. Please check your connection.');
+                resetAssignButton();
+            }
+        });
+
+        function hideAssignAlerts() {
+            document.getElementById('assignSuccessAlert').classList.add('d-none');
+            document.getElementById('assignErrorAlert').classList.add('d-none');
+        }
+
+        function showAssignSuccess(message) {
+            document.getElementById('assignSuccessMessage').textContent = message;
+            document.getElementById('assignSuccessAlert').classList.remove('d-none');
+            document.getElementById('assignErrorAlert').classList.add('d-none');
+        }
+
+        function showAssignError(message) {
+            document.getElementById('assignErrorMessage').textContent = message;
+            document.getElementById('assignErrorAlert').classList.remove('d-none');
+            document.getElementById('assignSuccessAlert').classList.add('d-none');
+        }
+
+        function resetAssignButton() {
+            assignBtnSpinner.classList.add('d-none');
+            assignBtnText.textContent = 'Assign Agent';
+            confirmAssignBtn.disabled = false;
+        }
+
+        // Also update View Modal to show AssignedDate
+        const viewModal = document.getElementById('viewApplicationModal');
+        viewModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            // ... existing code ...
+
+            // ✅ Add Assigned Date display
+            const assignedDate = button.getAttribute('data-assigneddate');
+            const assignedDateEl = document.getElementById('viewAssignedDate');
+            if (assignedDateEl) {
+                assignedDateEl.textContent = assignedDate || '-';
+            }
+        });
+    </script>
+}

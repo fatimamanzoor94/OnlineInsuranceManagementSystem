@@ -1,0 +1,579 @@
+@model List<OnlineInsuranceManagementSystem.Models.InsuranceType>
+@{
+    ViewData["Title"] = "Insurance Types Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card border-0 w-100 mb-3" style="border-radius: 30px; background-color: #f5f8fd;">
+    <div class="p-3 main-card">
+        <div class="container-fluid card-scroll-content px-3">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-3 flex-wrap gap-2">
+                <h4 class="mb-0">Insurance Types Management</h4>
+                <button class="btn btn-primary btn-sm d-flex align-items-center gap-1 rounded-pill px-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addInsuranceTypeModal">
+                    <i class="bx bx-plus"></i> Add Insurance Type
+                </button>
+            </div>
+
+            <!-- Search & Filter -->
+            <div class="card custom-card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-3">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Name</label>
+                            <input type="text" id="searchName"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter insurance type name..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Description</label>
+                            <input type="text" id="searchDescription"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter description keywords..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Filter Options</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill active" data-filter="all">All</button>
+                                <button class="btn btn-sm btn-outline-primary rounded-pill" data-filter="recent">Recently Created</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="card custom-card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h4 class="mb-1 fw-semibold">All Insurance Types</h4>
+                            <small class="text-muted">Manage your insurance type categories</small>
+                        </div>
+                        <!-- Export Buttons -->
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                    onclick="exportTable('excel', 'insuranceTypesTable', 'InsuranceTypes')">
+                                <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                    onclick="exportTable('pdf', 'insuranceTypesTable', 'InsuranceTypes')">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body px-4">
+                    <div class="table-responsive p-3">
+                        <table class="table align-middle mb-0" id="insuranceTypesTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Insurance Type ID</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Created Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+{
+    var fullDesc = item.Description ?? "N/A";
+
+    <tr>
+                                        <td>#INS-@item.InsuranceTypeId</td>
+                                        <td class="fw-semibold">@item.Name</td>
+                                        <td>
+                                            <span class="text-muted small">@fullDesc</span>
+                                        </td>
+                                        <td>@item.CreatedAt.ToString("dd-MMM-yyyy")</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm d-flex gap-2">
+                                                <!-- VIEW BUTTON -->
+                                                <button class="btn btn-outline-info view-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#viewInsuranceTypeModal"
+                                                        data-insurancetypeid="@item.InsuranceTypeId"
+                                                        data-name="@item.Name"
+                                                        data-description="@item.Description"
+                                                        data-createdat="@item.CreatedAt.ToString("dd-MMM-yyyy")"
+                                                        title="View Details">
+                                                    View
+                                                </button>
+
+                                                <!-- EDIT BUTTON -->
+                                                <button class="btn btn-outline-warning edit-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editInsuranceTypeModal"
+                                                        data-insurancetypeid="@item.InsuranceTypeId"
+                                                        data-name="@item.Name"
+                                                        data-description="@item.Description"
+                                                        title="Edit">
+                                                    Edit
+                                                </button>
+
+                                                <!-- DELETE BUTTON -->
+                                                <button type="button"
+                                                        class="btn btn-outline-danger delete-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteInsuranceTypeModal"
+                                                        data-insurancetypeid="@item.InsuranceTypeId"
+                                                        data-name="@item.Name"
+                                                        title="Delete">
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-between align-items-center px-4 py-3 border-top">
+                        <small class="text-muted">Total Insurance Types: @Model.Count</small>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== ADD INSURANCE TYPE MODAL ==================== -->
+<div class="modal fade" id="addInsuranceTypeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Add New Insurance Type</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form asp-action="CreateInsuranceType" asp-controller="InsuranceManagement" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-2">
+                        <label class="form-label small text-muted">Insurance Type Name <span class="text-danger">*</span></label>
+                        <input type="text" name="Name" class="form-control rounded-pill px-3"
+                               placeholder="e.g., Life Insurance, Motor Insurance..."
+                               required maxlength="100" pattern="[A-Za-z0-9\s\-\&\']{3,100}"
+                               title="Only letters, numbers, spaces, hyphens and apostrophes (3-100 characters)" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Description</label>
+                        <textarea name="Description" class="form-control rounded-3" rows="3"
+                                  placeholder="Brief description of this insurance type..." maxlength="500"></textarea>
+                    </div>
+                    <div class="modal-footer border-0 pt-3">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">Save Insurance Type</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== EDIT INSURANCE TYPE MODAL ==================== -->
+<div class="modal fade" id="editInsuranceTypeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Edit Insurance Type</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form asp-action="EditInsuranceType" asp-controller="InsuranceManagement" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="editInsuranceTypeId" name="InsuranceTypeId" />
+                    <div class="mb-2">
+                        <label class="form-label small text-muted">Insurance Type Name <span class="text-danger">*</span></label>
+                        <input type="text" id="editName" name="Name" class="form-control rounded-pill px-3"
+                               placeholder="e.g., Life Insurance, Motor Insurance..."
+                               required maxlength="100" pattern="[A-Za-z0-9\s\-\&\']{3,100}"
+                               title="Only letters, numbers, spaces, hyphens and apostrophes (3-100 characters)" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Description</label>
+                        <textarea id="editDescription" name="Description" class="form-control rounded-3" rows="3"
+                                  placeholder="Brief description of this insurance type..." maxlength="500"></textarea>
+                    </div>
+                    <div class="modal-footer border-0 pt-3">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">Update Insurance Type</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== DELETE INSURANCE TYPE MODAL ==================== -->
+<div class="modal fade" id="deleteInsuranceTypeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content delete-modal position-relative">
+            <div class="delete-icon-wrapper">
+                <div class="icon-box">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+            </div>
+            <div class="modal-body text-center pt-5 pb-4">
+                <h4 class="fw-bold">Delete Insurance Type?</h4>
+                <p class="text-muted">
+                    You are about to delete <strong id="deleteInsuranceTypeName"></strong><br />
+                    This action cannot be undone.
+                </p>
+                <form asp-action="DeleteInsuranceType" asp-controller="InsuranceManagement" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="deleteInsuranceTypeId" name="id" />
+                    <div class="d-flex gap-2 justify-content-center mt-3">
+                        <button type="button" class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger px-4 rounded-pill">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== VIEW INSURANCE TYPE DETAILS MODAL ==================== -->
+<div class="modal fade" id="viewInsuranceTypeModal" tabindex="-1" aria-labelledby="viewInsuranceTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bx bx-shield-quarter text-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0" id="viewInsuranceTypeModalLabel">Insurance Type Details</h5>
+                        <small class="text-muted" id="viewInsuranceTypeIdDisplay">#INS-XXXX</small>
+                    </div>
+                </div>
+                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body - Card Style -->
+            <div class="modal-body pt-3">
+                <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-tag me-1"></i>Insurance Type Name</label>
+                            <p class="form-control-plaintext fw-semibold mb-0" id="viewName">-</p>
+                        </div>
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-info-circle me-1"></i>Description</label>
+                            <p class="form-control-plaintext mb-0" id="viewDescription">-</p>
+                        </div>
+                        <!-- Created Date -->
+                        <div class="mb-0">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-calendar me-1"></i>Created Date</label>
+                            <p class="form-control-plaintext fw-medium mb-0" id="viewCreatedAt">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    Close
+                </button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" id="viewEditInsuranceTypeBtn">
+                    Edit Insurance Type
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CSS STYLES ==================== -->
+<style>
+    /* Delete Modal Animation - Exact Copy from Customers Page */
+    .delete-modal {
+        border-radius: 22px;
+        border: none;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+        background: #ffffff;
+        overflow: visible;
+        animation: popIn 0.3s ease;
+    }
+
+    .delete-icon-wrapper {
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+
+    .icon-box {
+        width: 85px;
+        height: 85px;
+        background: #fff5f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 6px solid white;
+    }
+
+        .icon-box i {
+            font-size: 34px;
+            color: #ff3b3b;
+        }
+
+    @@keyframes popIn {
+        from {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* View Modal Enhancements - Exact Copy from Customers Page */
+    #viewInsuranceTypeModal .form-control-plaintext {
+        font-size: 1.05rem;
+        padding: 0.25rem 0;
+        border-bottom: 1px dashed #dee2e6;
+        border-radius: 0;
+    }
+
+        #viewInsuranceTypeModal .form-control-plaintext:hover {
+            border-bottom-color: #0d6efd;
+            transition: border-color 0.2s ease;
+        }
+
+    #viewInsuranceTypeModal .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        #viewInsuranceTypeModal .card:hover {
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+    @@media (max-width: 576px) {
+        #viewInsuranceTypeModal .modal-body .card-body {
+            padding: 1.25rem !important;
+        }
+
+        #viewInsuranceTypeModal .form-control-plaintext {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ==================== SEARCH FUNCTIONALITY ====================
+            const searchName = document.getElementById('searchName');
+            const searchDescription = document.getElementById('searchDescription');
+
+            function filterTable() {
+                const nameVal = searchName.value.toLowerCase();
+                const descVal = searchDescription.value.toLowerCase();
+
+                document.querySelectorAll("#insuranceTypesTable tbody tr").forEach(row => {
+                    const name = row.cells[1]?.textContent.toLowerCase() || '';
+                    const desc = row.cells[2]?.textContent.toLowerCase() || '';
+                    row.style.display = (name.includes(nameVal) && desc.includes(descVal)) ? "" : "none";
+                });
+            }
+
+            searchName.addEventListener("input", filterTable);
+            searchDescription.addEventListener("input", filterTable);
+
+
+            // ==================== PAGINATION ====================
+            const rowsPerPage = 10;
+            let allTableRows = Array.from(document.querySelectorAll("#insuranceTypesTable tbody tr"));
+            let filteredRows = [...allTableRows];
+            const pagination = document.getElementById("pagination");
+            let currentPage = 1;
+
+            function applyFiltersAndPaginate() {
+                // Re-apply search filters first
+                filterTable();
+
+                // Then apply status/date filter
+                const activeFilter = document.querySelector('[data-filter].active')?.getAttribute('data-filter');
+
+                filteredRows = Array.from(document.querySelectorAll("#insuranceTypesTable tbody tr"))
+                    .filter(row => row.style.display !== 'none');
+
+                if (activeFilter === 'recent') {
+                    const thirtyDaysAgo = new Date();
+                    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+                    filteredRows = filteredRows.filter(row => {
+                        const dateText = row.cells[3]?.textContent; // Created Date column
+                        if (!dateText) return false;
+                        const rowDate = new Date(dateText);
+                        return rowDate >= thirtyDaysAgo;
+                    });
+                }
+
+                displayTablePage(1); // Reset to first page when filters change
+            }
+
+            function displayTablePage(page) {
+                currentPage = page;
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+
+                // Hide all rows first
+                allTableRows.forEach(row => row.style.display = 'none');
+
+                // Show only filtered + paginated rows
+                filteredRows.forEach((row, index) => {
+                    row.style.display = (index >= start && index < end) ? "" : "none";
+                });
+                updatePaginationButtons();
+            }
+
+            function updatePaginationButtons() {
+                pagination.innerHTML = "";
+                const pageCount = Math.ceil(filteredRows.length / rowsPerPage);
+                if (pageCount === 0) return;
+
+                // Prev Button
+                const prevLi = document.createElement("li");
+                prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+                prevLi.innerHTML = `<a class="page-link rounded-start-pill" href="#">Prev</a>`;
+                prevLi.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (currentPage > 1) displayTablePage(currentPage - 1);
+                });
+                pagination.appendChild(prevLi);
+
+                // Page Numbers (show max 5 around current)
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(pageCount, startPage + 4);
+                if (endPage - startPage < 4) {
+                    startPage = Math.max(1, endPage - 4);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const li = document.createElement("li");
+                    li.className = `page-item ${currentPage === i ? "active" : ""}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        displayTablePage(i);
+                    });
+                    pagination.appendChild(li);
+                }
+
+                // Next Button
+                const nextLi = document.createElement("li");
+                nextLi.className = `page-item ${currentPage === pageCount ? "disabled" : ""}`;
+                nextLi.innerHTML = `<a class="page-link rounded-end-pill" href="#">Next</a>`;
+                nextLi.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (currentPage < pageCount) displayTablePage(currentPage + 1);
+                });
+                pagination.appendChild(nextLi);
+            }
+
+            // Initial load
+            applyFiltersAndPaginate();
+
+
+            // ==================== FILTER BUTTONS ====================
+            document.querySelectorAll("[data-filter]").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
+                    this.classList.add("active");
+                    applyFiltersAndPaginate();
+                });
+            });
+
+            // Re-filter when search inputs change
+            searchName.addEventListener("input", applyFiltersAndPaginate);
+            searchDescription.addEventListener("input", applyFiltersAndPaginate);
+
+
+            // ==================== EDIT MODAL - Populate Data ====================
+            const editModal = document.getElementById('editInsuranceTypeModal');
+            editModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                document.getElementById('editInsuranceTypeId').value = button.getAttribute('data-insurancetypeid');
+                document.getElementById('editName').value = button.getAttribute('data-name') || '';
+                document.getElementById('editDescription').value = button.getAttribute('data-description') || '';
+            });
+
+
+            // ==================== DELETE MODAL - Populate Data ====================
+            const deleteModal = document.getElementById('deleteInsuranceTypeModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                document.getElementById('deleteInsuranceTypeId').value = button.getAttribute('data-insurancetypeid');
+                document.getElementById('deleteInsuranceTypeName').textContent = button.getAttribute('data-name');
+            });
+
+
+            // ==================== VIEW MODAL - Populate Data ====================
+            const viewModal = document.getElementById('viewInsuranceTypeModal');
+
+            viewModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+
+                const insuranceTypeId = button.getAttribute('data-insurancetypeid');
+                const name = button.getAttribute('data-name') || '-';
+                const description = button.getAttribute('data-description') || 'No description provided';
+                const createdAt = button.getAttribute('data-createdat') || '-';
+
+                // Populate fields
+                document.getElementById('viewInsuranceTypeIdDisplay').textContent = `#INS-${insuranceTypeId}`;
+                document.getElementById('viewName').textContent = name;
+                document.getElementById('viewDescription').textContent = description;
+                document.getElementById('viewCreatedAt').textContent = createdAt;
+
+                // Edit button in view modal -> open edit modal
+                document.getElementById('viewEditInsuranceTypeBtn').onclick = function() {
+                    const modalInstance = bootstrap.Modal.getInstance(viewModal);
+                    modalInstance.hide();
+
+                    setTimeout(() => {
+                        // Reuse the same data attributes to trigger edit modal
+                        const fakeEditBtn = document.createElement('button');
+                        fakeEditBtn.setAttribute('data-bs-toggle', 'modal');
+                        fakeEditBtn.setAttribute('data-bs-target', '#editInsuranceTypeModal');
+                        fakeEditBtn.setAttribute('data-insurancetypeid', insuranceTypeId);
+                        fakeEditBtn.setAttribute('data-name', name);
+                        fakeEditBtn.setAttribute('data-description', description);
+                        document.body.appendChild(fakeEditBtn);
+                        fakeEditBtn.click();
+                        fakeEditBtn.remove();
+                    }, 150);
+                };
+            });
+
+            // Re-initialize pagination after any modal closes (in case data changed)
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('hidden.bs.modal', function () {
+                    // Optional: Refresh page or re-fetch data via AJAX in production
+                    // For now, just re-apply filters to handle any DOM changes
+                    applyFiltersAndPaginate();
+                });
+            });
+
+        });
+    </script>
+}

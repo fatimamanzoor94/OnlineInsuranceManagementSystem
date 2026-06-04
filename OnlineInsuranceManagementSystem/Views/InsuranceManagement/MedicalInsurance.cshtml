@@ -1,0 +1,626 @@
+@model List<OnlineInsuranceManagementSystem.ViewModels.MedicalInsurancePolicyViewModel>
+@{
+    ViewData["Title"] = "Medical Insurance";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card border-0 w-100 mb-3" style="border-radius: 30px; background-color: #f5f8fd;">
+    <div class="p-3 main-card">
+        <div class="container-fluid card-scroll-content px-3">
+
+            <!-- ============ MEDICAL INSURANCE LIST VIEW ============ -->
+            <div id="medicalInsuranceListView">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+                    <h4 class="mb-0">Medical Insurance Management</h4>
+                </div>
+
+                <!-- TOP SUMMARY CARDS (Medical Insurance) -->
+                <div class="row g-3">
+                    <!-- Total Medical Policies -->
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card custom-card h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="icon-box">
+                                        <i class="bi bi-heart-pulse text-dark"></i>
+                                    </div>
+                                    <h6 class="card-title mt-3 mb-1">Total Medical Policies</h6>
+                                    <small class="text-muted" id="totalPolicies">@ViewBag.TotalPolicies</small>
+                                </div>
+                                <i class="bx bx-trending-up trend-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Active Policies -->
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card custom-card h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="icon-box">
+                                        <i class="bi bi-check-circle text-dark"></i>
+                                    </div>
+                                    <h6 class="card-title mt-3 mb-1">Active Policies</h6>
+                                    <small class="text-muted" id="activePolicies">@ViewBag.ActivePolicies</small>
+                                </div>
+                                <i class="bx bx-trending-up trend-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Premium Plans -->
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card custom-card h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="icon-box">
+                                        <i class="bi bi-star text-dark"></i>
+                                    </div>
+                                    <h6 class="card-title mt-3 mb-1">Premium Plans</h6>
+                                    <small class="text-muted" id="premiumPlans">@ViewBag.PremiumPlans</small>
+                                </div>
+                                <i class="bx bx-trending-up trend-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Total Coverage Amount -->
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card custom-card h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="icon-box">
+                                        <i class="bi bi-currency-dollar text-dark"></i>
+                                    </div>
+                                    <h6 class="card-title mt-3 mb-1">Total Coverage</h6>
+                                    <small class="text-muted" id="totalCoverage">$@(Convert.ToDecimal(ViewBag.TotalCoverage ?? 0).ToString("N0"))</small>
+                                </div>
+                                <i class="bx bx-trending-up trend-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEARCH & FILTER (MATCHES POLICIES PAGE STYLE) -->
+                <div class="card custom-card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-3">
+                        <div class="row g-3 align-items-end">
+
+                            <!-- Search -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label small text-muted mb-1">Search by Policy</label>
+                                <input type="text"
+                                       id="policySearch"
+                                       class="form-control form-control-sm rounded-pill px-3"
+                                       placeholder="Enter policy name or ID..." />
+                            </div>
+
+                            <!-- Status Filter Buttons -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label small text-muted mb-1">Filter Status</label>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button class="btn btn-sm btn-outline-secondary rounded-pill active filter-btn" data-filter="all">
+                                        All
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success rounded-pill filter-btn" data-filter="active">
+                                        Active
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger rounded-pill filter-btn" data-filter="inactive">
+                                        Inactive
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning rounded-pill filter-btn" data-filter="premium">
+                                        Premium
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MEDICAL INSURANCE TABLE SECTION -->
+                <div class="row g-4 mt-3">
+                    <div class="col-12">
+                        <div class="card custom-card h-100 border-0 shadow-sm rounded-4">
+                            <!-- Header -->
+                            <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div>
+                                        <h4 class="mb-1 fw-semibold">All Medical Insurance Policies</h4>
+                                        <small class="text-muted">View and manage medical insurance policy details</small>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                                onclick="exportTable('excel', 'medicalInsuranceTable', 'MedicalInsurancePolicies')">
+                                            <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                                        </button>
+
+                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                                onclick="exportTable('pdf', 'medicalInsuranceTable', 'MedicalInsurancePolicies')">
+                                            <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body px-4">
+                                <div class="table-responsive p-3">
+                                    <table class="table align-middle mb-0" id="medicalInsuranceTable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Policy ID</th>
+                                                <th>Policy Name</th>
+                                                <th>Insurance Type</th>
+                                                <th>Premium Amount</th>
+                                                <th>Coverage Amount</th>
+                                                <th>Duration</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var policy in Model)
+                                            {
+                                                <tr data-status="@(policy.IsActive ? "active" : "inactive")"
+                                                    data-premium="@(policy.PremiumAmount >= 500 ? "premium" : "standard")"
+                                                    data-policy-id="@policy.PolicyId">
+                                                    <td>@policy.PolicyIdDisplay</td>
+                                                    <td class="fw-semibold">@policy.PolicyName</td>
+                                                    <td>@policy.InsuranceTypeName</td>
+                                                    <td class="fw-medium">@policy.PremiumDisplay</td>
+                                                    <td class="fw-semibold text-primary">@policy.CoverageDisplay</td>
+                                                    <td>@policy.DurationDisplay</td>
+                                                    <td>
+                                                        <span class="badge @policy.StatusBadgeClass">@policy.StatusText</span>
+                                                        @if (policy.PremiumAmount >= 500)
+                                                        {
+                                                            <span class="badge @policy.PremiumPlanBadge ms-1">@policy.PremiumPlanText</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group">
+                                                            <button class="btn btn-outline-info view-details" data-policy-id="@policy.PolicyId" title="View Details"> View</button>
+                                                        </div>
+                                                        <style>
+                                                                                                                .view-details {
+                                                                                                                    border-radius: 0px;
+                                                                                                                    padding: 6px 14px;
+                                                                                                                    font-size: 13px;
+                                                                                                                    font-weight: 500;
+                                                                                                                    line-height: 1;
+                                                                                                                }
+                                                        </style>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ MEDICAL INSURANCE DETAIL VIEW (Hidden by default) ============ -->
+            <div id="medicalInsuranceDetailView" style="display: none;">
+                <!-- Back Button & Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" id="backToList">
+                            <i class="bx bx-arrow-back me-1"></i> Back to List
+                        </button>
+                        <h4 class="mb-0">Policy Details - <span id="detailPolicyId">#POL-0000</span></h4>
+                    </div>
+                </div>
+
+                <!-- Section 1: Policy Information -->
+                <div class="row g-4">
+                    <div class="col-12 col-lg-6">
+                        <div class="card custom-card border-0 shadow-sm rounded-4">
+                            <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                                <h5 class="mb-0 fw-semibold"><i class="bi bi-shield-check me-2"></i>Policy Information</h5>
+                            </div>
+                            <div class="card-body px-4">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label text-muted small mb-1">Policy Name</label>
+                                        <p class="mb-0 fw-medium" id="detailPolicyName">-</p>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label text-muted small mb-1">Policy ID</label>
+                                        <p class="mb-0 fw-medium" id="detailPolicyIdFull">#POL-0000</p>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label text-muted small mb-1">Insurance Type</label>
+                                        <p class="mb-0" id="detailInsuranceType">Medical Insurance</p>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label text-muted small mb-1">Premium Amount</label>
+                                        <p class="mb-0 fw-semibold text-primary" id="detailPremiumAmount">$0.00/month</p>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label text-muted small mb-1">Coverage Amount</label>
+                                        <p class="mb-0 fw-semibold" id="detailCoverageAmount">$0</p>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label text-muted small mb-1">Policy Duration</label>
+                                        <p class="mb-0" id="detailPolicyDuration">-</p>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label text-muted small mb-1">Status</label>
+                                        <span class="badge" id="detailStatus">-</span>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label text-muted small mb-1">Created Date</label>
+                                        <p class="mb-0" id="detailCreatedAt">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Coverage Benefits (Medical-Specific Content) -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card custom-card border-0 shadow-sm rounded-4">
+                            <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                                <h5 class="mb-0 fw-semibold"><i class="bi bi-gift me-2"></i>Coverage Benefits</h5>
+                            </div>
+                            <div class="card-body px-4">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="d-flex align-items-start gap-3 mb-3">
+                                            <div class="flex-shrink-0">
+                                                <i class="bi bi-hospital text-success fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1 fw-medium">Hospitalization Coverage</h6>
+                                                <p class="mb-0 small text-muted">Full coverage for inpatient treatment, room charges, ICU, and nursing care.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex align-items-start gap-3 mb-3">
+                                            <div class="flex-shrink-0">
+                                                <i class="bi bi-prescription2 text-danger fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1 fw-medium">Medicine & Pharmacy</h6>
+                                                <p class="mb-0 small text-muted">Reimbursement for prescribed medications, surgical supplies, and diagnostic tests.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex align-items-start gap-3 mb-3">
+                                            <div class="flex-shrink-0">
+                                                <i class="bi bi-ambulance text-primary fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1 fw-medium">Emergency Services</h6>
+                                                <p class="mb-0 small text-muted">24/7 ambulance coverage, emergency room visits, and critical care support.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex align-items-start gap-3">
+                                            <div class="flex-shrink-0">
+                                                <i class="bi bi-heart-pulse text-warning fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1 fw-medium">Preventive Care</h6>
+                                                <p class="mb-0 small text-muted">Annual health check-ups, vaccinations, and wellness programs included.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Premium Information -->
+                <div class="row g-4 mt-2">
+                    <div class="col-12">
+                        <div class="card custom-card border-0 shadow-sm rounded-4">
+                            <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                                <h5 class="mb-0 fw-semibold"><i class="bi bi-wallet2 me-2"></i>Premium Information</h5>
+                            </div>
+                            <div class="card-body px-4">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label text-muted small mb-1">Monthly Premium</label>
+                                        <p class="mb-0 fw-semibold text-primary fs-5" id="detailMonthlyPremium">$0.00</p>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label text-muted small mb-1">Annual Premium</label>
+                                        <p class="mb-0 fw-semibold" id="detailAnnualPremium">$0.00</p>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label text-muted small mb-1">Payment Frequency</label>
+                                        <p class="mb-0" id="detailPaymentFrequency">Monthly / Annual</p>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label text-muted small mb-1">Renewal Details</label>
+                                        <p class="mb-0" id="detailRenewalDetails">Policy renews automatically. Premium may be adjusted based on age, health status, and claim history at renewal.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Terms & Eligibility -->
+                <div class="row g-4 mt-2">
+                    <div class="col-12 col-lg-6">
+                        <div class="card custom-card border-0 shadow-sm rounded-4">
+                            <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                                <h5 class="mb-0 fw-semibold"><i class="bi bi-file-text me-2"></i>Terms & Conditions</h5>
+                            </div>
+                            <div class="card-body px-4">
+                                <p class="mb-0 small" id="detailTerms">
+                                    @(Model.FirstOrDefault()?.Terms ?? "Standard medical insurance terms and conditions apply. Please refer to the policy document for complete details regarding coverage exclusions, pre-existing conditions, waiting periods, and claim procedures.")
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="card custom-card border-0 shadow-sm rounded-4">
+                            <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                                <h5 class="mb-0 fw-semibold"><i class="bi bi-person-check me-2"></i>Eligibility & Notes</h5>
+                            </div>
+                            <div class="card-body px-4">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label text-muted small mb-1">Age Limit</label>
+                                        <p class="mb-0">18 - 75 years at policy inception</p>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label text-muted small mb-1">Requirements</label>
+                                        <p class="mb-0 small">Valid ID, medical history declaration, pre-policy health check-up (for coverage > $50,000)</p>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label text-muted small mb-1">Additional Notes</label>
+                                        <p class="mb-0 small text-muted">No-claim bonus available for claim-free years. Family floater options available. Cashless treatment at network hospitals.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ============ VIEW TOGGLE FUNCTIONALITY ============
+            const listView = document.getElementById('medicalInsuranceListView');
+            const detailView = document.getElementById('medicalInsuranceDetailView');
+            const backBtn = document.getElementById('backToList');
+            const viewDetailBtns = document.querySelectorAll('.view-details');
+
+            // Show detail view when "View" button is clicked
+            viewDetailBtns.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const policyId = this.getAttribute('data-policy-id');
+                    loadPolicyDetails(policyId);
+                });
+            });
+
+            // Back to list functionality
+            backBtn.addEventListener('click', function () {
+                detailView.style.display = 'none';
+                listView.style.display = 'block';
+            });
+
+            // ============ LOAD POLICY DETAILS (AJAX) ============
+            function loadPolicyDetails(policyId) {
+                // Show loading state
+                document.getElementById('detailPolicyId').textContent = '#POL-' + policyId.toString().padStart(4, '0');
+                document.getElementById('detailPolicyIdFull').textContent = '#POL-' + policyId.toString().padStart(4, '0');
+
+                // Fetch policy details from server - CHANGED ENDPOINT
+                fetch(`/InsuranceManagement/GetMedicalPolicyDetails?policyId=${policyId}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Policy not found');
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Populate Policy Information
+                        document.getElementById('detailPolicyName').textContent = data.policyName;
+                        document.getElementById('detailInsuranceType').textContent = data.insuranceTypeName;
+                        document.getElementById('detailPremiumAmount').textContent = '$' + data.premiumAmount.toFixed(2) + '/month';
+                        document.getElementById('detailCoverageAmount').textContent = '$' + data.coverageAmount.toLocaleString();
+                        document.getElementById('detailPolicyDuration').textContent = formatDuration(data.duration);
+                        document.getElementById('detailCreatedAt').textContent = new Date(data.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                        // Populate Status Badge
+                        const statusBadge = document.getElementById('detailStatus');
+                        statusBadge.textContent = data.isActive ? 'Active' : 'Inactive';
+                        statusBadge.className = 'badge ' + (data.isActive ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary');
+
+                        // Populate Premium Information
+                        document.getElementById('detailMonthlyPremium').textContent = '$' + data.premiumAmount.toFixed(2);
+                        document.getElementById('detailAnnualPremium').textContent = '$' + (data.premiumAmount * 12).toFixed(2);
+
+                        // Populate Terms
+                        document.getElementById('detailTerms').textContent = data.terms || 'Standard medical insurance terms and conditions apply.';
+
+                        // Switch views
+                        listView.style.display = 'none';
+                        detailView.style.display = 'block';
+
+                        // Scroll to top
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    })
+                    .catch(error => {
+                        console.error('Error loading policy details:', error);
+                        alert('Unable to load policy details. Please try again.');
+                    });
+            }
+
+            // Helper: Format duration display
+            function formatDuration(months) {
+                if (months >= 12) {
+                    const years = Math.floor(months / 12);
+                    return years === 1 ? '1 Year' : `${years} Years`;
+                }
+                return months === 1 ? '1 Month' : `${months} Months`;
+            }
+
+            // ============ SEARCH FUNCTIONALITY ============
+            const searchInput = document.getElementById('policySearch');
+            const tableRows = document.querySelectorAll('#medicalInsuranceTable tbody tr');
+
+            searchInput.addEventListener('keyup', function () {
+                const searchTerm = this.value.toLowerCase().trim();
+
+                tableRows.forEach(row => {
+                    const policyId = row.cells[0]?.textContent.toLowerCase() || '';
+                    const policyName = row.cells[1]?.textContent.toLowerCase() || '';
+                    const coverageAmount = row.cells[4]?.textContent.toLowerCase() || '';
+
+                    const matches = policyId.includes(searchTerm) ||
+                                   policyName.includes(searchTerm) ||
+                                   coverageAmount.includes(searchTerm);
+
+                    row.style.display = matches ? '' : 'none';
+                });
+
+                // Also trigger filter to maintain consistency
+                applyFilters();
+            });
+
+            // ============ FILTER FUNCTIONALITY ============
+            const filterBtns = document.querySelectorAll('#medicalInsuranceListView [data-filter]');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    // Update active state
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    applyFilters();
+                });
+            });
+
+            function applyFilters() {
+                const activeFilter = document.querySelector('.filter-btn.active')?.getAttribute('data-filter');
+                const searchTerm = searchInput.value.toLowerCase().trim();
+
+                tableRows.forEach(row => {
+                    // Check if row matches search
+                    const policyId = row.cells[0]?.textContent.toLowerCase() || '';
+                    const policyName = row.cells[1]?.textContent.toLowerCase() || '';
+                    const coverageAmount = row.cells[4]?.textContent.toLowerCase() || '';
+                    const matchesSearch = !searchTerm ||
+                                          policyId.includes(searchTerm) ||
+                                          policyName.includes(searchTerm) ||
+                                          coverageAmount.includes(searchTerm);
+
+                    // Check if row matches filter
+                    let matchesFilter = true;
+                    if (activeFilter && activeFilter !== 'all') {
+                        const rowStatus = row.getAttribute('data-status');
+                        const rowPremium = row.getAttribute('data-premium');
+
+                        switch (activeFilter) {
+                            case 'active':
+                                matchesFilter = rowStatus === 'active';
+                                break;
+                            case 'inactive':
+                                matchesFilter = rowStatus === 'inactive';
+                                break;
+                            case 'premium':
+                                matchesFilter = rowPremium === 'premium';
+                                break;
+                        }
+                    }
+
+                    // Show/hide row
+                    row.style.display = (matchesSearch && matchesFilter) ? '' : 'none';
+                });
+            }
+
+            // ============ SERVER-SIDE SEARCH/FILTER (Optional Enhancement) ============
+            // Uncomment below to enable AJAX-based server filtering for large datasets
+            /*
+            function loadFilteredPolicies(searchTerm, filter) {
+                fetch('/InsuranceManagement/SearchMedicalInsurance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `searchTerm=${encodeURIComponent(searchTerm)}&filter=${encodeURIComponent(filter)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Clear existing rows
+                    const tbody = document.querySelector('#medicalInsuranceTable tbody');
+                    tbody.innerHTML = '';
+
+                    // Populate new rows
+                    data.forEach(policy => {
+                        const row = document.createElement('tr');
+                        row.setAttribute('data-status', policy.isActive ? 'active' : 'inactive');
+                        row.setAttribute('data-premium', policy.premiumAmount >= 500 ? 'premium' : 'standard');
+                        row.setAttribute('data-policy-id', policy.policyId);
+                        row.innerHTML = `
+                            <td>${policy.policyIdDisplay}</td>
+                            <td class="fw-semibold">${policy.policyName}</td>
+                            <td>${policy.insuranceTypeName}</td>
+                            <td class="fw-medium">${policy.premiumDisplay}</td>
+                            <td class="fw-semibold text-primary">${policy.coverageDisplay}</td>
+                            <td>${policy.durationDisplay}</td>
+                            <td>
+                                <span class="badge ${policy.statusBadgeClass}">${policy.statusText}</span>
+                                ${policy.premiumAmount >= 500 ? `<span class="badge ${policy.premiumPlanBadge} ms-1">${policy.premiumPlanText}</span>` : ''}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-primary view-details" data-policy-id="${policy.policyId}">View</button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    // Re-attach event listeners to new View buttons
+                    document.querySelectorAll('.view-details').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const policyId = this.getAttribute('data-policy-id');
+                            loadPolicyDetails(policyId);
+                        });
+                    });
+                })
+                .catch(error => console.error('Error filtering policies:', error));
+            }
+            */
+
+            // ============ UTILITY: Format currency for display ============
+            function formatCurrency(amount) {
+                return '$' + parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            // ============ INITIALIZE: Re-attach listeners after DOM updates ============
+            function initializeViewButtons() {
+                document.querySelectorAll('.view-details').forEach(btn => {
+                    btn.removeEventListener('click', loadPolicyDetails);
+                    btn.addEventListener('click', function () {
+                        const policyId = this.getAttribute('data-policy-id');
+                        loadPolicyDetails(policyId);
+                    });
+                });
+            }
+
+            // Run initialization
+            initializeViewButtons();
+
+            // ============ EXPORT FUNCTIONALITY (Uses shared exportTable from _AdminLayout) ============
+            // Export buttons are handled by the shared exportTable() function in _AdminLayout.cshtml
+
+        });
+    </script>
+}

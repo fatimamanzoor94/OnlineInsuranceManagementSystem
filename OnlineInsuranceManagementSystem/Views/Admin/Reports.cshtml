@@ -1,0 +1,1086 @@
+@model OnlineInsuranceManagementSystem.ViewModels.ReportViewModel
+@using Newtonsoft.Json
+@{
+    ViewData["Title"] = "Reports & Analytics";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card border-0 w-100 mb-3" style="border-radius: 30px; background-color: #f5f8fd;">
+    <div class="p-3 main-card">
+        <div class="container-fluid card-scroll-content px-3">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-3 flex-wrap gap-2">
+                <h4 class="mb-0">Reports & Analytics</h4>
+                @* <div class="d-flex gap-2 flex-wrap">
+                    <form asp-action="Reports" method="get" class="d-flex gap-2">
+                        <select name="year" class="form-select form-select-sm rounded-pill px-3" style="min-width: 120px;" onchange="this.form.submit()">
+                            @foreach (var y in Model.AvailableYears)
+                            {
+                                <option value="@y" selected="@(Model.SelectedYear == y)">@y</option>
+                            }
+                        </select>
+                        <select name="policyType" class="form-select form-select-sm rounded-pill px-3" style="min-width: 150px;" onchange="this.form.submit()">
+                            @foreach (var pt in Model.AvailablePolicyTypes)
+                            {
+                                <option value="@pt" selected="@(Model.SelectedPolicyType == pt)">@pt</option>
+                            }
+                        </select>
+                    </form>
+                    <button class="btn btn-primary btn-sm d-flex align-items-center gap-1 rounded-pill px-3"
+                            onclick="exportReport('pdf')">
+                        <i class="bx bx-download"></i> Export Report
+                    </button>
+                </div> *@
+            </div>
+
+            <!-- ==================== SUMMARY CARDS (Same as Applications.cshtml) ==================== -->
+            <div class="row g-3 mb-4">
+                <!-- Total Revenue -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-currency-dollar text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Total Revenue</h6>
+                                <small class="text-muted" id="totalRevenue">Rs. @Model.TotalRevenue.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Revenue -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-calendar-check text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">This Month</h6>
+                                <small class="text-muted" id="monthlyRevenue">Rs. @Model.MonthlyRevenue.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Policies -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-shield-check text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Total Policies</h6>
+                                <small class="text-muted" id="totalPolicies">@Model.TotalPolicies.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Policies -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-check2-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Active Policies</h6>
+                                <small class="text-muted" id="activePolicies">@Model.ActivePolicies.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Claims -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-clipboard2-check text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Total Claims</h6>
+                                <small class="text-muted" id="totalClaims">@Model.TotalClaims.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Claim Amount -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-wallet2 text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Claim Amount</h6>
+                                <small class="text-muted" id="claimAmount">Rs. @Model.TotalClaimAmount.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Approved Claims -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-check-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Approved</h6>
+                                <small class="text-muted" id="approvedClaims">Rs. @Model.ApprovedClaimsAmount.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Claims -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-hourglass-split text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Pending</h6>
+                                <small class="text-muted" id="pendingClaims">Rs. @Model.PendingClaimsAmount.ToString("N0")</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SEARCH & FILTER SECTION (Same as Applications.cshtml) ==================== -->
+            <div class="card custom-card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-3">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search Reports</label>
+                            <input type="text" id="searchReports"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Search by type or period..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Report Type</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill active" data-filter="all">All</button>
+                                <button class="btn btn-sm btn-outline-primary rounded-pill" data-filter="revenue">Revenue</button>
+                                <button class="btn btn-sm btn-outline-warning rounded-pill" data-filter="claims">Claims</button>
+                                <button class="btn btn-sm btn-outline-success rounded-pill" data-filter="policy">Policy</button>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Date Range</label>
+                            <select class="form-select form-select-sm rounded-pill px-3">
+                                <option>Last 30 Days</option>
+                                <option>Last 90 Days</option>
+                                <option>This Year</option>
+                                <option>Custom</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+           
+            
+            <!-- ==================== RECENT REPORTS TABLE (Same as Applications.cshtml) ==================== -->
+            <div class="card custom-card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h4 class="mb-1 fw-semibold">Generated Reports</h4>
+                            <small class="text-muted">Recently exported reports and analytics</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                    onclick="exportTable('excel', 'reportsTable', 'Reports')">
+                                <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                    onclick="exportTable('pdf', 'reportsTable', 'Reports')">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body px-4">
+                    <div class="table-responsive p-3">
+                        <table class="table align-middle mb-0" id="reportsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Report ID</th>
+                                    <th>Type</th>
+                                    <th>Period</th>
+                                    <th>Generated</th>
+                                    <th>By</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var report in Model.RecentReports)
+                                {
+                                    <tr data-type="@report.ReportType.ToLower()">
+                                        <td><span class="fw-medium">#RPT-@report.ReportId.ToString("D4")</span></td>
+                                        <td>
+                                            <span class="badge bg-label-primary rounded-pill">@report.ReportType</span>
+                                        </td>
+                                        <td>@report.Period</td>
+                                        <td>@report.GeneratedDate.ToString("dd MMM, yyyy")</td>
+                                        <td>@report.GeneratedBy</td>
+                                        <td>
+                                            <span class="badge bg-@(report.Status == "Completed" ? "success" : "warning") rounded-pill">
+                                                @report.Status
+                                            </span>
+                                        </td>
+                                        <!-- ✅ UPDATED Actions Column in Reports Table -->
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <!-- ✅ View Button with data attributes -->
+                                                <button class="btn btn-outline-info view-report-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#viewReportModal"
+                                                        data-reportid="@report.ReportId"
+                                                        data-reporttype="@report.ReportType"
+                                                        data-period="@report.Period"
+                                                        data-generated="@report.GeneratedDate.ToString("dd MMM yyyy, hh:mm tt")"
+                                                        data-generatedby="@report.GeneratedBy"
+                                                        data-status="@report.Status"
+                                                        data-fileurl="@report.FileUrl"
+                                                        title="View Details">
+                                                    View
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-between align-items-center px-4 py-3 border-top">
+                        <small class="text-muted">Total Reports: @Model.RecentReports.Count</small>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<!-- ==================== VIEW REPORT MODAL (Same as Messages View Modal) ==================== -->
+<div class="modal fade" id="viewReportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center"
+                         style="width: 40px; height: 40px;">
+                        <i class="bx bx-file text-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0">Report Details</h5>
+                        <small class="text-muted" id="viewReportIdDisplay">#RPT-XXXX</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body pt-3">
+                <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+
+                        <!-- Report Type -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1">
+                                <i class="bx bx-category me-1"></i>Report Type
+                            </label>
+                            <p class="form-control-plaintext fw-semibold mb-0" id="viewReportType">-</p>
+                        </div>
+
+                        <!-- Period -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1">
+                                <i class="bx bx-calendar me-1"></i>Period
+                            </label>
+                            <p class="form-control-plaintext mb-0" id="viewPeriod">-</p>
+                        </div>
+
+                        <!-- Generated Date -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1">
+                                <i class="bx bx-time me-1"></i>Generated Date
+                            </label>
+                            <p class="form-control-plaintext mb-0" id="viewGeneratedDate">-</p>
+                        </div>
+
+                        <!-- Generated By -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1">
+                                <i class="bx bx-user me-1"></i>Generated By
+                            </label>
+                            <p class="form-control-plaintext mb-0" id="viewGeneratedBy">-</p>
+                        </div>
+
+                        <!-- Status & File URL Row -->
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">
+                                    <i class="bx bx-badge-check me-1"></i>Status
+                                </label>
+                                <span id="viewStatusBadge" class="badge rounded-pill">-</span>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">
+                                    <i class="bx bx-link me-1"></i>File
+                                </label>
+                                <p class="form-control-plaintext mb-0">
+                                    <a href="#" id="viewFileUrl" class="text-decoration-none" target="_blank">
+                                        <i class="bx bx-download me-1"></i>Download
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Report Preview Section (Optional - for demo data) -->
+                        <div class="mt-4 pt-3 border-top">
+                            <label class="form-label small text-muted mb-2">
+                                <i class="bx bx-show me-1"></i>Report Preview
+                            </label>
+                            <div class="p-3 bg-white rounded-3 border" id="reportPreview"
+                                 style="min-height: 120px; font-size: 0.9rem;">
+                                <div class="text-center text-muted py-3">
+                                    <i class="bx bx-file-blank fs-4 d-block mb-2"></i>
+                                    <small>Report preview will appear here after generation</small>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-6"
+                        data-bs-dismiss="modal">
+                    Close
+                </button>
+                
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Hidden data for charts -->
+@{
+    var revenueJson = System.Text.Json.JsonSerializer.Serialize(Model.MonthlyRevenueData);
+    var claimsJson = System.Text.Json.JsonSerializer.Serialize(Model.ClaimsAnalysisData);
+    var policiesJson = System.Text.Json.JsonSerializer.Serialize(Model.PolicyDistributionData);
+}
+<div id="chartData"
+     data-revenue="@revenueJson"
+     data-claims="@claimsJson"
+     data-policies="@policiesJson"
+     style="display:none;">
+</div>
+
+<!-- ==================== CSS STYLES (Exact match with Applications.cshtml) ==================== -->
+<style>
+    /* Custom Card Styling - Same as Applications Page */
+    .custom-card {
+        background: #ffffff;
+        border-radius: 16px !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .custom-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+    /* Icon Box - Same as Applications Page */
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        transition: background 0.2s ease;
+    }
+
+    .custom-card:hover .icon-box {
+        background: #e9ecef;
+    }
+
+    /* Trend Icon - Same as Applications Page */
+    .trend-icon {
+        font-size: 1.5rem;
+        color: #28a745;
+        opacity: 0.6;
+        transition: opacity 0.2s ease;
+    }
+
+    .custom-card:hover .trend-icon {
+        opacity: 1;
+    }
+
+    /* Badge Styles */
+    .badge.bg-label-primary {
+        background-color: #cfe2ff !important;
+        color: #0d6efd !important;
+    }
+
+    .badge.bg-label-success {
+        background-color: #d1e7dd !important;
+        color: #198754 !important;
+    }
+
+    .badge.bg-label-secondary {
+        background-color: #e2e3e5 !important;
+        color: #6c757d !important;
+    }
+
+    /* Chart Containers */
+    #revenueChart, #claimsChart, #policyChart {
+        min-height: 280px;
+    }
+
+    /* Table Styling - Same as Applications */
+    #reportsTable thead th {
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        border-bottom: 2px solid #e9ecef !important;
+    }
+
+    #reportsTable tbody td {
+        vertical-align: middle;
+        padding: 1rem 0.75rem;
+    }
+
+    /* Responsive Adjustments */
+    @@media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 0.5rem;
+        }
+
+            .card-header .btn,
+            .card-header .badge {
+                align-self: flex-end;
+            }
+    }
+
+    /* Policy Legend Styling */
+    #policyLegend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+    }
+
+
+
+    /* ==================== VIEW REPORT MODAL STYLES (Same as Messages) ==================== */
+
+    #viewReportModal .form-control-plaintext {
+        font-size: 1.05rem;
+        padding: 0.25rem 0;
+        border-bottom: 1px dashed #dee2e6;
+        border-radius: 0;
+    }
+
+        #viewReportModal .form-control-plaintext:hover {
+            border-bottom-color: #0d6efd;
+            transition: border-color 0.2s ease;
+        }
+
+    #viewReportModal .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        #viewReportModal .card:hover {
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+    #reportPreview {
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    }
+
+    /* Status Badge Colors */
+    #viewStatusBadge.bg-completed {
+        background-color: #d1e7dd !important;
+        color: #198754 !important;
+    }
+
+    #viewStatusBadge.bg-processing {
+        background-color: #cff4fc !important;
+        color: #055160 !important;
+    }
+
+    #viewStatusBadge.bg-failed {
+        background-color: #f8d7da !important;
+        color: #842029 !important;
+    }
+
+    /* Responsive Adjustments */
+    @@media (max-width: 576px) {
+        #viewReportModal .modal-body .card-body {
+            padding: 1.25rem !important;
+        }
+
+        #viewReportModal .form-control-plaintext {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<!-- ==================== APEXCHARTS & JAVASCRIPT ==================== -->
+@section Scripts {
+    <script src="~/aassets/vendor/libs/apex-charts/apexcharts.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+        // Parse chart data from hidden div
+        const chartData = document.getElementById('chartData');
+        const revenueData = JSON.parse(chartData.dataset.revenue || '[]');
+        const claimsData = JSON.parse(chartData.dataset.claims || '[]');
+        const policyData = JSON.parse(chartData.dataset.policies || '[]');
+
+        // Color palette as specified
+        const chartColors = ['#0A3D62', '#1B4F72', '#21618C', '#2874A6', '#2E86C1'];
+
+        // ==================== MONTHLY REVENUE LINE CHART ====================
+        const revenueOptions = {
+        series: [{
+        name: 'Revenue (Rs.)',
+        data: revenueData.map(d => parseFloat(d.revenue || d.Revenue))
+        }],
+        chart: {
+        type: 'line',
+        height: 320,
+        toolbar: { show: false },
+        fontFamily: 'Public Sans, sans-serif',
+        zoom: { enabled: false }
+        },
+        colors: ['#2E86C1'],
+        stroke: {
+        curve: 'smooth',
+        width: 3,
+        colors: ['#2E86C1']
+        },
+        fill: {
+        type: 'gradient',
+        gradient: {
+        shade: 'dark',
+        gradientToColors: ['#0A3D62'],
+        shadeIntensity: 1,
+        type: 'vertical',
+        opacityFrom: 0.4,
+        opacityTo: 0.1,
+        stops: [0, 100]
+        }
+        },
+        markers: {
+        size: 4,
+        colors: ['#2E86C1'],
+        strokeColors: '#fff',
+        strokeWidth: 2,
+        hover: { size: 6 }
+        },
+        xaxis: {
+        categories: revenueData.map(d => d.month || d.Month),
+        labels: {
+        style: { colors: '#6c757d', fontSize: '11px', fontWeight: 500 },
+        rotate: -45
+        },
+        axisBorder: { show: false },
+        axisTicks: { show: false }
+        },
+        yaxis: {
+        labels: {
+        style: { colors: '#6c757d', fontSize: '11px' },
+        formatter: function(val) {
+        if (val >= 1000000) return (val/1000000).toFixed(1) + 'M';
+        if (val >= 1000) return (val/1000).toFixed(0) + 'K';
+        return val;
+        }
+        },
+        title: {
+        text: 'Amount',
+        style: { color: '#6c757d', fontSize: '11px' }
+        }
+        },
+        grid: {
+        borderColor: '#e9ecef',
+        strokeDashArray: 4,
+        padding: { left: 10, right: 20, top: 10, bottom: 10 }
+        },
+        tooltip: {
+        theme: 'light',
+        x: { formatter: function(val) { return val; } },
+        y: {
+        formatter: function(val) {
+        return 'Rs. ' + val.toLocaleString('en-PK');
+        }
+        }
+        },
+        dataLabels: { enabled: false }
+        };
+
+        if (document.getElementById('revenueChart')) {
+        new ApexCharts(document.querySelector("#revenueChart"), revenueOptions).render();
+        }
+
+        // ==================== CLAIMS ANALYSIS BAR CHART ====================
+        const claimsOptions = {
+        series: [
+        {
+        name: 'Approved',
+        data: claimsData.map(d => parseInt(d.approvedClaims || d.ApprovedClaims))
+        },
+        {
+        name: 'Pending',
+        data: claimsData.map(d => parseInt(d.pendingClaims || d.PendingClaims))
+        },
+        {
+        name: 'Rejected',
+        data: claimsData.map(d => parseInt(d.rejectedClaims || d.RejectedClaims))
+        }
+        ],
+        chart: {
+        type: 'bar',
+        height: 320,
+        toolbar: { show: false },
+        fontFamily: 'Public Sans, sans-serif',
+        stacked: true
+        },
+        colors: ['#2874A6', '#2E86C1', '#1B4F72'],
+        plotOptions: {
+        bar: {
+        borderRadius: 4,
+        columnWidth: '60%',
+        distributed: false
+        }
+        },
+        dataLabels: { enabled: false },
+        xaxis: {
+        categories: claimsData.map(d => d.category || d.Category),
+        labels: {
+        style: { colors: '#6c757d', fontSize: '11px', fontWeight: 500 },
+        rotate: -45
+        },
+        axisBorder: { show: false },
+        axisTicks: { show: false }
+        },
+        yaxis: {
+        labels: {
+        style: { colors: '#6c757d', fontSize: '11px' },
+        formatter: function(val) { return Math.round(val); }
+        },
+        title: {
+        text: 'Claims Count',
+        style: { color: '#6c757d', fontSize: '11px' }
+        }
+        },
+        grid: {
+        borderColor: '#e9ecef',
+        strokeDashArray: 4,
+        padding: { left: 10, right: 20, top: 10, bottom: 10 }
+        },
+        tooltip: {
+        theme: 'light',
+        x: { formatter: function(val) { return val; } },
+        y: { formatter: function(val) { return val + ' claims'; } }
+        },
+        legend: {
+        position: 'bottom',
+        offsetY: 0,
+        labels: { colors: '#6c757d' }
+        }
+        };
+
+        if (document.getElementById('claimsChart')) {
+        new ApexCharts(document.querySelector("#claimsChart"), claimsOptions).render();
+        }
+
+        // ==================== POLICY DISTRIBUTION DOUGHNUT CHART ====================
+        const policyOptions = {
+        series: policyData.map(d => parseInt(d.policyCount || d.PolicyCount)),
+        chart: {
+        type: 'donut',
+        height: 280,
+        fontFamily: 'Public Sans, sans-serif'
+        },
+        colors: policyData.map(d => d.color || chartColors[policyData.indexOf(d) % chartColors.length]),
+        labels: policyData.map(d => d.policyType || d.PolicyType),
+        legend: { show: false },
+        plotOptions: {
+        pie: {
+        donut: {
+        size: '65%',
+        labels: {
+        show: true,
+        name: {
+        show: true,
+        fontSize: '13px',
+        fontWeight: 600,
+        color: '#2c3e50'
+        },
+        value: {
+        show: true,
+        fontSize: '16px',
+        fontWeight: 700,
+        color: '#0A3D62',
+        formatter: function(val) { return val; }
+        },
+        total: {
+        show: true,
+        label: 'Total',
+        fontSize: '11px',
+        fontWeight: 500,
+        color: '#6c757d',
+        formatter: function(w) {
+        return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+        }
+        }
+        }
+        }
+        }
+        },
+        dataLabels: { enabled: false },
+        tooltip: {
+        theme: 'light',
+        y: {
+        formatter: function(val) {
+        return val + ' policies';
+        }
+        }
+        },
+        responsive: [{
+        breakpoint: 480,
+        options: {
+        chart: { height: 240 },
+        plotOptions: {
+        pie: {
+        donut: {
+        labels: {
+        value: { fontSize: '14px' }
+        }
+        }
+        }
+        }
+        }
+        }]
+        };
+
+        if (document.getElementById('policyChart')) {
+        const policyChart = new ApexCharts(document.querySelector("#policyChart"), policyOptions);
+        policyChart.render();
+
+        // Build custom legend
+        const legendContainer = document.getElementById('policyLegend');
+        if (legendContainer && policyData.length > 0) {
+        legendContainer.innerHTML = policyData.map((item, index) => `
+        <div class="legend-item">
+        <span class="legend-color" style="background: ${item.color || chartColors[index % chartColors.length]}"></span>
+        <span>${item.policyType || item.PolicyType}</span>
+        </div>
+        `).join('');
+        }
+        }
+
+        // ==================== VIEW REPORT MODAL FUNCTIONALITY ====================
+
+        const viewReportModal = document.getElementById('viewReportModal');
+
+        if (viewReportModal) {
+        viewReportModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+
+        // Extract data from data attributes
+        const reportId = button.getAttribute('data-reportid');
+        const reportType = button.getAttribute('data-reporttype');
+        const period = button.getAttribute('data-period');
+        const generated = button.getAttribute('data-generated');
+        const generatedBy = button.getAttribute('data-generatedby');
+        const status = button.getAttribute('data-status');
+        const fileUrl = button.getAttribute('data-fileurl');
+
+        // ✅ Extract model data for preview
+        const totalRevenue = button.getAttribute('data-totalrevenue');
+        const monthlyRevenue = button.getAttribute('data-monthlyrevenue');
+        const totalClaims = button.getAttribute('data-totalclaims');
+        const totalClaimAmount = button.getAttribute('data-totalclaimamount');
+        const totalPolicies = button.getAttribute('data-totalpolicies');
+        const activePolicies = button.getAttribute('data-activepolicies');
+        const transactionCount = @Model.MonthlyRevenueData.Sum(x => x.TransactionCount);
+        const approvedClaims = @Model.ClaimsAnalysisData.Sum(x => x.ApprovedClaims);
+        const pendingClaims = @Model.ClaimsAnalysisData.Sum(x => x.PendingClaims);
+        const totalPremium = @Model.PolicyDistributionData.Sum(x => x.TotalPremium).ToString("N0");
+        const totalCoverage = @Model.PolicyDistributionData.Sum(x => x.TotalCoverage).ToString("N0");
+
+        // Populate modal fields
+        document.getElementById('viewReportIdDisplay').textContent = '#RPT-' + reportId.toString().padStart(4, '0');
+        document.getElementById('viewReportType').textContent = reportType || '-';
+        document.getElementById('viewPeriod').textContent = period || '-';
+        document.getElementById('viewGeneratedDate').textContent = generated || '-';
+        document.getElementById('viewGeneratedBy').textContent = generatedBy || '-';
+
+        // Status Badge
+        const statusBadge = document.getElementById('viewStatusBadge');
+        const statusLower = status?.toLowerCase();
+
+        if (statusLower === 'completed') {
+        statusBadge.className = 'badge bg-completed rounded-pill';
+        statusBadge.textContent = 'Completed';
+        } else if (statusLower === 'processing') {
+        statusBadge.className = 'badge bg-processing rounded-pill';
+        statusBadge.textContent = 'Processing';
+        } else if (statusLower === 'failed') {
+        statusBadge.className = 'badge bg-failed rounded-pill';
+        statusBadge.textContent = 'Failed';
+        } else {
+        statusBadge.className = 'badge bg-secondary rounded-pill';
+        statusBadge.textContent = status || 'Unknown';
+        }
+
+        // File URL
+        const fileLink = document.getElementById('viewFileUrl');
+        if (fileUrl && fileUrl !== '#') {
+        fileLink.href = fileUrl;
+        fileLink.style.display = 'inline';
+        } else {
+        fileLink.href = '#';
+        fileLink.style.opacity = '0.5';
+        fileLink.style.pointerEvents = 'none';
+        }
+
+        // ✅ Report Preview (Dynamic based on report type) - FIXED VERSION
+        const previewDiv = document.getElementById('reportPreview');
+
+        if (reportType === 'Revenue') {
+        previewDiv.innerHTML = `
+        <div class="small">
+        <p class="mb-2"><strong>📊 Revenue Summary</strong></p>
+        <ul class="list-unstyled mb-0 small">
+        <li>• Total Revenue: <strong>Rs. ${totalRevenue}</strong></li>
+        <li>• Monthly Revenue: <strong>Rs. ${monthlyRevenue}</strong></li>
+        <li>• Transactions: <strong>${transactionCount}</strong></li>
+        <li>• Period: <strong>${period}</strong></li>
+        </ul>
+        </div>
+        `;
+        } else if (reportType === 'Claims') {
+        previewDiv.innerHTML = `
+        <div class="small">
+        <p class="mb-2"><strong>📋 Claims Analysis</strong></p>
+        <ul class="list-unstyled mb-0 small">
+        <li>• Total Claims: <strong>${totalClaims}</strong></li>
+        <li>• Approved: <strong>${approvedClaims}</strong></li>
+        <li>• Pending: <strong>${pendingClaims}</strong></li>
+        <li>• Total Amount: <strong>Rs. ${totalClaimAmount}</strong></li>
+        </ul>
+        </div>
+        `;
+        } else if (reportType === 'Policy Analysis') {
+        previewDiv.innerHTML = `
+        <div class="small">
+        <p class="mb-2"><strong>🛡️ Policy Distribution</strong></p>
+        <ul class="list-unstyled mb-0 small">
+        <li>• Total Policies: <strong>${totalPolicies}</strong></li>
+        <li>• Active Policies: <strong>${activePolicies}</strong></li>
+        <li>• Total Premium: <strong>Rs. ${totalPremium}</strong></li>
+        <li>• Total Coverage: <strong>Rs. ${totalCoverage}</strong></li>
+        </ul>
+        </div>
+        `;
+        } else {
+        previewDiv.innerHTML = `
+        <div class="text-center text-muted py-3">
+        <i class="bx bx-file-blank fs-4 d-block mb-2"></i>
+        <small>Report preview will appear here after generation</small>
+        </div>
+        `;
+        }
+
+        // Download Button Click Handler
+        const downloadBtn = document.getElementById('downloadReportBtn');
+        downloadBtn.onclick = function(e) {
+        e.preventDefault();
+
+        if (fileUrl && fileUrl !== '#') {
+        window.open(fileUrl, '_blank');
+        } else {
+        alert(`Downloading ${reportType} Report for period: ${period}\n\nIn production, this would trigger the actual file download.`);
+        }
+        };
+        });
+        }
+
+        // ==================== SEARCH & FILTER FUNCTIONALITY ====================
+        const searchReports = document.getElementById('searchReports');
+
+        function filterReportsTable() {
+        const searchVal = searchReports?.value.toLowerCase() || '';
+        const activeFilter = document.querySelector('[data-filter].active')?.dataset.filter || 'all';
+
+        document.querySelectorAll("#reportsTable tbody tr").forEach(row => {
+        const reportType = row.dataset.type || '';
+        const rowText = row.textContent.toLowerCase();
+
+        const matchesSearch = rowText.includes(searchVal);
+        const matchesFilter = activeFilter === 'all' || reportType === activeFilter;
+
+        row.style.display = (matchesSearch && matchesFilter) ? "" : "none";
+        });
+        }
+
+        if (searchReports) {
+        searchReports.addEventListener("input", filterReportsTable);
+        }
+
+        // Filter buttons
+        document.querySelectorAll("[data-filter]").forEach(btn => {
+        btn.addEventListener("click", function () {
+        document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
+        this.classList.add("active");
+        filterReportsTable();
+        });
+        });
+
+        // ==================== PAGINATION ====================
+        const rowsPerPage = 10;
+        const tableRows = document.querySelectorAll("#reportsTable tbody tr");
+        const pagination = document.getElementById("pagination");
+        let currentPage = 1;
+
+        function displayTablePage(page) {
+        currentPage = page;
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        let visibleIndex = 0;
+        tableRows.forEach((row) => {
+        if (row.style.display !== "none") {
+        row.style.display = (visibleIndex >= start && visibleIndex < end) ? "" : "none";
+        visibleIndex++;
+        }
+        });
+        updatePaginationButtons();
+        }
+
+        function updatePaginationButtons() {
+        if (!pagination) return;
+
+        pagination.innerHTML = "";
+        const visibleRows = Array.from(tableRows).filter(r => r.style.display !== "none");
+        const pageCount = Math.ceil(visibleRows.length / rowsPerPage);
+
+        if (pageCount <= 1) return;
+
+        // Prev Button
+        const prevLi = document.createElement("li");
+        prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+        prevLi.innerHTML = `<a class="page-link rounded-start-pill" href="#">Prev</a>`;
+        prevLi.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (currentPage > 1) displayTablePage(currentPage - 1);
+        });
+        pagination.appendChild(prevLi);
+
+        // Page Numbers
+        for (let i = 1; i <= pageCount; i++) {
+        const li = document.createElement("li");
+        li.className = `page-item ${currentPage === i ? "active" : ""}`;
+        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        li.addEventListener("click", function (e) {
+        e.preventDefault();
+        displayTablePage(i);
+        });
+        pagination.appendChild(li);
+        }
+
+        // Next Button
+        const nextLi = document.createElement("li");
+        nextLi.className = `page-item ${currentPage === pageCount ? "disabled" : ""}`;
+        nextLi.innerHTML = `<a class="page-link rounded-end-pill" href="#">Next</a>`;
+        nextLi.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (currentPage < pageCount) displayTablePage(currentPage + 1);
+        });
+        pagination.appendChild(nextLi);
+        }
+
+        if (tableRows.length > 0) {
+        displayTablePage(1);
+        }
+
+        // ==================== EXPORT FUNCTIONS ====================
+        window.exportChart = function(chartName, format) {
+        // In production, integrate with ApexCharts export or server-side PDF generation
+        alert(`Exporting ${chartName} chart as ${format.toUpperCase()}...\n\nIn production, this would generate a downloadable file.`);
+        };
+
+        window.exportReport = function(format) {
+        alert(`Generating full report as ${format.toUpperCase()}...\n\nThis would compile all charts and tables into a single document.`);
+        };
+
+        window.viewReport = function(reportId) {
+        // Navigate to report detail view or open modal
+        alert(`Viewing report #RPT-${reportId.toString().padStart(4, '0')}`);
+        };
+        });
+
+    </script>
+}

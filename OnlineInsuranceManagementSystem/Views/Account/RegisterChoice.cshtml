@@ -1,0 +1,171 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>OIMS | Choose Register Type</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="~/images/Logo.png">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+        theme: {
+        extend: {
+        colors: {
+        primary: '#08979D',
+        secondary: '#2F9D94',
+        accent: '#025f67',
+        background: '#F6F6F6',
+        muted: '#36454f',
+        },
+        fontFamily: {
+        sans: ['Inter', 'sans-serif']
+        }
+        }
+        }
+        }
+    </script>
+
+    <style>
+        body {
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-image: url('../images/Bg21.jfif');
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        }
+
+        body::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(4, 31, 37, 0.89);
+        }
+
+        body > * {
+        position: relative;
+        z-index: 1;
+        }
+
+        .floating-shape {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        }
+
+        @@keyframes float {
+        0%, 100% {
+        transform: translateY(0px);
+        }
+
+        50% {
+        transform: translateY(-15px);
+        }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Floating shapes (same login vibe) -->
+    <div class="floating-shape w-20 h-20 top-10 left-10 animate-[float_3s_ease-in-out_infinite]"></div>
+    <div class="floating-shape w-28 h-28 bottom-20 right-10 animate-[float_4s_ease-in-out_infinite]"></div>
+
+    <!-- MAIN CARD -->
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+        <!-- Header -->
+        <div class="bg-primary p-6 text-white text-center relative">
+
+            <a href="/"
+               class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30">
+                <i class="fas fa-times"></i>
+            </a>
+
+            <div class="w-12 h-12 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-3">
+                <i class="fas fa-user-plus"></i>
+            </div>
+
+            <h2 class="text-2xl font-bold">Create Account</h2>
+            <p class="text-white/70 text-sm mt-1">Choose your account type</p>
+
+        </div>
+
+        <!-- BODY -->
+        <div class="p-6 space-y-5">
+
+            <!-- CUSTOMER -->
+            <a href="/Account/Register"
+               class="flex items-center justify-between p-4 border rounded-xl hover:shadow-md hover:border-primary transition group">
+
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-user"></i>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-800 group-hover:text-primary">Customer</h3>
+                        <p class="text-sm text-gray-500">Buy insurance policies</p>
+                    </div>
+                </div>
+
+                <i class="fas fa-arrow-right text-gray-400 group-hover:text-primary"></i>
+
+            </a>
+
+            <!-- AGENT -->
+            <a href="/Account/Register?role=Agent"
+               class="flex items-center justify-between p-4 border rounded-xl hover:shadow-md hover:border-secondary transition group">
+
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-800 group-hover:text-green-600">Agent</h3>
+                        <p class="text-sm text-gray-500">Sell insurance policies</p>
+                    </div>
+                </div>
+
+                <i class="fas fa-arrow-right text-gray-400 group-hover:text-green-600"></i>
+
+            </a>
+
+            <!-- LOGIN LINK -->
+            <p class="text-center text-sm text-gray-500 mt-4">
+                Already have an account?
+                <a href="/Account/Login" class="text-primary font-semibold hover:underline">
+                    Login
+                </a>
+            </p>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

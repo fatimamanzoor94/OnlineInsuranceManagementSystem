@@ -1,0 +1,521 @@
+﻿@model OnlineInsuranceManagementSystem.ViewModels.UserProfileViewModel
+@{
+    ViewData["Title"] = "My Profile";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card border-0 w-100 mb-3" style="border-radius: 30px; background-color: #f5f8fd;">
+    <div class="p-3 main-card">
+        <div class="container-fluid card-scroll-content px-3">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-3 flex-wrap gap-2">
+                <div>
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-circle text-primary me-2"></i>Profile Settings
+                    </h4>
+                    <small class="text-muted">Manage your personal information and account preferences</small>
+                </div>
+                <span class="badge bg-label-@(Model.RoleBadgeClass?.Replace("bg-", "") ?? "secondary") rounded-pill px-3 py-2">
+                    <i class="bi bi-shield-check me-1"></i>@Model.Role
+                </span>
+            </div>
+
+            <div class="row g-4">
+                <!-- LEFT COLUMN: Profile Card & Stats -->
+                <div class="col-lg-4">
+                    <!-- Profile Card -->
+                    <div class="card custom-card h-100 overflow-hidden">
+                        <!-- Cover Banner -->
+                        <div class="profile-cover" style="height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+
+                        <div class="card-body text-center px-4 pb-4" style="margin-top: -50px;">
+                            <!-- Profile Image with Upload -->
+                            <div class="position-relative d-inline-block mb-3">
+                                <img id="profilePreview"
+                                     src="@(string.IsNullOrEmpty(Model.ProfileImageUrl)
+                                                                               ? "/aassets/img/avatars/default.png"
+                                                                               : Model.ProfileImageUrl + "?v=" + DateTime.Now.Ticks)"
+                                     alt="Profile"
+                                     class="rounded-circle border border-4 border-white shadow"
+                                     style="width: 110px; height: 110px; object-fit: cover; background: #fff;">
+
+                                <label for="profileImageUpload"
+                                       class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow cursor-pointer border border-3 border-white"
+                                       style="width: 34px; height: 34px; z-index: 10;"
+                                       title="Change profile picture">
+                                    <i class="bi bi-camera-fill" style="font-size: 14px;"></i>
+                                </label>
+                                <input type="file"
+                                       id="profileImageUpload"
+                                       name="profileImage"
+                                       form="profileForm"
+                                       class="d-none"
+                                       accept="image/*">
+                            </div>
+
+                            <!-- User Info -->
+                            <h5 class="mb-1 fw-bold">@Model.FullName</h5>
+                            <p class="text-muted mb-2 small">@Model.Email</p>
+                            <span class="badge bg-label-@(Model.RoleBadgeClass?.Replace("bg-", "") ?? "secondary") rounded-pill px-3 py-1 mb-3 small">
+                                @Model.Role
+                            </span>
+
+                            <!-- Quick Stats Grid -->
+                            <div class="row g-2 text-start px-1">
+                                <div class="col-6">
+                                    <div class="p-2 rounded-3 bg-light-subtle border">
+                                        <small class="text-muted d-block" style="font-size: 11px;">Member Since</small>
+                                        <strong class="d-block" style="font-size: 13px;">@Model.CreatedAt?.ToString("MMM yyyy")</strong>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-2 rounded-3 bg-light-subtle border">
+                                        <small class="text-muted d-block" style="font-size: 11px;">Last Login</small>
+                                        <strong class="d-block" style="font-size: 13px;">@Model.LastLoginDate?.ToString("dd MMM")</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="button"
+                                        class="btn btn-outline-primary rounded-pill btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#changePasswordModal">
+                                    <i class="bi bi-key me-2"></i>Change Password
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary rounded-pill btn-sm" onclick="history.back()">
+                                    <i class="bi bi-arrow-left me-2"></i>Back
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Completion Widget -->
+                    
+                </div>
+
+                <!-- RIGHT COLUMN: Edit Form -->
+                <div class="col-lg-8">
+                    <div class="card custom-card">
+                        <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div>
+                                    <h5 class="mb-1 fw-semibold">
+                                        <i class="bi bi-pencil-square me-2 text-primary"></i>Personal Information
+                                    </h5>
+                                    <small class="text-muted">Update your account details and preferences</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body px-4 pb-4">
+                            <form asp-action="UpdateProfile" method="post" enctype="multipart/form-data" id="profileForm">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" asp-for="UserId" />
+
+                                <div class="row g-3">
+                                    <!-- Full Name -->
+                                    <div class="col-md-6">
+                                        <label asp-for="FullName" class="form-label small text-muted fw-medium">
+                                            <i class="bi bi-person me-1"></i>Full Name <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0 rounded-start-pill">
+                                                <i class="bi bi-person text-muted"></i>
+                                            </span>
+                                            <input asp-for="FullName" class="form-control rounded-end-pill ps-3" placeholder="Enter your full name" />
+                                        </div>
+                                        <span asp-validation-for="FullName" class="text-danger small mt-1"></span>
+                                    </div>
+
+                                    <!-- Email (Read-only) -->
+                                    <div class="col-md-6">
+                                        <label class="form-label small text-muted fw-medium">
+                                            <i class="bi bi-envelope me-1"></i>Email Address
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0 rounded-start-pill">
+                                                <i class="bi bi-envelope text-muted"></i>
+                                            </span>
+                                            <input type="email" value="@Model.Email" class="form-control rounded-end-pill ps-3 bg-light" readonly />
+                                        </div>
+                                        <small class="text-muted">Contact administrator to update email</small>
+                                    </div>
+
+                                    <!-- Phone -->
+                                    <div class="col-md-6">
+                                        <label asp-for="Phone" class="form-label small text-muted fw-medium">
+                                            <i class="bi bi-phone me-1"></i>Phone Number <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0 rounded-start-pill">
+                                                <i class="bi bi-phone text-muted"></i>
+                                            </span>
+                                            <input asp-for="Phone" class="form-control rounded-end-pill ps-3" placeholder="03XXXXXXXXX" />
+                                        </div>
+                                        <span asp-validation-for="Phone" class="text-danger small mt-1"></span>
+                                    </div>
+
+                                    <!-- CNIC -->
+                                    <div class="col-md-6">
+                                        <label asp-for="CNIC" class="form-label small text-muted fw-medium">
+                                            <i class="bi bi-card-checklist me-1"></i>CNIC
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0 rounded-start-pill">
+                                                <i class="bi bi-card-checklist text-muted"></i>
+                                            </span>
+                                            <input asp-for="CNIC" class="form-control rounded-end-pill ps-3" placeholder="13 digits without dashes" maxlength="13" />
+                                        </div>
+                                        <span asp-validation-for="CNIC" class="text-danger small mt-1"></span>
+                                    </div>
+
+                                    <!-- Gender -->
+                                    <div class="col-md-6">
+                                        <label asp-for="Gender" class="form-label small text-muted fw-medium">
+                                            <i class="bi bi-gender-ambiguous me-1"></i>Gender
+                                        </label>
+                                        <select asp-for="Gender" class="form-select rounded-pill px-3">
+                                            <option value="">Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Date of Birth -->
+                                    <div class="col-md-6">
+                                        <label asp-for="DateOfBirth" class="form-label small text-muted fw-medium">
+                                            <i class="bi bi-calendar me-1"></i>Date of Birth
+                                        </label>
+                                        <input asp-for="DateOfBirth" type="date" class="form-control rounded-pill px-3" />
+                                    </div>
+
+                                    <!-- City -->
+                                    <div class="col-md-6">
+                                        <label asp-for="City" class="form-label small text-muted fw-medium">
+                                            <i class="bi bi-geo-alt me-1"></i>City
+                                        </label>
+                                        <input asp-for="City" class="form-control rounded-pill px-3" placeholder="Enter your city" />
+                                    </div>
+
+                                    <!-- Country -->
+                                    <div class="col-md-6">
+                                        <label asp-for="Country" class="form-label small text-muted fw-medium">
+                                            <i class="bi bi-globe me-1"></i>Country
+                                        </label>
+                                        <input asp-for="Country" class="form-control rounded-pill px-3" placeholder="Enter your country" value="@(Model.Country ?? "Pakistan")" />
+                                    </div>
+
+                                    <!-- Address (Full Width) -->
+                                    <div class="col-12">
+                                        <label asp-for="Address" class="form-label small text-muted fw-medium">
+                                            <i class="bi bi-house me-1"></i>Address
+                                        </label>
+                                        <textarea asp-for="Address" class="form-control rounded-3 px-3" rows="3" placeholder="Enter your full address"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" onclick="history.back()">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="btn btn-primary rounded-pill px-4" id="saveProfileBtn">
+                                        <span id="saveBtnText">Update Profile</span>
+                                        <span id="saveBtnSpinner" class="spinner-border spinner-border-sm d-none ms-2" role="status"></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </div>
+
+<!-- ==================== CHANGE PASSWORD MODAL ==================== -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content border-0 shadow-lg rounded-4">
+<div class="modal-header border-0 pb-0 pt-4 px-4">
+<h5 class="modal-title fw-semibold"><i class="bi bi-key me-2 text-primary"></i>Change Password</h5>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body pt-0 px-4">
+<form asp-action="ChangePassword" method="post" id="passwordForm">
+@Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label small text-muted fw-medium">Current Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 rounded-start-pill">
+                                <i class="bi bi-lock text-muted"></i>
+                            </span>
+                            <input type="password" name="currentPassword" class="form-control rounded-end-pill ps-3" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted fw-medium">New Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 rounded-start-pill">
+                                <i class="bi bi-key text-muted"></i>
+                            </span>
+                            <input type="password" name="newPassword" id="newPassword" class="form-control rounded-end-pill ps-3" required minlength="6" />
+                        </div>
+                        <small class="text-muted">Minimum 6 characters</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted fw-medium">Confirm New Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 rounded-start-pill">
+                                <i class="bi bi-key-fill text-muted"></i>
+                            </span>
+                            <input type="password" name="confirmPassword" class="form-control rounded-end-pill ps-3" required />
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info small mb-0 rounded-3">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Use a mix of letters, numbers, and symbols for better security.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="passwordForm" class="btn btn-primary rounded-pill px-4">Change Password</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+<!-- ==================== CSS STYLES (Matching Dashboard) ==================== -->
+<style>
+/* Custom Card Styling - Same as Dashboard */
+.custom-card {
+background: #ffffff;
+border-radius: 16px !important;
+border: 1px solid #eef1f6 !important;
+box-shadow: 0 8px 30px rgba(16, 24, 40, 0.04);
+transition: transform 0.2s ease, box-shadow 0.2s ease;
+overflow: hidden;
+}
+
+.custom-card:hover {
+transform: translateY(-3px);
+box-shadow: 0 12px 35px rgba(16, 24, 40, 0.08) !important;
+}
+
+/* Profile Cover */
+    .profile-cover {
+        background: #f8f9fa !important;
+        background-image: none !important;
+    }
+
+        .profile-cover::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: #f8f9fa; 
+        }
+
+/* Profile Image */
+#profilePreview {
+transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+#profilePreview:hover {
+filter: brightness(0.95);
+transform: scale(1.03);
+}
+
+/* Input Groups - Dashboard Style */
+.input-group-text {
+background-color: #f8f9fa !important;
+border-color: #dee2e6 !important;
+transition: background 0.2s ease;
+}
+
+.form-control,
+.form-select {
+border-color: #dee2e6 !important;
+transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+/* border-color: #0d6efd !important; */
+/* box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15) !important; */
+}
+
+.input-group:focus-within .input-group-text {
+background-color: #e9ecef !important;
+}
+
+/* Badge Styles - Dashboard System */
+.badge.bg-label-primary { background-color: #cfe2ff !important; color: #0d6efd !important; }
+.badge.bg-label-success { background-color: #d1e7dd !important; color: #198754 !important; }
+.badge.bg-label-warning { background-color: #fff3cd !important; color: #856404 !important; }
+.badge.bg-label-info { background-color: #cff4fc !important; color: #055160 !important; }
+.badge.bg-label-secondary { background-color: #e2e3e5 !important; color: #6c757d !important; }
+.badge.bg-label-danger { background-color: #f8d7da !important; color: #842029 !important; }
+
+/* Button Styles */
+.btn-outline-primary:hover,
+.btn-primary:hover {
+transform: translateY(-2px);
+transition: transform 0.2s ease, box-shadow 0.2s ease;
+box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+}
+
+/* Progress Ring */
+.progress-ring__circle-fg {
+transform: rotate(-90deg);
+transform-origin: 50% 50%;
+transition: stroke-dashoffset 0.6s ease;
+}
+
+/* Form Labels */
+.form-label {
+font-size: 13px;
+margin-bottom: 0.35rem !important;
+}
+
+/* Card Header */
+.card-header {
+border-bottom: 1px solid #f1f3f7 !important;
+padding-bottom: 12px !important;
+}
+
+/* Fade-in Animation */
+@@keyframes fadeInUp {
+from { opacity: 0; transform: translateY(15px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.custom-card { animation: fadeInUp 0.4s ease-out; }
+.custom-card:nth-child(2) { animation-delay: 0.1s; }
+
+/* Responsive Adjustments */
+@@media (max-width: 992px) {
+.col-lg-4, .col-lg-8 { flex: 0 0 100%; max-width: 100%; }
+}
+
+@@media (max-width: 768px) {
+.d-flex.justify-content-end { flex-direction: column; }
+.btn { width: 100%; margin-bottom: 0.5rem; }
+.btn:last-child { margin-bottom: 0; }
+}
+
+/* Utilities */
+.cursor-pointer { cursor: pointer; }
+.bg-light-subtle.border {
+border-color: #e9ecef !important;
+transition: background 0.2s ease;
+}
+.bg-light-subtle.border:hover { background: #e9ecef !important; }
+</style>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+@section Scripts {
+<partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ========== PROFILE IMAGE PREVIEW & UPLOAD ==========
+            const profileImageInput = document.getElementById('profileImageUpload');
+            const profilePreview = document.getElementById('profilePreview');
+
+            if (profileImageInput && profilePreview) {
+                profileImageInput.addEventListener('change', function (e) {
+                    const file = e.target.files[0];
+                    console.log('=== FILE SELECTED ===');
+                    console.log('File:', file);
+                    console.log('File Name:', file?.name);
+                    console.log('File Size:', file?.size);
+                    console.log('File Type:', file?.type);
+
+                    if (file) {
+                        if (!file.type.startsWith('image/')) {
+                            alert('Please select a valid image file');
+                            profileImageInput.value = '';
+                            return;
+                        }
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('Image size should be less than 5MB');
+                            profileImageInput.value = '';
+                            return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = function (event) {
+                            profilePreview.src = event.target.result;
+                            console.log('Image preview updated');
+                        };
+                        reader.readAsDataURL(file);
+                        console.log('=== END FILE SELECT ===');
+                    }
+                });
+            }
+
+            // ========== FORM SUBMISSION DEBUG ==========
+            const profileForm = document.getElementById('profileForm');
+            if (profileForm) {
+                profileForm.addEventListener('submit', function (e) {
+                    console.log('=== FORM SUBMITTING ===');
+                    const formData = new FormData(profileForm);
+                    for (let [key, value] of formData.entries()) {
+                        console.log(key, ':', value);
+                    }
+                    const fileInput = document.getElementById('profileImageUpload');
+                    console.log('File Input Files:', fileInput.files);
+                    console.log('File Input Value:', fileInput.value);
+
+                    if (!profileForm.checkValidity()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        profileForm.classList.add('was-validated');
+                        console.log('Form validation failed');
+                        return;
+                    }
+                    console.log('Form is valid, submitting...');
+                    const saveBtn = document.getElementById('saveProfileBtn');
+                    const saveBtnText = document.getElementById('saveBtnText');
+                    const saveBtnSpinner = document.getElementById('saveBtnSpinner');
+                    saveBtn.disabled = true;
+                    saveBtnText.textContent = 'Saving...';
+                    saveBtnSpinner.classList.remove('d-none');
+                });
+            }
+
+            // ========== PASSWORD MATCH VALIDATION ==========
+            const passwordForm = document.getElementById('passwordForm');
+            if (passwordForm) {
+                passwordForm.addEventListener('submit', function (e) {
+                    const newPassword = document.getElementById('newPassword').value;
+                    const confirmPassword = passwordForm.querySelector('input[name="confirmPassword"]').value;
+                    if (newPassword !== confirmPassword) {
+                        e.preventDefault();
+                        alert('New passwords do not match!');
+                        return;
+                    }
+                });
+            }
+
+            // ========== AUTO-HIDE TEMPDATA ALERTS ==========
+            setTimeout(function () {
+                document.querySelectorAll('.alert:not(.alert-permanent)').forEach(alert => {
+                    alert.style.transition = 'opacity 0.3s ease';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                });
+            }, 5000);
+        });
+    </script>
+
+                    }

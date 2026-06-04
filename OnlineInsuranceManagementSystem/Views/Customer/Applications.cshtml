@@ -1,0 +1,959 @@
+﻿@model OnlineInsuranceManagementSystem.ViewModels.CustomerApplicationsIndexViewModel
+@{
+    ViewData["Title"] = "My Applications";
+    Layout = "~/Views/Shared/_CustomerLayout.cshtml";
+}
+
+<div class="card border-0 w-100 mb-3" style="border-radius: 30px; background-color: #f5f8fd;">
+    <div class="p-3 main-card">
+        <div class="container-fluid card-scroll-content px-3">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-3 flex-wrap gap-2">
+                <h4 class="mb-0">My Applications</h4>
+                <div class="d-flex gap-2 align-items-center">
+                    
+
+                    <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill">
+                        <i class="bx bx-list-ul me-1"></i> @Model.TotalApplications Total
+                    </span>
+                    <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                        <i class="bx bx-check-circle me-1"></i> @Model.ApprovedApplications Approved
+                    </span>
+                </div>
+            </div>
+
+            <!-- TOP SUMMARY CARDS (EXACT SAME DESIGN AS ADMIN) -->
+            <div class="row g-3 mb-4">
+                <!-- Total Applications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-file-earmark-text text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Total Applications</h6>
+                                <small class="text-muted" id="totalApplications">@Model.TotalApplications</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pending Applications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-hourglass-split text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Pending Applications</h6>
+                                <small class="text-muted" id="pendingApplications">@Model.PendingApplications</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Approved Applications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-check-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Approved Applications</h6>
+                                <small class="text-muted" id="approvedApplications">@Model.ApprovedApplications</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Rejected Applications -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-x-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Rejected Applications</h6>
+                                <small class="text-muted" id="rejectedApplications">@Model.RejectedApplications</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter (EXACT SAME DESIGN AS ADMIN) -->
+            <div class="card custom-card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-3">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Application ID</label>
+                            <input type="text" id="searchAppId"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter application ID..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Policy/Type</label>
+                            <input type="text" id="searchName"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter policy or type name..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Filter Status</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill active" data-filter="all">All</button>
+                                <button class="btn btn-sm btn-outline-warning rounded-pill" data-filter="pending">Pending</button>
+                                <button class="btn btn-sm btn-outline-success rounded-pill" data-filter="approved">Approved</button>
+                                <button class="btn btn-sm btn-outline-danger rounded-pill" data-filter="rejected">Rejected</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table (EXACT SAME DESIGN AS ADMIN) -->
+            <div class="card custom-card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h4 class="mb-1 fw-semibold">My Applications</h4>
+                            <small class="text-muted">Track your insurance application status</small>
+                        </div>
+                        <!-- Export Buttons (SAME FUNCTION AS ADMIN) -->
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                    onclick="exportTable('excel', 'applicationsTable', 'MyApplications')">
+                                <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                    onclick="exportTable('pdf', 'applicationsTable', 'MyApplications')">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body px-4">
+                    <div class="table-responsive p-3">
+                        <table class="table align-middle mb-0" id="applicationsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Application ID</th>
+                                    <th>Policy Name</th>
+                                    <th>Insurance Type</th>
+                                    <th>Apply Date</th>
+                                    <th>Status</th>
+                                    <th>Remarks</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var app in Model.Applications)
+                                {
+                                    <tr data-status="@app.Status.ToLower()">
+                                        <td>@app.ApplicationIdDisplay</td>
+                                        <td>@app.PolicyName</td>
+                                        <td>@app.InsuranceTypeName</td>
+                                        <td>@app.ApplyDateDisplay</td>
+                                        <td>
+                                            <span class="badge @app.StatusBadgeClass">@app.StatusText</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small">@(string.IsNullOrEmpty(app.Remarks) ? "-" : app.Remarks)</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm d-flex gap-2">
+                                                <!-- ✅ VIEW DETAILS BUTTON (Replaces Admin Edit) -->
+                                                <button class="btn btn-outline-info view-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#viewApplicationModal"
+                                                        data-appid="@app.ApplicationId"
+                                                        data-policyid="@app.PolicyId"
+                                                        data-policyname="@app.PolicyName"
+                                                        data-insurancetype="@app.InsuranceTypeName"
+                                                        data-applydate="@app.ApplyDateDisplay"
+                                                        data-status="@app.Status"
+                                                        data-remarks="@(app.Remarks ?? "-")"
+                                                        data-premium="@app.PremiumFormatted"
+                                                        data-coverage="@app.CoverageFormatted"
+                                                        data-duration="@app.DurationFormatted"
+                                                        title="View Details">
+                                                    View
+                                                </button>
+
+                                                <!-- ✅ VIEW POLICY BUTTON (Replaces Admin Assign Agent) -->
+                                                <button class="btn btn-outline-primary policy-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#viewPolicyModal"
+                                                        data-policyid="@app.PolicyId"
+                                                        title="View Policy Details">
+                                                    Policy
+                                                </button>
+
+                                                <!-- ✅ TRACK STATUS BUTTON (Replaces Admin Approve/Reject) -->
+                                                <button class="btn btn-outline-warning track-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#trackStatusModal"
+                                                        data-appid="@app.ApplicationId"
+                                                        title="Track Application Status">
+                                                    Track
+                                                </button>
+
+                                                <!-- ✅ DOWNLOAD DOCUMENTS (If Available) -->
+                                                @if (app.Documents.Any())
+                                                {
+                                                    <button class="btn btn-outline-success documents-btn"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#documentsModal"
+                                                            data-appid="@app.ApplicationId"
+                                                            title="View Documents">
+                                                        <i class="bi bi-paperclip"></i>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination (EXACT SAME AS ADMIN) -->
+                    <div class="d-flex justify-content-between align-items-center px-4 py-3 border-top">
+                        <small class="text-muted">Total Applications: @Model.Applications.Count</small>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== VIEW APPLICATION DETAILS MODAL (Same Structure as Admin View Modal) ==================== -->
+<div class="modal fade" id="viewApplicationModal" tabindex="-1" aria-labelledby="viewApplicationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bx bx-file text-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0" id="viewApplicationModalLabel">Application Details</h5>
+                        <small class="text-muted" id="viewApplicationIdDisplay">#APP-XXXX</small>
+                    </div>
+                </div>
+                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body - Card Style -->
+            <div class="modal-body pt-3">
+                <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+                        <!-- Policy Name -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-shield me-1"></i>Policy Name</label>
+                            <p class="form-control-plaintext fw-semibold mb-0" id="viewPolicyName">-</p>
+                        </div>
+                        <!-- Insurance Type -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-category me-1"></i>Insurance Type</label>
+                            <p class="form-control-plaintext mb-0" id="viewInsuranceType">-</p>
+                        </div>
+                        <!-- Premium & Coverage -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-dollar me-1"></i>Premium Amount</label>
+                                <p class="form-control-plaintext fw-semibold mb-0" id="viewPremiumAmount">-</p>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-wallet me-1"></i>Coverage Amount</label>
+                                <p class="form-control-plaintext fw-semibold mb-0" id="viewCoverageAmount">-</p>
+                            </div>
+                        </div>
+                        <!-- Duration -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-time me-1"></i>Duration</label>
+                            <p class="form-control-plaintext mb-0" id="viewDuration">-</p>
+                        </div>
+                        <!-- Apply Date & Status -->
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-calendar me-1"></i>Apply Date</label>
+                                <p class="form-control-plaintext mb-0" id="viewApplyDate">-</p>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-badge-check me-1"></i>Status</label>
+                                <span id="viewStatusBadge" class="badge rounded-pill">-</span>
+                            </div>
+                        </div>
+                        <!-- Remarks -->
+                        <div class="mb-3 mt-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-note me-1"></i>Remarks</label>
+                            <p class="form-control-plaintext mb-0" id="viewRemarks">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    Close
+                </button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" id="viewTrackStatusBtn">
+                    Track Status
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== VIEW POLICY DETAILS MODAL (Same Structure as Admin View Modal) ==================== -->
+<div class="modal fade" id="viewPolicyModal" tabindex="-1" aria-labelledby="viewPolicyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bx bx-shield-quarter text-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0" id="viewPolicyModalLabel">Policy Details</h5>
+                        <small class="text-muted" id="viewPolicyIdDisplay">#POL-XXXX</small>
+                    </div>
+                </div>
+                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body - Card Style -->
+            <div class="modal-body pt-3">
+                <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+                        <!-- Policy Name -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-tag me-1"></i>Policy Name</label>
+                            <p class="form-control-plaintext fw-semibold mb-0" id="policyViewName">-</p>
+                        </div>
+                        <!-- Insurance Type -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-category me-1"></i>Insurance Type</label>
+                            <p class="form-control-plaintext mb-0" id="policyViewInsuranceType">-</p>
+                        </div>
+                        <!-- Premium & Coverage -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-dollar me-1"></i>Premium Amount</label>
+                                <p class="form-control-plaintext fw-semibold mb-0" id="policyViewPremium">-</p>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-wallet me-1"></i>Coverage Amount</label>
+                                <p class="form-control-plaintext fw-semibold mb-0" id="policyViewCoverage">-</p>
+                            </div>
+                        </div>
+                        <!-- Duration -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-time me-1"></i>Duration</label>
+                            <p class="form-control-plaintext mb-0" id="policyViewDuration">-</p>
+                        </div>
+                        <!-- Terms -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-file me-1"></i>Terms & Conditions</label>
+                            <p class="form-control-plaintext mb-0" id="policyViewTerms" style="white-space: pre-wrap; max-height: 120px; overflow-y: auto;">-</p>
+                        </div>
+                        <!-- Status & Created Date -->
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-badge-check me-1"></i>Status</label>
+                                <span id="policyViewStatusBadge" class="badge rounded-pill">-</span>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-calendar me-1"></i>Created Date</label>
+                                <p class="form-control-plaintext fw-medium mb-0" id="policyViewCreatedAt">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TRACK STATUS TIMELINE MODAL (Same Structure as Admin Edit Modal) ==================== -->
+<div class="modal fade" id="trackStatusModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Application Timeline</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+                        <!-- Timeline Header -->
+                        <div class="mb-4 text-center">
+                            <h6 class="fw-semibold mb-1" id="timelinePolicyName">-</h6>
+                            <span id="timelineCurrentStatus" class="badge rounded-pill">-</span>
+                        </div>
+
+                        <!-- Timeline Items -->
+                        <div class="timeline" id="timelineContainer">
+                            <!-- Dynamic timeline items will be inserted here by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== DOCUMENTS VIEWER MODAL (Same Structure as Admin Add Modal) ==================== -->
+<div class="modal fade" id="documentsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Application Documents</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <div class="list-group list-group-flush" id="documentsList">
+                    <!-- Dynamic document items will be inserted here by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CSS STYLES (EXACT SAME AS ADMIN) ==================== -->
+<style>
+    /* Delete Modal Animation - KEPT FOR CONSISTENCY */
+    .delete-modal {
+        border-radius: 22px;
+        border: none;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+        background: #ffffff;
+        overflow: visible;
+        animation: popIn 0.3s ease;
+    }
+
+    .delete-icon-wrapper {
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+
+    .delete-icon {
+        width: 85px;
+        height: 85px;
+        background: #fff5f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 6px solid white;
+    }
+
+        .delete-icon i {
+            font-size: 34px;
+            color: #ff3b3b;
+        }
+
+    @@keyframes popIn {
+        from {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* View Modal Enhancements */
+    #viewApplicationModal .form-control-plaintext,
+    #viewPolicyModal .form-control-plaintext {
+        font-size: 1.05rem;
+        padding: 0.25rem 0;
+        border-bottom: 1px dashed #dee2e6;
+        border-radius: 0;
+    }
+
+        #viewApplicationModal .form-control-plaintext:hover,
+        #viewPolicyModal .form-control-plaintext:hover {
+            border-bottom-color: #0d6efd;
+            transition: border-color 0.2s ease;
+        }
+
+    #viewApplicationModal .card,
+    #viewPolicyModal .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        #viewApplicationModal .card:hover,
+        #viewPolicyModal .card:hover {
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+    /* Timeline Styles */
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+        margin: 0;
+    }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 10px;
+            bottom: 10px;
+            width: 2px;
+            background: #dee2e6;
+        }
+
+    .timeline-item {
+        position: relative;
+        padding-bottom: 20px;
+    }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #0d6efd;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 2px #0d6efd;
+        }
+
+        .timeline-item.approved::before {
+            background: #198754;
+            box-shadow: 0 0 0 2px #198754;
+        }
+
+        .timeline-item.rejected::before {
+            background: #dc3545;
+            box-shadow: 0 0 0 2px #dc3545;
+        }
+
+    .timeline-date {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 4px;
+    }
+
+    .timeline-event {
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 2px;
+    }
+
+    .timeline-desc {
+        font-size: 0.9rem;
+        color: #495057;
+    }
+
+    /* Documents List Styles */
+    #documentsList .list-group-item {
+        border: none;
+        padding: 0.75rem 0;
+        border-bottom: 1px dashed #dee2e6;
+    }
+
+        #documentsList .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+    @@media (max-width: 576px) {
+        #viewApplicationModal .modal-body .card-body,
+        #viewPolicyModal .modal-body .card-body {
+            padding: 1.25rem !important;
+        }
+
+        #viewApplicationModal .form-control-plaintext,
+        #viewPolicyModal .form-control-plaintext {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<!-- ==================== JAVASCRIPT (SAME BEHAVIOR AS ADMIN, CUSTOMER LOGIC) ==================== -->
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ==================== SEARCH FUNCTIONALITY (EXACT SAME AS ADMIN) ====================
+            const searchAppId = document.getElementById('searchAppId');
+            const searchName = document.getElementById('searchName');
+
+            function filterTable() {
+                const appIdVal = searchAppId.value.toLowerCase();
+                const nameVal = searchName.value.toLowerCase();
+
+                document.querySelectorAll("#applicationsTable tbody tr").forEach(row => {
+                    const appId = row.cells[0]?.textContent.toLowerCase() || '';
+                    const policyName = row.cells[1]?.textContent.toLowerCase() || '';
+                    const insuranceType = row.cells[2]?.textContent.toLowerCase() || '';
+
+                    const matches = (appId.includes(appIdVal)) &&
+                                   (policyName.includes(nameVal) || insuranceType.includes(nameVal));
+
+                    row.style.display = matches ? "" : "none";
+                });
+            }
+
+            searchAppId.addEventListener("input", filterTable);
+            searchName.addEventListener("input", filterTable);
+
+
+            // ==================== PAGINATION (EXACT SAME AS ADMIN) ====================
+            const rowsPerPage = 10;
+            const tableRows = document.querySelectorAll("#applicationsTable tbody tr");
+            const pagination = document.getElementById("pagination");
+            let currentPage = 1;
+
+            function displayTablePage(page) {
+                currentPage = page;
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+
+                tableRows.forEach((row, index) => {
+                    // Respect search/filter visibility
+                    if (row.style.display === "none") {
+                        row.dataset.hiddenByFilter = "true";
+                    } else {
+                        row.dataset.hiddenByFilter = "false";
+                    }
+
+                    const isVisible = row.dataset.hiddenByFilter !== "true";
+                    const isInPage = index >= start && index < end;
+                    row.style.display = (isVisible && isInPage) ? "" : "none";
+                });
+                updatePaginationButtons();
+            }
+
+            function updatePaginationButtons() {
+                const visibleRows = Array.from(tableRows).filter(row => row.dataset.hiddenByFilter !== "true");
+                const pageCount = Math.ceil(visibleRows.length / rowsPerPage) || 1;
+
+                if (currentPage > pageCount) currentPage = 1;
+                pagination.innerHTML = "";
+
+                // Prev Button
+                const prevLi = document.createElement("li");
+                prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+                prevLi.innerHTML = `<a class="page-link rounded-start-pill" href="#">Prev</a>`;
+                prevLi.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (currentPage > 1) displayTablePage(currentPage - 1);
+                });
+                pagination.appendChild(prevLi);
+
+                // Page Numbers
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(pageCount, startPage + 4);
+                if (endPage - startPage < 4 && pageCount > 5) startPage = Math.max(1, endPage - 4);
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const li = document.createElement("li");
+                    li.className = `page-item ${currentPage === i ? "active" : ""}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        displayTablePage(i);
+                    });
+                    pagination.appendChild(li);
+                }
+
+                // Next Button
+                const nextLi = document.createElement("li");
+                nextLi.className = `page-item ${currentPage === pageCount ? "disabled" : ""}`;
+                nextLi.innerHTML = `<a class="page-link rounded-end-pill" href="#">Next</a>`;
+                nextLi.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (currentPage < pageCount) displayTablePage(currentPage + 1);
+                });
+                pagination.appendChild(nextLi);
+            }
+
+            displayTablePage(1);
+
+            // Re-apply pagination after filter changes
+            const originalFilterTable = filterTable;
+            filterTable = function() {
+                originalFilterTable();
+                currentPage = 1;
+                displayTablePage(1);
+            };
+
+
+            // ==================== STATUS FILTER (EXACT SAME AS ADMIN) ====================
+            document.querySelectorAll("[data-filter]").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
+                    this.classList.add("active");
+
+                    const filter = this.getAttribute('data-filter');
+                    const rows = document.querySelectorAll("#applicationsTable tbody tr");
+
+                    rows.forEach(row => {
+                        const rowStatus = row.getAttribute('data-status');
+                        let showRow = (filter === 'all') || (filter === rowStatus);
+
+                        // Also respect search filters
+                        const appIdVal = searchAppId.value.toLowerCase();
+                        const nameVal = searchName.value.toLowerCase();
+                        const appId = row.cells[0]?.textContent.toLowerCase() || '';
+                        const policyName = row.cells[1]?.textContent.toLowerCase() || '';
+                        const insuranceType = row.cells[2]?.textContent.toLowerCase() || '';
+                        const nameMatch = policyName.includes(nameVal) || insuranceType.includes(nameVal);
+                        const appIdMatch = appId.includes(appIdVal);
+
+                        if (showRow && nameMatch && appIdMatch) {
+                            row.style.display = '';
+                            row.dataset.hiddenByFilter = 'false';
+                        } else {
+                            row.style.display = 'none';
+                            row.dataset.hiddenByFilter = 'true';
+                        }
+                    });
+
+                    currentPage = 1;
+                    displayTablePage(1);
+                });
+            });
+
+
+            // ==================== VIEW MODAL - Populate Application Data ====================
+            const viewModal = document.getElementById('viewApplicationModal');
+            viewModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+
+                // Populate fields from data attributes
+                document.getElementById('viewApplicationIdDisplay').textContent = `#APP-${button.getAttribute('data-appid')}`;
+                document.getElementById('viewPolicyName').textContent = button.getAttribute('data-policyname') || '-';
+                document.getElementById('viewInsuranceType').textContent = button.getAttribute('data-insurancetype') || '-';
+                document.getElementById('viewPremiumAmount').textContent = `$${button.getAttribute('data-premium')}`;
+                document.getElementById('viewCoverageAmount').textContent = `$${button.getAttribute('data-coverage')}`;
+                document.getElementById('viewDuration').textContent = button.getAttribute('data-duration');
+                document.getElementById('viewApplyDate').textContent = button.getAttribute('data-applydate') || '-';
+                document.getElementById('viewRemarks').textContent = button.getAttribute('data-remarks') || '-';
+
+                // Status Badge
+                const status = button.getAttribute('data-status')?.toLowerCase();
+                const statusBadge = document.getElementById('viewStatusBadge');
+                if (status === 'approved') {
+                    statusBadge.className = 'badge bg-success-subtle text-success rounded-pill';
+                    statusBadge.textContent = 'Approved';
+                } else if (status === 'rejected') {
+                    statusBadge.className = 'badge bg-danger-subtle text-danger rounded-pill';
+                    statusBadge.textContent = 'Rejected';
+                } else {
+                    statusBadge.className = 'badge bg-warning-subtle text-warning rounded-pill';
+                    statusBadge.textContent = 'Pending';
+                }
+
+                // Track button in view modal -> open track modal
+                document.getElementById('viewTrackStatusBtn').onclick = function() {
+                    const modalInstance = bootstrap.Modal.getInstance(viewModal);
+                    modalInstance.hide();
+                    setTimeout(() => {
+                        const fakeTrackBtn = document.createElement('button');
+                        fakeTrackBtn.setAttribute('data-bs-toggle', 'modal');
+                        fakeTrackBtn.setAttribute('data-bs-target', '#trackStatusModal');
+                        fakeTrackBtn.setAttribute('data-appid', button.getAttribute('data-appid'));
+                        document.body.appendChild(fakeTrackBtn);
+                        fakeTrackBtn.click();
+                        fakeTrackBtn.remove();
+                    }, 150);
+                };
+            });
+
+
+            // ==================== POLICY MODAL - Fetch & Populate Policy Details ====================
+            const policyModal = document.getElementById('viewPolicyModal');
+            policyModal.addEventListener('show.bs.modal', async function (event) {
+                const button = event.relatedTarget;
+                const policyId = button.getAttribute('data-policyid');
+
+                // Show loading state
+                document.getElementById('policyViewName').textContent = 'Loading...';
+
+                try {
+                    const response = await fetch(`/Customer/GetPolicyDetails?policyId=${policyId}`);
+                    const data = await response.json();
+
+                    if (data.error) throw new Error(data.error);
+
+                    // Populate fields
+                    document.getElementById('viewPolicyIdDisplay').textContent = `#POL-${data.policyId}`;
+                    document.getElementById('policyViewName').textContent = data.policyName || '-';
+                    document.getElementById('policyViewInsuranceType').textContent = data.insuranceTypeName || '-';
+                    document.getElementById('policyViewPremium').textContent = data.premiumAmount ? `$${parseFloat(data.premiumAmount).toFixed(2)}` : '-';
+                    document.getElementById('policyViewCoverage').textContent = data.coverageAmount ? `$${parseFloat(data.coverageAmount).toFixed(2)}` : '-';
+                    document.getElementById('policyViewDuration').textContent = data.duration ? `${data.duration} Months` : '-';
+                    document.getElementById('policyViewTerms').textContent = data.terms || 'No terms specified';
+                    document.getElementById('policyViewCreatedAt').textContent = data.createdAt ? new Date(data.createdAt).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}) : '-';
+
+                    // Status Badge
+                    const statusBadge = document.getElementById('policyViewStatusBadge');
+                    if (data.status) {
+                        statusBadge.className = 'badge bg-success-subtle text-success rounded-pill';
+                        statusBadge.textContent = 'Active';
+                    } else {
+                        statusBadge.className = 'badge bg-danger-subtle text-danger rounded-pill';
+                        statusBadge.textContent = 'Inactive';
+                    }
+                } catch (error) {
+                    console.error('Policy fetch error:', error);
+                    document.getElementById('policyViewName').textContent = 'Error loading policy';
+                }
+            });
+
+
+            // ==================== TRACK STATUS MODAL - Fetch & Build Timeline ====================
+            const trackModal = document.getElementById('trackStatusModal');
+            trackModal.addEventListener('show.bs.modal', async function (event) {
+                const button = event.relatedTarget;
+                const applicationId = button.getAttribute('data-appid');
+                const timelineContainer = document.getElementById('timelineContainer');
+
+                // Show loading
+                timelineContainer.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Loading timeline...</div>';
+
+                try {
+                    const response = await fetch(`/Customer/GetApplicationTimeline?applicationId=${applicationId}`);
+                    const data = await response.json();
+
+                    if (data.error) throw new Error(data.error);
+
+                    // Update header
+                    document.getElementById('timelinePolicyName').textContent = data.policyName;
+                    const statusBadge = document.getElementById('timelineCurrentStatus');
+                    statusBadge.textContent = data.currentStatus;
+                    statusBadge.className = `badge rounded-pill ${
+                        data.currentStatus.toLowerCase() === 'approved' ? 'bg-success-subtle text-success' :
+                        data.currentStatus.toLowerCase() === 'rejected' ? 'bg-danger-subtle text-danger' :
+                        'bg-warning-subtle text-warning'
+                    }`;
+
+                    // Build timeline items
+                    timelineContainer.innerHTML = '';
+                    data.timeline.forEach(item => {
+                        const itemClass = item.Status.toLowerCase();
+                        timelineContainer.innerHTML += `
+                            <div class="timeline-item ${itemClass}">
+                                <div class="timeline-date">${item.Date}</div>
+                                <div class="timeline-event">${item.Event}</div>
+                                <div class="timeline-desc">${item.Description}</div>
+                            </div>
+                        `;
+                    });
+                } catch (error) {
+                    console.error('Timeline fetch error:', error);
+                    timelineContainer.innerHTML = '<div class="alert alert-danger small">Failed to load timeline</div>';
+                }
+            });
+
+
+            // ==================== DOCUMENTS MODAL - Populate Document List ====================
+            const documentsModal = document.getElementById('documentsModal');
+            documentsModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const applicationId = button.getAttribute('data-appid');
+                const documentsList = document.getElementById('documentsList');
+
+                // For now, show placeholder - implement actual document fetching from DB
+                documentsList.innerHTML = `
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
+                            <strong>Policy_Terms.pdf</strong>
+                            <br><small class="text-muted">Uploaded: 15-Jan-2024</small>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-outline-primary rounded-pill">Download</a>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-file-earmark-image text-primary me-2"></i>
+                            <strong>ID_Proof.jpg</strong>
+                            <br><small class="text-muted">Uploaded: 15-Jan-2024</small>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-outline-primary rounded-pill">Download</a>
+                    </div>
+                `;
+            });
+
+
+            // ==================== EXPORT FUNCTIONS (EXACT SAME AS ADMIN) ====================
+            window.exportTable = function(format, tableId, filename) {
+                const table = document.getElementById(tableId);
+                if (!table) return;
+
+                if (format === 'excel') {
+                    let csv = [];
+                    const rows = table.querySelectorAll("tr");
+                    for (let row of rows) {
+                        let cols = row.querySelectorAll("td, th");
+                        let data = [];
+                        for (let col of cols) {
+                            let text = col.innerText.replace(/"/g, '""');
+                            data.push('"' + text + '"');
+                        }
+                        csv.push(data.join(","));
+                    }
+                    const csvFile = new Blob([csv.join("\n")], {type: "text/csv"});
+                    const downloadLink = document.createElement("a");
+                    downloadLink.href = URL.createObjectURL(csvFile);
+                    downloadLink.download = `${filename}_${new Date().toISOString().slice(0,10)}.csv`;
+                    downloadLink.click();
+                }
+            };
+
+
+            // ==================== UTILITY: Show Alert ====================
+            function showAlert(type, message) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow-sm`;
+                alertDiv.style.zIndex = '9999';
+                alertDiv.role = 'alert';
+                alertDiv.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+                document.body.appendChild(alertDiv);
+                setTimeout(() => { if (alertDiv.parentNode) alertDiv.remove(); }, 5000);
+            }
+
+        });
+    </script>
+}

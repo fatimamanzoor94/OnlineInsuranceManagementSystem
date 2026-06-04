@@ -1,0 +1,720 @@
+@model List<OnlineInsuranceManagementSystem.ViewModels.ClaimViewModel>
+@{
+    ViewData["Title"] = "Claims Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    // Populate dropdowns from ViewBag
+    var customers = ViewBag.Customers as List<OnlineInsuranceManagementSystem.Models.User> ?? new();
+    var policies = ViewBag.Policies as List<OnlineInsuranceManagementSystem.Models.Policy> ?? new();
+}
+
+<div class="card border-0 w-100 mb-3" style="border-radius: 30px; background-color: #f5f8fd;">
+    <div class="p-3 main-card">
+        <div class="container-fluid card-scroll-content px-3">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-3 flex-wrap gap-2">
+                <h4 class="mb-0">Claims Management</h4>
+                <button class="btn btn-primary btn-sm d-flex align-items-center gap-1 rounded-pill px-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addClaimModal">
+                    <i class="bx bx-plus"></i> Add Claim
+                </button>
+            </div>
+
+            <!-- TOP SUMMARY CARDS (Same design as Customers page) -->
+            <div class="row g-3 mb-4">
+                <!-- Total Claims -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-clipboard2-check text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Total Claims</h6>
+                                <small class="text-muted" id="totalClaims">@ViewBag.TotalClaims</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pending Claims -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-hourglass-split text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Pending Claims</h6>
+                                <small class="text-muted" id="pendingClaims">@ViewBag.PendingClaims</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Approved Claims -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-check-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Approved Claims</h6>
+                                <small class="text-muted" id="approvedClaims">@ViewBag.ApprovedClaims</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Rejected Claims -->
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card custom-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="icon-box">
+                                    <i class="bi bi-x-circle text-dark"></i>
+                                </div>
+                                <h6 class="card-title mt-3 mb-1">Rejected Claims</h6>
+                                <small class="text-muted" id="rejectedClaims">@ViewBag.RejectedClaims</small>
+                            </div>
+                            <i class="bx bx-trending-up trend-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter (Same design as Customers page) -->
+            <div class="card custom-card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-3">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Claim ID</label>
+                            <input type="text" id="searchClaimId"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter claim ID..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Search by Customer/Policy</label>
+                            <input type="text" id="searchName"
+                                   class="form-control form-control-sm rounded-pill px-3"
+                                   placeholder="Enter customer or policy name..." />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small text-muted mb-1">Filter Status</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill active" data-filter="all">All</button>
+                                <button class="btn btn-sm btn-outline-warning rounded-pill" data-filter="pending">Pending</button>
+                                <button class="btn btn-sm btn-outline-success rounded-pill" data-filter="approved">Approved</button>
+                                <button class="btn btn-sm btn-outline-danger rounded-pill" data-filter="rejected">Rejected</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table (Same design as Customers page) -->
+            <div class="card custom-card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-0 pb-2 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h4 class="mb-1 fw-semibold">All Claims</h4>
+                            <small class="text-muted">Manage insurance claims submitted by users</small>
+                        </div>
+                        <!-- Export Buttons (Same function as Customers page) -->
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                    onclick="exportTable('excel', 'claimsTable', 'Claims')">
+                                <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                    onclick="exportTable('pdf', 'claimsTable', 'Claims')">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body px-4">
+                    <div class="table-responsive p-3">
+                        <table class="table align-middle mb-0" id="claimsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Claim ID</th>
+                                    <th>Customer Name</th>
+                                    <th>Policy Name</th>
+                                    <th>Claim Amount</th>
+                                    <th>Claim Date</th>
+                                    <th>Status</th>
+                                    <th>Reason</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var claim in Model)
+                                {
+                                    <tr data-status="@claim.Status.ToLower()">
+                                        <td>@claim.ClaimIdDisplay</td>
+                                        <td>@claim.UserName</td>
+                                        <td>@claim.PolicyName</td>
+                                        <td class="fw-semibold text-primary">@claim.ClaimAmountDisplay</td>
+                                        <td>@claim.ClaimDateDisplay</td>
+                                        <td>
+                                            <span class="badge @claim.StatusBadgeClass">@claim.StatusText</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small">@(string.IsNullOrEmpty(claim.Reason) ? "-" : claim.Reason)</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm d-flex gap-2">
+                                                <!-- VIEW BUTTON -->
+                                                <button class="btn btn-outline-info view-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#viewClaimModal"
+                                                        data-claimid="@claim.ClaimId"
+                                                        data-username="@claim.UserName"
+                                                        data-policyname="@claim.PolicyName"
+                                                        data-claimamount="@claim.ClaimAmount.ToString("F2")"
+                                                        data-claimdate="@claim.ClaimDateDisplay"
+                                                        data-status="@claim.Status"
+                                                        data-reason="@(claim.Reason ?? "-")"
+                                                        title="View Details">
+                                                    View
+                                                </button>
+
+                                                <!-- EDIT BUTTON -->
+                                                <button class="btn btn-outline-warning edit-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editClaimModal"
+                                                        data-claimid="@claim.ClaimId"
+                                                        data-userid="@claim.UserId"
+                                                        data-policyid="@claim.PolicyId"
+                                                        data-claimamount="@claim.ClaimAmount.ToString("F2")"
+                                                        data-claimdate="@claim.ClaimDate.ToString("yyyy-MM-dd")"
+                                                        data-status="@claim.Status"
+                                                        data-reason="@(claim.Reason ?? "")"
+                                                        title="Edit">
+                                                    Edit
+                                                </button>
+
+                                                <!-- DELETE BUTTON -->
+                                                <button type="button"
+                                                        class="btn btn-outline-danger delete-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteClaimModal"
+                                                        data-claimid="@claim.ClaimId"
+                                                        data-claiminfo="@claim.UserName - @claim.PolicyName"
+                                                        title="Delete">
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination (Same as Customers page) -->
+                    <div class="d-flex justify-content-between align-items-center px-4 py-3 border-top">
+                        <small class="text-muted">Total Claims: @Model.Count</small>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== ADD CLAIM MODAL ==================== -->
+<div class="modal fade" id="addClaimModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Add New Claim</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form asp-action="CreateClaim" method="post">
+                    <!-- User Dropdown -->
+                    <select name="UserId" class="form-select mb-2 rounded-pill" required>
+                        <option value="">Select Customer</option>
+                        @foreach (var customer in customers.Where(c => c.Role == "Customer"))
+                        {
+                            <option value="@customer.UserId">@customer.FullName</option>
+                        }
+                    </select>
+
+                    <!-- Policy Dropdown -->
+                    <select name="PolicyId" class="form-select mb-2 rounded-pill" required>
+                        <option value="">Select Policy</option>
+                        @foreach (var policy in policies)
+                        {
+                            <option value="@policy.PolicyId">@policy.PolicyName</option>
+                        }
+                    </select>
+
+                    <!-- Claim Amount -->
+                    <input type="number" name="ClaimAmount" class="form-control mb-2 rounded-pill"
+                           placeholder="Enter claim amount" step="0.01" min="0" required />
+
+                    <!-- Claim Date -->
+                    <input type="date" name="ClaimDate" class="form-control mb-2 rounded-pill"
+                           value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+
+                    <!-- Status Dropdown -->
+                    <select name="Status" class="form-select mb-2 rounded-pill">
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+
+                    <!-- Reason Textarea -->
+                    <textarea name="Reason" class="form-control mb-2 rounded-3"
+                              placeholder="Enter claim reason (optional)" rows="3"></textarea>
+
+                    <div class="modal-footer border-0 pt-3">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">Save Claim</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== EDIT CLAIM MODAL ==================== -->
+<div class="modal fade" id="editClaimModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">Edit Claim</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form asp-action="UpdateClaim" method="post">
+                    <input type="hidden" id="editClaimId" name="ClaimId" />
+
+                    <!-- User Dropdown -->
+                    <select id="editUserId" name="UserId" class="form-select mb-2 rounded-pill" required>
+                        <option value="">Select Customer</option>
+                        @foreach (var customer in customers.Where(c => c.Role == "Customer"))
+                        {
+                            <option value="@customer.UserId">@customer.FullName</option>
+                        }
+                    </select>
+
+                    <!-- Policy Dropdown -->
+                    <select id="editPolicyId" name="PolicyId" class="form-select mb-2 rounded-pill" required>
+                        <option value="">Select Policy</option>
+                        @foreach (var policy in policies)
+                        {
+                            <option value="@policy.PolicyId">@policy.PolicyName</option>
+                        }
+                    </select>
+
+                    <!-- Claim Amount -->
+                    <input type="number" id="editClaimAmount" name="ClaimAmount" class="form-control mb-2 rounded-pill"
+                           placeholder="Enter claim amount" step="0.01" min="0" required />
+
+                    <!-- Claim Date -->
+                    <input type="date" id="editClaimDate" name="ClaimDate" class="form-control mb-2 rounded-pill" required />
+
+                    <!-- Status Dropdown -->
+                    <select id="editStatus" name="Status" class="form-select mb-2 rounded-pill">
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+
+                    <!-- Reason Textarea -->
+                    <textarea id="editReason" name="Reason" class="form-control mb-2 rounded-3"
+                              placeholder="Enter claim reason (optional)" rows="3"></textarea>
+
+                    <div class="modal-footer border-0 pt-3">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">Update Claim</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== DELETE CLAIM MODAL ==================== -->
+<div class="modal fade" id="deleteClaimModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content delete-modal position-relative">
+            <div class="delete-icon-wrapper">
+                <div class="icon-box delete-icon">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                
+            </div>
+            <div class="modal-body text-center pt-5 pb-4">
+                <h4 class="fw-bold">Delete Claim?</h4>
+                <p class="text-muted">
+                    You are about to delete <strong id="deleteClaimInfo"></strong><br />
+                    This action cannot be undone.
+                </p>
+                <form asp-action="DeleteClaim" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="deleteClaimId" name="id" />
+                    <div class="d-flex gap-2 justify-content-center mt-3">
+                        <button type="button" class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger px-4 rounded-pill">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== VIEW CLAIM DETAILS MODAL ==================== -->
+<div class="modal fade" id="viewClaimModal" tabindex="-1" aria-labelledby="viewClaimModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-sm rounded-4">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bx bx-clipboard text-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0" id="viewClaimModalLabel">Claim Details</h5>
+                        <small class="text-muted" id="viewClaimIdDisplay">#CLM-XXXX</small>
+                    </div>
+                </div>
+                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body - Card Style -->
+            <div class="modal-body pt-3">
+                <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+                        <!-- Customer Name -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-user me-1"></i>Customer Name</label>
+                            <p class="form-control-plaintext fw-semibold mb-0" id="viewUserName">-</p>
+                        </div>
+                        <!-- Policy Name -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-shield me-1"></i>Policy Name</label>
+                            <p class="form-control-plaintext mb-0" id="viewPolicyName">-</p>
+                        </div>
+                        <!-- Claim Amount -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-dollar me-1"></i>Claim Amount</label>
+                            <p class="form-control-plaintext fw-semibold text-primary mb-0" id="viewClaimAmount">-</p>
+                        </div>
+                        <!-- Claim Date -->
+                        <div class="mb-3">
+                            <label class="form-label small text-muted mb-1"><i class="bx bx-calendar me-1"></i>Claim Date</label>
+                            <p class="form-control-plaintext mb-0" id="viewClaimDate">-</p>
+                        </div>
+                        <!-- Status & Reason -->
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-badge-check me-1"></i>Status</label>
+                                <span id="viewStatusBadge" class="badge rounded-pill">-</span>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1"><i class="bx bx-note me-1"></i>Reason</label>
+                                <p class="form-control-plaintext mb-0" id="viewReason">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    Close
+                </button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CSS STYLES (Same as Customers page) ==================== -->
+<style>
+    .delete-modal {
+        border-radius: 22px;
+        border: none;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+        background: #ffffff;
+        overflow: visible;
+        animation: popIn 0.3s ease;
+    }
+
+    .delete-icon-wrapper {
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+
+    .delete-icon {
+        width: 85px;
+        height: 85px;
+        background: #fff5f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 6px solid white;
+    }
+
+    .delete-icon i {
+            font-size: 34px;
+            color: #ff3b3b;
+        }
+
+    @@keyframes popIn {
+        from {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* View Modal Enhancements */
+    #viewClaimModal .form-control-plaintext {
+        font-size: 1.05rem;
+        padding: 0.25rem 0;
+        border-bottom: 1px dashed #dee2e6;
+        border-radius: 0;
+    }
+
+        #viewClaimModal .form-control-plaintext:hover {
+            border-bottom-color: #0d6efd;
+            transition: border-color 0.2s ease;
+        }
+
+    #viewClaimModal .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        #viewClaimModal .card:hover {
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+    @@media (max-width: 576px) {
+        #viewClaimModal .modal-body .card-body {
+            padding: 1.25rem !important;
+        }
+
+        #viewClaimModal .form-control-plaintext {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<!-- ==================== JAVASCRIPT (Same behavior as Customers page) ==================== -->
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ==================== SEARCH FUNCTIONALITY ====================
+            const searchClaimId = document.getElementById('searchClaimId');
+            const searchName = document.getElementById('searchName');
+
+            function filterTable() {
+                const claimIdVal = searchClaimId.value.toLowerCase();
+                const nameVal = searchName.value.toLowerCase();
+
+                document.querySelectorAll("#claimsTable tbody tr").forEach(row => {
+                    const claimId = row.cells[0]?.textContent.toLowerCase() || '';
+                    const customerName = row.cells[1]?.textContent.toLowerCase() || '';
+                    const policyName = row.cells[2]?.textContent.toLowerCase() || '';
+
+                    const matches = (claimId.includes(claimIdVal)) &&
+                                   (customerName.includes(nameVal) || policyName.includes(nameVal));
+
+                    row.style.display = matches ? "" : "none";
+                });
+            }
+
+            searchClaimId.addEventListener("input", filterTable);
+            searchName.addEventListener("input", filterTable);
+
+
+            // ==================== PAGINATION ====================
+            const rowsPerPage = 10;
+            const tableRows = document.querySelectorAll("#claimsTable tbody tr");
+            const pagination = document.getElementById("pagination");
+            let currentPage = 1;
+
+            function displayTablePage(page) {
+                currentPage = page;
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+
+                tableRows.forEach((row, index) => {
+                    row.style.display = (index >= start && index < end) ? "" : "none";
+                });
+                updatePaginationButtons();
+            }
+
+            function updatePaginationButtons() {
+                pagination.innerHTML = "";
+                const pageCount = Math.ceil(tableRows.length / rowsPerPage);
+
+                // Prev Button
+                const prevLi = document.createElement("li");
+                prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+                prevLi.innerHTML = `<a class="page-link rounded-start-pill" href="#">Prev</a>`;
+                prevLi.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (currentPage > 1) displayTablePage(currentPage - 1);
+                });
+                pagination.appendChild(prevLi);
+
+                // Page Numbers
+                for (let i = 1; i <= pageCount; i++) {
+                    const li = document.createElement("li");
+                    li.className = `page-item ${currentPage === i ? "active" : ""}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        displayTablePage(i);
+                    });
+                    pagination.appendChild(li);
+                }
+
+                // Next Button
+                const nextLi = document.createElement("li");
+                nextLi.className = `page-item ${currentPage === pageCount ? "disabled" : ""}`;
+                nextLi.innerHTML = `<a class="page-link rounded-end-pill" href="#">Next</a>`;
+                nextLi.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (currentPage < pageCount) displayTablePage(currentPage + 1);
+                });
+                pagination.appendChild(nextLi);
+            }
+
+            displayTablePage(1);
+
+
+            // ==================== STATUS FILTER ====================
+            document.querySelectorAll("[data-filter]").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
+                    this.classList.add("active");
+
+                    const filter = this.getAttribute('data-filter');
+                    const rows = document.querySelectorAll("#claimsTable tbody tr");
+
+                    rows.forEach(row => {
+                        const rowStatus = row.getAttribute('data-status');
+
+                        if (filter === 'all') {
+                            row.style.display = '';
+                        } else if (filter === rowStatus) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+
+            // ==================== EDIT MODAL - Populate Data ====================
+            const editModal = document.getElementById('editClaimModal');
+            editModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+
+                document.getElementById('editClaimId').value = button.getAttribute('data-claimid');
+                document.getElementById('editUserId').value = button.getAttribute('data-userid');
+                document.getElementById('editPolicyId').value = button.getAttribute('data-policyid');
+                document.getElementById('editClaimAmount').value = button.getAttribute('data-claimamount');
+                document.getElementById('editClaimDate').value = button.getAttribute('data-claimdate');
+                document.getElementById('editStatus').value = button.getAttribute('data-status');
+                document.getElementById('editReason').value = button.getAttribute('data-reason');
+            });
+
+
+            // ==================== DELETE MODAL - Populate Data ====================
+            const deleteModal = document.getElementById('deleteClaimModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                document.getElementById('deleteClaimId').value = button.getAttribute('data-claimid');
+                document.getElementById('deleteClaimInfo').textContent = button.getAttribute('data-claiminfo');
+            });
+
+
+            // ==================== VIEW MODAL - Populate Data ====================
+            const viewModal = document.getElementById('viewClaimModal');
+
+            viewModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+
+                const claimId = button.getAttribute('data-claimid');
+                const userName = button.getAttribute('data-username');
+                const policyName = button.getAttribute('data-policyname');
+                const claimAmount = button.getAttribute('data-claimamount');
+                const claimDate = button.getAttribute('data-claimdate');
+                const status = button.getAttribute('data-status');
+                const reason = button.getAttribute('data-reason');
+
+                // Populate fields
+                document.getElementById('viewClaimIdDisplay').textContent = `#CLM-${claimId}`;
+                document.getElementById('viewUserName').textContent = userName || '-';
+                document.getElementById('viewPolicyName').textContent = policyName || '-';
+                document.getElementById('viewClaimAmount').textContent = `$${parseFloat(claimAmount).toFixed(2)}`;
+                document.getElementById('viewClaimDate').textContent = claimDate || '-';
+                document.getElementById('viewReason').textContent = reason || '-';
+
+                // Status Badge
+                const statusBadge = document.getElementById('viewStatusBadge');
+                const statusLower = status?.toLowerCase();
+
+                if (statusLower === 'approved') {
+                    statusBadge.className = 'badge bg-success-subtle text-success rounded-pill';
+                    statusBadge.textContent = 'Approved';
+                } else if (statusLower === 'rejected') {
+                    statusBadge.className = 'badge bg-danger-subtle text-danger rounded-pill';
+                    statusBadge.textContent = 'Rejected';
+                } else {
+                    statusBadge.className = 'badge bg-warning-subtle text-warning rounded-pill';
+                    statusBadge.textContent = 'Pending';
+                }
+
+                // Edit button in view modal -> open edit modal
+                document.getElementById('viewEditClaimBtn').onclick = function() {
+                    const modalInstance = bootstrap.Modal.getInstance(viewModal);
+                    modalInstance.hide();
+
+                    setTimeout(() => {
+                        const fakeEditBtn = document.createElement('button');
+                        fakeEditBtn.setAttribute('data-bs-toggle', 'modal');
+                        fakeEditBtn.setAttribute('data-bs-target', '#editClaimModal');
+                        fakeEditBtn.setAttribute('data-claimid', claimId);
+                        fakeEditBtn.setAttribute('data-userid', button.getAttribute('data-userid'));
+                        fakeEditBtn.setAttribute('data-policyid', button.getAttribute('data-policyid'));
+                        fakeEditBtn.setAttribute('data-claimamount', claimAmount);
+                        fakeEditBtn.setAttribute('data-claimdate', claimDate);
+                        fakeEditBtn.setAttribute('data-status', status);
+                        fakeEditBtn.setAttribute('data-reason', reason);
+                        document.body.appendChild(fakeEditBtn);
+                        fakeEditBtn.click();
+                        fakeEditBtn.remove();
+                    }, 150);
+                };
+            });
+
+        });
+    </script>
+}
